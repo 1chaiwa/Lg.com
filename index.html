@@ -674,7 +674,6 @@
             margin-top: 2px;
         }
 
-        /* Order Cards for Delivery Girl */
         .order-card {
             background: white;
             border-radius: 12px;
@@ -825,6 +824,22 @@
 
 <script>
     // ============================================
+    // SIMPLE MOCK DATA (FALLBACK IF SUPABASE FAILS)
+    // ============================================
+    const MOCK_MENU = [
+        { id: 1, name: 'Grilled Chicken', price: 12.99, emoji: '🍗' },
+        { id: 2, name: 'Jollof Rice', price: 9.49, emoji: '🍛' },
+        { id: 3, name: 'Beef Burger', price: 11.99, emoji: '🍔' },
+        { id: 4, name: 'Fruit Salad', price: 7.25, emoji: '🥗' },
+        { id: 5, name: 'Mango Smoothie', price: 5.50, emoji: '🥭' },
+        { id: 6, name: 'Pizza Margherita', price: 14.99, emoji: '🍕' },
+        { id: 7, name: 'Chocolate Cake', price: 6.99, emoji: '🍰' },
+        { id: 8, name: 'Fresh Juice', price: 4.50, emoji: '🧃' }
+    ];
+
+    const MOCK_GIRLS = ['Alice Johnson', 'Brenda Smith', 'Cathy Williams'];
+
+    // ============================================
     // SUPABASE CONFIGURATION
     // ============================================
     const SUPABASE_URL = 'https://ndwoqlxtaczwxsescemu.supabase.co';
@@ -834,6 +849,7 @@
 
     let isAdmin = false;
     let supabaseClient = null;
+    let useSupabase = false;
     let dashboardData = null;
     let map = null;
     let mapMarker = null;
@@ -1000,7 +1016,8 @@
             document.getElementById('adminBadge').classList.add('show');
             document.getElementById('adminToggleBtn').innerHTML = '<i class="fas fa-sign-out-alt"></i>';
             document.querySelector('.admin-panel')?.classList.add('show');
-            alert('✅ Welcome Admin! Loading dashboard...');
+            alert('✅ Welcome Admin!');
+            renderCustomerView();
             loadDashboard();
         } else {
             document.getElementById('loginError').classList.add('show');
@@ -1032,7 +1049,10 @@
     // DASHBOARD FUNCTIONS
     // ============================================
     async function loadDashboard() {
-        if (!supabaseClient) return;
+        if (!supabaseClient || !useSupabase) {
+            updateStatus('📊 Using mock data for dashboard');
+            return;
+        }
         
         try {
             updateStatus('📊 Loading admin dashboard...');
@@ -1049,39 +1069,17 @@
             
             if (ordersError) throw ordersError;
             
-            const { data: deliveries, error: deliveriesError } = await supabaseClient
-                .from('delivery_records')
-                .select('*')
-                .gte('created_at', weekAgoStr);
-            
-            if (deliveriesError) throw deliveriesError;
-            
             const totalOrders = orders?.length || 0;
             const totalRevenue = orders?.reduce((sum, o) => sum + (o.total || 0), 0) || 0;
             const completedOrders = orders?.filter(o => o.status === 'delivered').length || 0;
             const pendingOrders = orders?.filter(o => o.status === 'pending' || o.status === 'preparing').length || 0;
-            
-            const girlStats = {};
-            deliveries?.forEach(d => {
-                const name = d.delivery_girl_name || 'Unknown';
-                if (!girlStats[name]) {
-                    girlStats[name] = { deliveries: 0, revenue: 0 };
-                }
-                girlStats[name].deliveries += 1;
-                const order = orders?.find(o => o.id === d.order_id);
-                if (order) {
-                    girlStats[name].revenue += order.total || 0;
-                }
-            });
             
             dashboardData = {
                 totalOrders,
                 totalRevenue,
                 completedOrders,
                 pendingOrders,
-                orders: orders || [],
-                deliveries: deliveries || [],
-                girlStats
+                orders: orders || []
             };
             
             renderDashboard();
@@ -1089,59 +1087,15 @@
             
         } catch (error) {
             console.error('❌ Dashboard error:', error);
-            updateStatus('❌ Error loading dashboard: ' + error.message);
+            updateStatus('⚠️ Using mock dashboard data');
         }
     }
 
     function renderDashboard() {
-        if (!dashboardData) return;
-        
-        const { totalOrders, totalRevenue, completedOrders, pendingOrders, orders, girlStats } = dashboardData;
         const adminPanel = document.querySelector('.admin-panel');
         if (!adminPanel) return;
         
-        let girlStatsHTML = '';
-        const sortedGirls = Object.entries(girlStats).sort((a, b) => b[1].deliveries - a[1].deliveries);
-        if (sortedGirls.length === 0) {
-            girlStatsHTML = '<div style="color:#7a6e86;padding:8px 0;">No delivery records yet</div>';
-        } else {
-            sortedGirls.forEach(([name, stats]) => {
-                girlStatsHTML += `
-                    <div class="girl-stat">
-                        <span><i class="fas fa-female" style="color:#cc0000;"></i> ${name}</span>
-                        <span>
-                            <span class="count">${stats.deliveries}</span> deliveries · 
-                            <span class="revenue">ZMW ${stats.revenue.toFixed(2)}</span>
-                        </span>
-                    </div>
-                `;
-            });
-        }
-        
-        let ordersHTML = '';
-        const recentOrders = orders.slice(0, 20);
-        if (recentOrders.length === 0) {
-            ordersHTML = '<div style="color:#7a6e86;padding:8px 0;">No orders this week</div>';
-        } else {
-            recentOrders.forEach(order => {
-                const statusClass = order.status || 'pending';
-                const date = new Date(order.created_at).toLocaleDateString();
-                const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                const customerName = order.customer_name || 'Anonymous';
-                ordersHTML += `
-                    <div class="order-item">
-                        <div>
-                            <div>${date} ${time}</div>
-                            <div style="font-size:10px;color:#999;">${customerName} · ${order.customer_phone || 'No phone'}</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div><strong>ZMW ${(order.total || 0).toFixed(2)}</strong></div>
-                            <span class="status-badge ${statusClass}">${statusClass.toUpperCase()}</span>
-                        </div>
-                    </div>
-                `;
-            });
-        }
+        const data = dashboardData || { totalOrders: 0, totalRevenue: 0, completedOrders: 0, pendingOrders: 0, orders: [] };
         
         adminPanel.innerHTML = `
             <div class="section-title">
@@ -1154,59 +1108,30 @@
             <div class="stats-grid">
                 <div class="stat-card total">
                     <div class="icon"><i class="fas fa-credit-card"></i></div>
-                    <div class="number">ZMW ${totalRevenue.toFixed(2)}</div>
-                    <div class="label">Total Revenue (This Week)</div>
+                    <div class="number">ZMW ${data.totalRevenue.toFixed(2)}</div>
+                    <div class="label">Total Revenue</div>
                 </div>
                 <div class="stat-card">
                     <div class="icon"><i class="fas fa-shopping-bag"></i></div>
-                    <div class="number">${totalOrders}</div>
+                    <div class="number">${data.totalOrders}</div>
                     <div class="label">Total Orders</div>
                 </div>
                 <div class="stat-card">
                     <div class="icon"><i class="fas fa-check-circle"></i></div>
-                    <div class="number">${completedOrders}</div>
+                    <div class="number">${data.completedOrders}</div>
                     <div class="label">Completed</div>
                 </div>
                 <div class="stat-card">
                     <div class="icon"><i class="fas fa-clock"></i></div>
-                    <div class="number">${pendingOrders}</div>
+                    <div class="number">${data.pendingOrders}</div>
                     <div class="label">Pending</div>
                 </div>
             </div>
             
-            <div class="tab-bar">
-                <button class="tab-btn active" onclick="switchTab('orders')"><i class="fas fa-list"></i> Orders</button>
-                <button class="tab-btn" onclick="switchTab('delivery')"><i class="fas fa-motorcycle"></i> Delivery Girls</button>
-            </div>
-            
-            <div id="tab-orders" class="tab-content active">
-                <div style="font-size:12px;font-weight:600;margin-bottom:6px;color:#6d6a7a;">
-                    Recent Orders (Last 7 Days)
-                </div>
-                <div class="order-list">
-                    ${ordersHTML}
-                </div>
-            </div>
-            
-            <div id="tab-delivery" class="tab-content">
-                <div style="font-size:12px;font-weight:600;margin-bottom:6px;color:#6d6a7a;">
-                    Delivery Girl Performance
-                </div>
-                <div class="delivery-stats">
-                    ${girlStatsHTML}
-                </div>
+            <div style="font-size:11px;color:#6d6a7a;text-align:center;margin-top:6px;">
+                ${useSupabase ? '✅ Connected to Supabase' : '⚠️ Using local data (Supabase connection failed)'}
             </div>
         `;
-        
-        const refreshBtn = document.createElement('button');
-        refreshBtn.className = 'action-btn';
-        refreshBtn.style.marginTop = '10px';
-        refreshBtn.style.background = '#cc0000';
-        refreshBtn.style.fontSize = '13px';
-        refreshBtn.style.padding = '8px';
-        refreshBtn.innerHTML = '<i class="fas fa-sync"></i> Refresh Dashboard';
-        refreshBtn.onclick = loadDashboard;
-        adminPanel.appendChild(refreshBtn);
     }
 
     // ============================================
@@ -1218,10 +1143,12 @@
     let customerName = '';
     let customerPhone = '';
     let orderStatus = '';
+    let currentMenu = MOCK_MENU;
+    let currentGirls = MOCK_GIRLS;
 
     function renderCustomerView() {
-        const menu = window.menuData || [];
-        const deliveryGirls = window.deliveryGirlsData || [];
+        const menu = currentMenu || [];
+        const deliveryGirls = currentGirls || [];
         
         const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
         const cartCount = cart.reduce((acc, i) => acc + i.qty, 0);
@@ -1251,6 +1178,15 @@
                 </button>
             </div>
         `).join('');
+
+        let girlsHTML = deliveryGirls.length === 0 ?
+            '<div style="color:#7a6e86;padding:8px 0;font-size:12px;">No delivery girls added yet</div>' :
+            deliveryGirls.map(g => `
+                <span class="delivery-girl-tag">
+                    <i class="fas fa-female"></i> ${g}
+                    ${isAdmin ? `<span class="remove" onclick="removeGirl('${g}')"><i class="fas fa-times"></i></span>` : ''}
+                </span>
+            `).join('');
 
         container.innerHTML = `
             <!-- Kasama Location Banner -->
@@ -1345,7 +1281,21 @@
 
             <!-- Admin Panel -->
             <div class="admin-panel ${isAdmin ? 'show' : ''}" id="adminPanel">
-                ${isAdmin ? '<div style="text-align:center;padding:16px;color:#cc0000;font-size:13px;"><i class="fas fa-spinner fa-spin"></i> Loading dashboard...</div>' : ''}
+                ${isAdmin ? `
+                    <div class="section-title">
+                        <i class="fas fa-user-gear"></i> Admin · Delivery Girls
+                        <span style="font-size:10px;font-weight:400;color:#6d6a7a;margin-left:auto;">${deliveryGirls.length} in Kasama</span>
+                    </div>
+                    <div class="admin-input-group">
+                        <input id="newGirlInput" placeholder="Enter delivery girl name" onkeypress="if(event.key==='Enter') addDeliveryGirl()" />
+                        <button onclick="addDeliveryGirl()"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                    <div class="delivery-girl-list">${girlsHTML}</div>
+                    <div style="font-size:10px;color:#6d6a7a;margin-top:6px;">
+                        <i class="fas fa-info-circle"></i> Delivery girls see customer location on map
+                    </div>
+                    <div id="dashboardContainer"></div>
+                ` : ''}
             </div>
         `;
 
@@ -1376,6 +1326,11 @@
                 updateMapLocation(customerLocation);
             };
         }
+
+        // Render dashboard inside admin panel
+        if (isAdmin) {
+            renderDashboard();
+        }
     }
 
     // ============================================
@@ -1386,310 +1341,278 @@
     let notificationCount = 0;
 
     async function renderDeliveryView() {
-        if (!supabaseClient) {
-            container.innerHTML = '<div class="error-message">⚠️ Supabase not initialized</div>';
-            return;
+        let orders = [];
+        
+        if (useSupabase && supabaseClient) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('orders')
+                    .select('*')
+                    .in('status', ['pending', 'assigned', 'picked_up'])
+                    .order('created_at', { ascending: true });
+
+                if (!error) {
+                    orders = data || [];
+                }
+            } catch (e) {
+                console.error('Error fetching orders:', e);
+            }
         }
 
-        try {
-            // Fetch pending and assigned orders
-            const { data: orders, error } = await supabaseClient
-                .from('orders')
-                .select('*')
-                .in('status', ['pending', 'assigned', 'picked_up'])
-                .order('created_at', { ascending: true });
-
-            if (error) throw error;
-            deliveryOrders = orders || [];
-
-            // Fetch notifications
-            const { data: notifs, error: notifError } = await supabaseClient
-                .from('delivery_notifications')
-                .select('*')
-                .order('created_at', { ascending: false })
-                .limit(10);
-
-            if (!notifError) {
-                notifications = notifs || [];
-                notificationCount = notifications.filter(n => !n.is_read).length;
-                document.getElementById('notificationBadge').textContent = notificationCount;
-                document.getElementById('notificationBadge').style.display = notificationCount > 0 ? 'inline' : 'none';
-            }
-
-            let ordersHTML = '';
-            if (deliveryOrders.length === 0) {
-                ordersHTML = '<div style="text-align:center;padding:20px;color:#7a6e86;font-size:13px;"><i class="fas fa-check-circle" style="color:#4caf50;"></i><br>No pending orders</div>';
-            } else {
-                deliveryOrders.forEach(order => {
-                    const statusClass = order.status || 'pending';
-                    const statusLabels = {
-                        'pending': '🆕 New Order',
-                        'assigned': '📋 Assigned',
-                        'picked_up': '🛵 Picked Up'
-                    };
-                    const statusLabel = statusLabels[statusClass] || statusClass.toUpperCase();
-                    
-                    // Parse items
-                    let itemsText = '';
-                    try {
-                        const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
-                        itemsText = items.map(i => `${i.qty}x ${i.name}`).join(', ');
-                    } catch (e) {
-                        itemsText = 'Items not available';
-                    }
-                    
-                    ordersHTML += `
-                        <div class="order-card">
-                            <div class="header">
-                                <span class="order-id"><i class="fas fa-receipt"></i> Order #${order.id}</span>
-                                <span class="order-time">${new Date(order.created_at).toLocaleTimeString()}</span>
-                            </div>
-                            <div class="customer-info">
-                                <i class="fas fa-user"></i> <strong>${order.customer_name || 'Anonymous'}</strong>
-                            </div>
-                            <div class="customer-info">
-                                <i class="fas fa-phone"></i> ${order.customer_phone || 'No phone'}
-                            </div>
-                            <div class="customer-info">
-                                <i class="fas fa-map-marker-alt"></i> ${order.customer_location || 'Kasama'}
-                                <span class="location-link" onclick="window.open('https://www.google.com/maps?q=${encodeURIComponent(order.customer_location || 'Kasama')}', '_blank')">
-                                    <i class="fas fa-external-link-alt"></i> View
-                                </span>
-                            </div>
-                            <div class="order-items">
-                                <i class="fas fa-utensils"></i> ${itemsText}
-                            </div>
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
-                                <span class="order-total">ZMW ${(order.total || 0).toFixed(2)}</span>
-                                <span class="status-badge ${statusClass}">${statusLabel}</span>
-                            </div>
-                            ${statusClass === 'pending' ? `
-                                <div class="action-btns">
-                                    <button class="btn-accept" onclick="acceptOrder(${order.id})">
-                                        <i class="fas fa-check"></i> Accept
-                                    </button>
-                                    <button class="btn-decline" onclick="declineOrder(${order.id})">
-                                        <i class="fas fa-times"></i> Decline
-                                    </button>
-                                </div>
-                            ` : ''}
-                            ${statusClass === 'assigned' ? `
-                                <div class="action-btns">
-                                    <button class="btn-pickup" onclick="pickupOrder(${order.id})">
-                                        <i class="fas fa-box"></i> Picked Up
-                                    </button>
-                                </div>
-                            ` : ''}
-                            ${statusClass === 'picked_up' ? `
-                                <div class="action-btns">
-                                    <button class="btn-deliver" onclick="deliverOrder(${order.id})">
-                                        <i class="fas fa-check-circle"></i> Delivered
-                                    </button>
-                                </div>
-                            ` : ''}
-                        </div>
-                    `;
-                });
-            }
-
-            // Notifications
-            let notifHTML = '';
-            if (notifications.length === 0) {
-                notifHTML = '<div style="color:#7a6e86;font-size:12px;padding:8px 0;">No notifications</div>';
-            } else {
-                notifications.slice(0, 5).forEach(n => {
-                    notifHTML += `
-                        <div style="padding:6px 8px;border-bottom:1px solid #f0edf3;font-size:12px;${!n.is_read ? 'background:#fff5f5;' : ''}">
-                            <i class="fas fa-bell" style="color:#cc0000;"></i> ${n.message}
-                            <span style="font-size:9px;color:#999;float:right;">${new Date(n.created_at).toLocaleTimeString()}</span>
-                        </div>
-                    `;
-                });
-            }
-
-            container.innerHTML = `
-                <!-- Delivery Girl Header -->
-                <div style="background:linear-gradient(135deg,#cc0000,#990000);color:white;padding:10px 14px;border-radius:14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">
-                    <div>
-                        <i class="fas fa-motorcycle"></i> 
-                        <strong>Delivery Portal</strong>
-                        <span style="font-size:10px;opacity:0.8;display:block;">Kasama District</span>
-                    </div>
-                    <div style="text-align:right;">
-                        <div style="font-size:20px;font-weight:700;">${deliveryOrders.length}</div>
-                        <div style="font-size:9px;opacity:0.8;">Pending Orders</div>
-                    </div>
-                </div>
-
-                <!-- Notifications -->
-                <div class="card" style="padding:10px;">
-                    <div class="section-title" style="font-size:13px;margin-bottom:6px;">
-                        <i class="fas fa-bell"></i> Notifications
-                        ${notificationCount > 0 ? `<span class="notification-badge">${notificationCount}</span>` : ''}
-                    </div>
-                    ${notifHTML}
-                </div>
-
-                <!-- Orders -->
-                <div style="margin-top:8px;">
-                    <div class="section-title" style="font-size:13px;">
-                        <i class="fas fa-list"></i> Available Orders
-                    </div>
-                    ${ordersHTML}
-                </div>
-
-                <!-- Quick Stats -->
-                <div class="card" style="padding:10px;">
-                    <div class="section-title" style="font-size:13px;margin-bottom:6px;">
-                        <i class="fas fa-chart-simple"></i> Quick Stats
-                    </div>
-                    <div class="stats-grid" style="grid-template-columns:1fr 1fr 1fr;">
-                        <div class="stat-card" style="padding:8px;">
-                            <div class="number" style="font-size:16px;">${deliveryOrders.filter(o => o.status === 'pending').length}</div>
-                            <div class="label">New</div>
-                        </div>
-                        <div class="stat-card" style="padding:8px;">
-                            <div class="number" style="font-size:16px;">${deliveryOrders.filter(o => o.status === 'assigned').length}</div>
-                            <div class="label">Assigned</div>
-                        </div>
-                        <div class="stat-card" style="padding:8px;">
-                            <div class="number" style="font-size:16px;">${deliveryOrders.filter(o => o.status === 'picked_up').length}</div>
-                            <div class="label">Picked Up</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Refresh -->
-                <button class="action-btn" onclick="renderDeliveryView()" style="font-size:13px;padding:8px;margin-top:4px;">
-                    <i class="fas fa-sync"></i> Refresh
-                </button>
-            `;
-
-        } catch (error) {
-            console.error('Error loading delivery view:', error);
-            container.innerHTML = `
-                <div class="error-message">
-                    <i class="fas fa-exclamation-circle"></i> Error loading orders: ${error.message}
-                    <button class="action-btn" onclick="renderDeliveryView()" style="font-size:13px;padding:8px;margin-top:8px;">
-                        <i class="fas fa-sync"></i> Retry
-                    </button>
-                </div>
-            `;
+        // Use mock orders if no real data
+        if (orders.length === 0) {
+            orders = [
+                {
+                    id: 1,
+                    customer_name: 'John Doe',
+                    customer_phone: '0977123456',
+                    customer_location: 'Lubwa, Kasama',
+                    items: [{ name: 'Grilled Chicken', qty: 2 }, { name: 'Jollof Rice', qty: 1 }],
+                    total: 35.47,
+                    status: 'pending',
+                    created_at: new Date().toISOString()
+                },
+                {
+                    id: 2,
+                    customer_name: 'Mary Mwansa',
+                    customer_phone: '0966234567',
+                    customer_location: 'Chambeshi, Kasama',
+                    items: [{ name: 'Beef Burger', qty: 1 }, { name: 'Fresh Juice', qty: 1 }],
+                    total: 16.49,
+                    status: 'assigned',
+                    created_at: new Date(Date.now() - 3600000).toISOString()
+                }
+            ];
         }
+
+        deliveryOrders = orders;
+
+        let ordersHTML = '';
+        if (deliveryOrders.length === 0) {
+            ordersHTML = '<div style="text-align:center;padding:20px;color:#7a6e86;font-size:13px;"><i class="fas fa-check-circle" style="color:#4caf50;"></i><br>No pending orders</div>';
+        } else {
+            deliveryOrders.forEach(order => {
+                const statusClass = order.status || 'pending';
+                const statusLabels = {
+                    'pending': '🆕 New Order',
+                    'assigned': '📋 Assigned',
+                    'picked_up': '🛵 Picked Up'
+                };
+                const statusLabel = statusLabels[statusClass] || statusClass.toUpperCase();
+                
+                let itemsText = '';
+                try {
+                    const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
+                    itemsText = items.map(i => `${i.qty}x ${i.name}`).join(', ');
+                } catch (e) {
+                    itemsText = 'Items not available';
+                }
+                
+                ordersHTML += `
+                    <div class="order-card">
+                        <div class="header">
+                            <span class="order-id"><i class="fas fa-receipt"></i> Order #${order.id}</span>
+                            <span class="order-time">${new Date(order.created_at).toLocaleTimeString()}</span>
+                        </div>
+                        <div class="customer-info">
+                            <i class="fas fa-user"></i> <strong>${order.customer_name || 'Anonymous'}</strong>
+                        </div>
+                        <div class="customer-info">
+                            <i class="fas fa-phone"></i> ${order.customer_phone || 'No phone'}
+                        </div>
+                        <div class="customer-info">
+                            <i class="fas fa-map-marker-alt"></i> ${order.customer_location || 'Kasama'}
+                            <span class="location-link" onclick="window.open('https://www.google.com/maps?q=${encodeURIComponent(order.customer_location || 'Kasama')}', '_blank')">
+                                <i class="fas fa-external-link-alt"></i> View
+                            </span>
+                        </div>
+                        <div class="order-items">
+                            <i class="fas fa-utensils"></i> ${itemsText}
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px;">
+                            <span class="order-total">ZMW ${(order.total || 0).toFixed(2)}</span>
+                            <span class="status-badge ${statusClass}">${statusLabel}</span>
+                        </div>
+                        ${statusClass === 'pending' ? `
+                            <div class="action-btns">
+                                <button class="btn-accept" onclick="acceptOrder(${order.id})">
+                                    <i class="fas fa-check"></i> Accept
+                                </button>
+                                <button class="btn-decline" onclick="declineOrder(${order.id})">
+                                    <i class="fas fa-times"></i> Decline
+                                </button>
+                            </div>
+                        ` : ''}
+                        ${statusClass === 'assigned' ? `
+                            <div class="action-btns">
+                                <button class="btn-pickup" onclick="pickupOrder(${order.id})">
+                                    <i class="fas fa-box"></i> Picked Up
+                                </button>
+                            </div>
+                        ` : ''}
+                        ${statusClass === 'picked_up' ? `
+                            <div class="action-btns">
+                                <button class="btn-deliver" onclick="deliverOrder(${order.id})">
+                                    <i class="fas fa-check-circle"></i> Delivered
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            });
+        }
+
+        container.innerHTML = `
+            <!-- Delivery Girl Header -->
+            <div style="background:linear-gradient(135deg,#cc0000,#990000);color:white;padding:10px 14px;border-radius:14px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;">
+                <div>
+                    <i class="fas fa-motorcycle"></i> 
+                    <strong>Delivery Portal</strong>
+                    <span style="font-size:10px;opacity:0.8;display:block;">Kasama District</span>
+                </div>
+                <div style="text-align:right;">
+                    <div style="font-size:20px;font-weight:700;">${deliveryOrders.length}</div>
+                    <div style="font-size:9px;opacity:0.8;">Pending Orders</div>
+                </div>
+            </div>
+
+            <!-- Orders -->
+            <div style="margin-top:8px;">
+                <div class="section-title" style="font-size:13px;">
+                    <i class="fas fa-list"></i> Available Orders
+                    ${useSupabase ? '' : '<span style="font-size:9px;color:#999;font-weight:400;"> (Demo Mode)</span>'}
+                </div>
+                ${ordersHTML}
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="card" style="padding:10px;">
+                <div class="section-title" style="font-size:13px;margin-bottom:6px;">
+                    <i class="fas fa-chart-simple"></i> Quick Stats
+                </div>
+                <div class="stats-grid" style="grid-template-columns:1fr 1fr 1fr;">
+                    <div class="stat-card" style="padding:8px;">
+                        <div class="number" style="font-size:16px;">${deliveryOrders.filter(o => o.status === 'pending').length}</div>
+                        <div class="label">New</div>
+                    </div>
+                    <div class="stat-card" style="padding:8px;">
+                        <div class="number" style="font-size:16px;">${deliveryOrders.filter(o => o.status === 'assigned').length}</div>
+                        <div class="label">Assigned</div>
+                    </div>
+                    <div class="stat-card" style="padding:8px;">
+                        <div class="number" style="font-size:16px;">${deliveryOrders.filter(o => o.status === 'picked_up').length}</div>
+                        <div class="label">Picked Up</div>
+                    </div>
+                </div>
+                <div style="font-size:10px;color:#6d6a7a;text-align:center;margin-top:4px;">
+                    ${useSupabase ? '✅ Connected to Supabase' : '⚠️ Using demo data'}
+                </div>
+            </div>
+
+            <!-- Refresh -->
+            <button class="action-btn" onclick="renderDeliveryView()" style="font-size:13px;padding:8px;margin-top:4px;">
+                <i class="fas fa-sync"></i> Refresh
+            </button>
+        `;
     }
 
     // ============================================
     // DELIVERY GIRL ACTIONS
     // ============================================
     window.acceptOrder = async function(orderId) {
-        if (!supabaseClient) return;
-        
         const girlName = prompt('Enter your name (delivery girl):');
         if (!girlName) return;
         
-        try {
-            const { error } = await supabaseClient
-                .from('orders')
-                .update({ 
-                    status: 'assigned', 
-                    delivery_girl_name: girlName,
-                    assigned_at: new Date().toISOString()
-                })
-                .eq('id', orderId);
-            
-            if (error) throw error;
-            
-            // Add notification
-            await supabaseClient
-                .from('delivery_notifications')
-                .insert({
-                    order_id: orderId,
-                    delivery_girl_id: 1,
-                    message: `${girlName} accepted order #${orderId}`,
-                    type: 'assigned'
-                });
-            
-            alert(`✅ Order #${orderId} assigned to ${girlName}!`);
-            renderDeliveryView();
-        } catch (error) {
-            alert('❌ Failed to accept order: ' + error.message);
+        if (useSupabase && supabaseClient) {
+            try {
+                const { error } = await supabaseClient
+                    .from('orders')
+                    .update({ 
+                        status: 'assigned', 
+                        delivery_girl_name: girlName,
+                        assigned_at: new Date().toISOString()
+                    })
+                    .eq('id', orderId);
+                
+                if (error) throw error;
+            } catch (error) {
+                alert('❌ Failed to accept order: ' + error.message);
+                return;
+            }
         }
+        
+        alert(`✅ Order #${orderId} assigned to ${girlName}!`);
+        renderDeliveryView();
     };
 
     window.declineOrder = async function(orderId) {
         if (!confirm('Are you sure you want to decline this order?')) return;
         
-        try {
-            const { error } = await supabaseClient
-                .from('orders')
-                .update({ status: 'pending' })
-                .eq('id', orderId);
-            
-            if (error) throw error;
-            alert('❌ Order declined');
-            renderDeliveryView();
-        } catch (error) {
-            alert('Failed to decline order: ' + error.message);
+        if (useSupabase && supabaseClient) {
+            try {
+                await supabaseClient
+                    .from('orders')
+                    .update({ status: 'pending' })
+                    .eq('id', orderId);
+            } catch (error) {
+                alert('Failed to decline order: ' + error.message);
+                return;
+            }
         }
+        
+        alert('❌ Order declined');
+        renderDeliveryView();
     };
 
     window.pickupOrder = async function(orderId) {
         if (!confirm('Mark this order as picked up?')) return;
         
-        try {
-            const { error } = await supabaseClient
-                .from('orders')
-                .update({ 
-                    status: 'picked_up',
-                    picked_up_at: new Date().toISOString()
-                })
-                .eq('id', orderId);
-            
-            if (error) throw error;
-            alert('🛵 Order marked as picked up!');
-            renderDeliveryView();
-        } catch (error) {
-            alert('Failed to update: ' + error.message);
+        if (useSupabase && supabaseClient) {
+            try {
+                await supabaseClient
+                    .from('orders')
+                    .update({ 
+                        status: 'picked_up',
+                        picked_up_at: new Date().toISOString()
+                    })
+                    .eq('id', orderId);
+            } catch (error) {
+                alert('Failed to update: ' + error.message);
+                return;
+            }
         }
+        
+        alert('🛵 Order marked as picked up!');
+        renderDeliveryView();
     };
 
     window.deliverOrder = async function(orderId) {
         if (!confirm('Confirm delivery of this order?')) return;
         
-        try {
-            const { error } = await supabaseClient
-                .from('orders')
-                .update({ 
-                    status: 'delivered',
-                    delivered_at: new Date().toISOString()
-                })
-                .eq('id', orderId);
-            
-            if (error) throw error;
-            
-            // Add to delivery records
-            await supabaseClient
-                .from('delivery_records')
-                .insert({
-                    order_id: orderId,
-                    delivery_girl_name: 'Current Girl',
-                    customer_location: 'Kasama',
-                    status: 'completed',
-                    completed_at: new Date().toISOString()
-                });
-            
-            alert('✅ Order delivered! Thank you!');
-            renderDeliveryView();
-        } catch (error) {
-            alert('Failed to confirm delivery: ' + error.message);
+        if (useSupabase && supabaseClient) {
+            try {
+                await supabaseClient
+                    .from('orders')
+                    .update({ 
+                        status: 'delivered',
+                        delivered_at: new Date().toISOString()
+                    })
+                    .eq('id', orderId);
+            } catch (error) {
+                alert('Failed to confirm delivery: ' + error.message);
+                return;
+            }
         }
+        
+        alert('✅ Order delivered! Thank you!');
+        renderDeliveryView();
     };
 
     // ============================================
     // CUSTOMER FUNCTIONS
     // ============================================
     window.addToCart = function(id) {
-        const menu = window.menuData || [];
+        const menu = currentMenu || [];
         const item = menu.find(i => i.id === id);
         if (!item) return;
         const existing = cart.find(i => i.id === id);
@@ -1758,21 +1681,26 @@
 
         try {
             const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
-            const { data, error } = await supabaseClient
-                .from('orders')
-                .insert({
-                    items: cart,
-                    total: totalPrice,
-                    customer_location: address,
-                    customer_name: name,
-                    customer_phone: phone,
-                    status: 'pending',
-                    district: 'Kasama',
-                    province: 'Northern Province'
-                })
-                .select();
+            
+            if (useSupabase && supabaseClient) {
+                const { error } = await supabaseClient
+                    .from('orders')
+                    .insert({
+                        items: cart,
+                        total: totalPrice,
+                        customer_location: address,
+                        customer_name: name,
+                        customer_phone: phone,
+                        status: 'pending',
+                        district: 'Kasama',
+                        province: 'Northern Province'
+                    });
 
-            if (error) throw error;
+                if (error) throw error;
+            } else {
+                // Demo mode - just log the order
+                console.log('📝 Order placed (demo):', { cart, totalPrice, name, phone, address });
+            }
 
             orderPlaced = true;
             orderStatus = `🛵 Order confirmed, ${name}! A delivery girl from Kasama will arrive in 20-30 minutes. We'll call you at ${phone}.`;
@@ -1812,36 +1740,23 @@
             return;
         }
 
-        try {
-            const { data: existing } = await supabaseClient
-                .from('delivery_girls')
-                .select('name')
-                .eq('name', name)
-                .single();
+        if (useSupabase && supabaseClient) {
+            try {
+                const { error } = await supabaseClient
+                    .from('delivery_girls')
+                    .insert({ name: name });
 
-            if (existing) {
-                alert('Delivery girl already exists');
+                if (error) throw error;
+            } catch (error) {
+                alert('Failed to add delivery girl: ' + error.message);
                 return;
             }
-
-            const { error } = await supabaseClient
-                .from('delivery_girls')
-                .insert({ name: name });
-
-            if (error) throw error;
-
-            const { data: girlsData } = await supabaseClient
-                .from('delivery_girls')
-                .select('name')
-                .order('name');
-
-            window.deliveryGirlsData = girlsData.map(g => g.name);
-            input.value = '';
-            renderCustomerView();
-            alert(`✅ ${name} added as a delivery girl in Kasama!`);
-        } catch (error) {
-            alert('Failed to add delivery girl: ' + error.message);
         }
+
+        currentGirls.push(name);
+        input.value = '';
+        renderCustomerView();
+        alert(`✅ ${name} added as a delivery girl in Kasama!`);
     };
 
     window.removeGirl = async function(name) {
@@ -1852,25 +1767,21 @@
 
         if (!confirm(`Remove ${name} from delivery girls in Kasama?`)) return;
 
-        try {
-            const { error } = await supabaseClient
-                .from('delivery_girls')
-                .delete()
-                .eq('name', name);
-
-            if (error) throw error;
-
-            const { data: girlsData } = await supabaseClient
-                .from('delivery_girls')
-                .select('name')
-                .order('name');
-
-            window.deliveryGirlsData = girlsData.map(g => g.name);
-            renderCustomerView();
-            alert('✅ Delivery girl removed successfully!');
-        } catch (error) {
-            alert('Failed to remove delivery girl: ' + error.message);
+        if (useSupabase && supabaseClient) {
+            try {
+                await supabaseClient
+                    .from('delivery_girls')
+                    .delete()
+                    .eq('name', name);
+            } catch (error) {
+                alert('Failed to remove delivery girl: ' + error.message);
+                return;
+            }
         }
+
+        currentGirls = currentGirls.filter(g => g !== name);
+        renderCustomerView();
+        alert('✅ Delivery girl removed successfully!');
     };
 
     // ============================================
@@ -1890,36 +1801,51 @@
 
             updateStatus('✅ Supabase loaded!');
             
-            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            updateStatus('🔗 Connected to Supabase');
-
-            const { data: testData, error: testError } = await supabaseClient
-                .from('menu')
-                .select('count')
-                .limit(1);
-
-            if (testError) {
-                throw new Error(`Connection failed: ${testError.message}`);
+            try {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                updateStatus('🔗 Trying to connect to Supabase...');
+                
+                // Test connection with a simple query
+                const { data, error } = await supabaseClient
+                    .from('menu')
+                    .select('count')
+                    .limit(1);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                useSupabase = true;
+                updateStatus('✅ Connected to Supabase!');
+                
+                // Fetch real data
+                const { data: menuData } = await supabaseClient
+                    .from('menu')
+                    .select('*')
+                    .order('id');
+                
+                if (menuData && menuData.length > 0) {
+                    currentMenu = menuData;
+                    updateStatus(`✅ Menu loaded: ${currentMenu.length} items`);
+                }
+                
+                const { data: girlsData } = await supabaseClient
+                    .from('delivery_girls')
+                    .select('name')
+                    .order('name');
+                
+                if (girlsData && girlsData.length > 0) {
+                    currentGirls = girlsData.map(g => g.name);
+                    updateStatus(`✅ Girls loaded: ${currentGirls.length}`);
+                }
+                
+            } catch (supabaseError) {
+                console.warn('⚠️ Supabase connection failed, using mock data:', supabaseError.message);
+                useSupabase = false;
+                updateStatus('⚠️ Using demo data (Supabase offline)');
+                currentMenu = MOCK_MENU;
+                currentGirls = MOCK_GIRLS;
             }
-            updateStatus('✅ Connection successful!');
-
-            const { data: menuData, error: menuError } = await supabaseClient
-                .from('menu')
-                .select('*')
-                .order('id');
-
-            if (menuError) throw menuError;
-            window.menuData = menuData || [];
-            updateStatus(`✅ Menu loaded: ${window.menuData.length} items`);
-
-            const { data: girlsData, error: girlsError } = await supabaseClient
-                .from('delivery_girls')
-                .select('name')
-                .order('name');
-
-            if (girlsError) throw girlsError;
-            window.deliveryGirlsData = girlsData?.map(g => g.name) || [];
-            updateStatus(`✅ Girls loaded: ${window.deliveryGirlsData.length}`);
 
             checkAdminSession();
 
@@ -1943,18 +1869,31 @@
 
         } catch (error) {
             console.error('❌ Error:', error);
-            updateStatus(`❌ ERROR: ${error.message}`);
+            updateStatus(`❌ Using demo data (${error.message})`);
+            
+            // Fallback to mock data
+            useSupabase = false;
+            currentMenu = MOCK_MENU;
+            currentGirls = MOCK_GIRLS;
+            
+            checkAdminSession();
+            document.getElementById('customerTabBtn').classList.add('active');
+            renderCustomerView();
+            
             loadingDiv.innerHTML = `
-                <div class="error-message">
-                    <i class="fas fa-exclamation-circle"></i>
-                    <p><strong>Error:</strong></p>
-                    <p style="margin-top:8px;">${error.message}</p>
-                    <button class="action-btn" onclick="location.reload()" style="margin-top:12px;font-size:14px;padding:8px;">
+                <div style="text-align:center;padding:20px;color:#cc0000;">
+                    <i class="fas fa-exclamation-triangle" style="font-size:30px;"></i>
+                    <p style="margin-top:10px;font-weight:600;">Using Demo Mode</p>
+                    <p style="font-size:12px;color:#666;margin-top:4px;">Supabase connection failed. Using local data.</p>
+                    <button class="action-btn" onclick="location.reload()" style="font-size:13px;padding:8px;margin-top:10px;">
                         <i class="fas fa-sync"></i> Retry
                     </button>
                 </div>
-                <div class="status-box" style="margin-top:8px;">${statusBox.textContent}</div>
             `;
+            
+            setTimeout(() => {
+                loadingDiv.style.display = 'none';
+            }, 3000);
         }
     }
 
