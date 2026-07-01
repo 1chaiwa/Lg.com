@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Laura Girls · Kasama Food Delivery</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         * {
             margin: 0;
@@ -189,7 +191,7 @@
             margin: 4px 0;
             position: relative;
         }
-        .map-container iframe {
+        .map-container #map {
             width: 100%;
             height: 100%;
             border: 0;
@@ -414,7 +416,6 @@
             transform: scale(0.95);
         }
 
-        /* Admin Login Styles */
         .admin-login-btn {
             background: rgba(255,255,255,0.15);
             color: white;
@@ -492,21 +493,6 @@
         .admin-login-box .error.show {
             display: block;
         }
-        .admin-logout-btn {
-            background: rgba(255,255,255,0.15);
-            color: white;
-            border: none;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 10px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .admin-logout-btn:hover {
-            background: rgba(255,255,255,0.25);
-        }
         .admin-header-badge {
             background: #ffcc00;
             color: #990000;
@@ -520,7 +506,6 @@
             display: inline-block;
         }
 
-        /* Dashboard Stats */
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -697,10 +682,13 @@
     const SUPABASE_URL = 'https://ndwoqlxtaczwxsescemu.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kd29xbHh0YWN6d3hzZXNjZW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5Mjk2MTQsImV4cCI6MjA5ODUwNTYxNH0.43PgLQSdEESXboLGrdtZCHq-f8TwzItXaGuxmI4NEe8';
 
-    // Admin password (can be changed)
     const ADMIN_PASSWORD = 'admin123';
 
     let isAdmin = false;
+    let supabaseClient = null;
+    let dashboardData = null;
+    let map = null;
+    let mapMarker = null;
 
     const container = document.getElementById('app-container');
     const loadingDiv = document.getElementById('loadingDiv');
@@ -714,6 +702,115 @@
     }
 
     updateStatus('🚀 App starting... Kasama, Zambia');
+
+    // ============================================
+    // MAP FUNCTIONS (OpenStreetMap - No API Key Needed)
+    // ============================================
+    function initMap(location) {
+        try {
+            const mapContainer = document.getElementById('map');
+            if (!mapContainer) return;
+
+            // Use Nominatim to geocode the location
+            const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`;
+            
+            fetch(geocodeUrl)
+                .then(response => response.json())
+                .then(data => {
+                    let lat = -10.2129; // Kasama default
+                    let lng = 31.1809;
+                    
+                    if (data && data.length > 0) {
+                        lat = parseFloat(data[0].lat);
+                        lng = parseFloat(data[0].lon);
+                    }
+                    
+                    // Initialize map
+                    if (map) {
+                        map.remove();
+                    }
+                    
+                    map = L.map('map').setView([lat, lng], 14);
+                    
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(map);
+                    
+                    // Add marker
+                    const markerIcon = L.divIcon({
+                        html: '<i class="fas fa-map-marker-alt" style="color:#cc0000;font-size:30px;"></i>',
+                        className: 'custom-marker',
+                        iconSize: [30, 30],
+                        iconAnchor: [15, 30]
+                    });
+                    
+                    mapMarker = L.marker([lat, lng], { icon: markerIcon }).addTo(map);
+                    mapMarker.bindPopup(`<strong>📍 ${location}</strong>`).openPopup();
+                    
+                    // Hide loading
+                    document.getElementById('mapLoading')?.style.setProperty('display', 'none');
+                })
+                .catch(error => {
+                    console.error('Geocoding error:', error);
+                    // Fallback to Kasama
+                    showFallbackMap();
+                });
+        } catch (error) {
+            console.error('Map error:', error);
+            showFallbackMap();
+        }
+    }
+
+    function showFallbackMap() {
+        const mapContainer = document.getElementById('map');
+        if (!mapContainer) return;
+        
+        if (map) {
+            map.remove();
+        }
+        
+        map = L.map('map').setView([-10.2129, 31.1809], 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+        
+        const markerIcon = L.divIcon({
+            html: '<i class="fas fa-map-marker-alt" style="color:#cc0000;font-size:30px;"></i>',
+            className: 'custom-marker',
+            iconSize: [30, 30],
+            iconAnchor: [15, 30]
+        });
+        
+        mapMarker = L.marker([-10.2129, 31.1809], { icon: markerIcon }).addTo(map);
+        mapMarker.bindPopup('📍 Kasama, Zambia').openPopup();
+        
+        document.getElementById('mapLoading')?.style.setProperty('display', 'none');
+    }
+
+    function updateMapLocation(location) {
+        if (!location) return;
+        
+        const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`;
+        
+        fetch(geocodeUrl)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    const lat = parseFloat(data[0].lat);
+                    const lng = parseFloat(data[0].lon);
+                    
+                    if (map) {
+                        map.setView([lat, lng], 14);
+                        if (mapMarker) {
+                            mapMarker.setLatLng([lat, lng]);
+                            mapMarker.bindPopup(`<strong>📍 ${location}</strong>`).openPopup();
+                        }
+                    }
+                }
+            })
+            .catch(error => console.error('Geocoding error:', error));
+    }
 
     // ============================================
     // ADMIN FUNCTIONS
@@ -774,24 +871,16 @@
     // ============================================
     // DASHBOARD FUNCTIONS
     // ============================================
-    let supabaseClient = null;
-    let dashboardData = null;
-
     async function loadDashboard() {
         if (!supabaseClient) return;
         
         try {
             updateStatus('📊 Loading admin dashboard...');
             
-            // Get today's stats
-            const today = new Date().toISOString().split('T')[0];
-            
-            // Get orders for this week
             const weekAgo = new Date();
             weekAgo.setDate(weekAgo.getDate() - 7);
             const weekAgoStr = weekAgo.toISOString();
             
-            // Fetch orders
             const { data: orders, error: ordersError } = await supabaseClient
                 .from('orders')
                 .select('*')
@@ -800,7 +889,6 @@
             
             if (ordersError) throw ordersError;
             
-            // Fetch delivery records
             const { data: deliveries, error: deliveriesError } = await supabaseClient
                 .from('delivery_records')
                 .select('*')
@@ -808,13 +896,11 @@
             
             if (deliveriesError) throw deliveriesError;
             
-            // Calculate stats
             const totalOrders = orders?.length || 0;
             const totalRevenue = orders?.reduce((sum, o) => sum + (o.total || 0), 0) || 0;
             const completedOrders = orders?.filter(o => o.status === 'delivered').length || 0;
             const pendingOrders = orders?.filter(o => o.status === 'pending' || o.status === 'preparing').length || 0;
             
-            // Calculate delivery girl stats
             const girlStats = {};
             deliveries?.forEach(d => {
                 const name = d.delivery_girl_name || 'Unknown';
@@ -822,7 +908,6 @@
                     girlStats[name] = { deliveries: 0, revenue: 0 };
                 }
                 girlStats[name].deliveries += 1;
-                // Find associated order
                 const order = orders?.find(o => o.id === d.order_id);
                 if (order) {
                     girlStats[name].revenue += order.total || 0;
@@ -852,11 +937,9 @@
         if (!dashboardData) return;
         
         const { totalOrders, totalRevenue, completedOrders, pendingOrders, orders, girlStats } = dashboardData;
-        
         const adminPanel = document.querySelector('.admin-panel');
         if (!adminPanel) return;
         
-        // Build girl stats HTML
         let girlStatsHTML = '';
         const sortedGirls = Object.entries(girlStats).sort((a, b) => b[1].deliveries - a[1].deliveries);
         if (sortedGirls.length === 0) {
@@ -875,7 +958,6 @@
             });
         }
         
-        // Build orders HTML
         let ordersHTML = '';
         const recentOrders = orders.slice(0, 20);
         if (recentOrders.length === 0) {
@@ -955,7 +1037,6 @@
             </div>
         `;
         
-        // Add refresh button
         const refreshBtn = document.createElement('button');
         refreshBtn.className = 'action-btn';
         refreshBtn.style.marginTop = '12px';
@@ -966,7 +1047,6 @@
     }
 
     window.switchTab = function(tab) {
-        // Update tabs
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
         
@@ -999,8 +1079,6 @@
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             updateStatus('🔗 Connected to Supabase');
 
-            // Test connection
-            updateStatus('📡 Testing connection...');
             const { data: testData, error: testError } = await supabaseClient
                 .from('menu')
                 .select('count')
@@ -1011,8 +1089,6 @@
             }
             updateStatus('✅ Connection successful!');
 
-            // Fetch menu
-            updateStatus('📋 Fetching menu...');
             const { data: menuData, error: menuError } = await supabaseClient
                 .from('menu')
                 .select('*')
@@ -1021,8 +1097,6 @@
             if (menuError) throw menuError;
             updateStatus(`✅ Menu loaded: ${menuData?.length || 0} items`);
 
-            // Fetch delivery girls
-            updateStatus('👩 Fetching delivery girls...');
             const { data: girlsData, error: girlsError } = await supabaseClient
                 .from('delivery_girls')
                 .select('name')
@@ -1031,15 +1105,11 @@
             if (girlsError) throw girlsError;
             updateStatus(`✅ Girls loaded: ${girlsData?.length || 0}`);
 
-            // Check admin session
             checkAdminSession();
 
-            // Render the app
-            updateStatus('🎨 Rendering app...');
             renderApp(menuData || [], girlsData?.map(g => g.name) || [], supabaseClient);
             updateStatus('✅ App ready! Serving Kasama District');
             
-            // Load dashboard if admin
             if (isAdmin) {
                 await loadDashboard();
             }
@@ -1108,8 +1178,6 @@
                     </span>
                 `).join('');
 
-            const mapSrc = `https://www.google.com/maps/embed/v1/place?key=AIzaSyC0X7LOV5Vqk7t7mGzN9eK8zP5yH9Qw0Jc&q=${encodeURIComponent(customerLocation)}&zoom=14`;
-
             container.innerHTML = `
                 <!-- Kasama Location Banner -->
                 <div style="background:linear-gradient(135deg,#cc0000,#990000);color:white;padding:10px 16px;border-radius:16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;">
@@ -1155,7 +1223,7 @@
                     <div class="section-title">
                         <i class="fas fa-map-marked-alt"></i> Real-time Location
                         <span style="font-size:10px;color:#cc0000;margin-left:auto;">
-                            <i class="fas fa-satellite"></i> GPS Live
+                            <i class="fas fa-globe-africa"></i> OpenStreetMap
                         </span>
                     </div>
                     <div class="map-container">
@@ -1163,12 +1231,7 @@
                             <i class="fas fa-spinner fa-spin"></i><br>
                             Loading Kasama map...
                         </div>
-                        <iframe 
-                            src="${mapSrc}" 
-                            loading="lazy" 
-                            title="Kasama Delivery Map"
-                            onload="document.getElementById('mapLoading').style.display='none'"
-                        ></iframe>
+                        <div id="map"></div>
                     </div>
                     <div style="font-size:13px;margin-top:6px;display:flex;justify-content:space-between;align-items:center;">
                         <div>
@@ -1189,13 +1252,19 @@
                     </button>
                 </div>
 
-                <!-- Admin Panel (Hidden by default) -->
+                <!-- Admin Panel -->
                 <div class="admin-panel ${isAdmin ? 'show' : ''}" id="adminPanel">
                     ${isAdmin ? '<div style="text-align:center;padding:20px;color:#cc0000;"><i class="fas fa-spinner fa-spin"></i> Loading dashboard...</div>' : ''}
                 </div>
             `;
 
-            // Re-apply admin visibility if admin is logged in
+            // Initialize map after DOM update
+            setTimeout(() => {
+                if (document.getElementById('map')) {
+                    initMap(customerLocation);
+                }
+            }, 500);
+
             const panel = document.getElementById('adminPanel');
             if (panel) {
                 if (isAdmin) {
@@ -1237,6 +1306,7 @@
         window.updateLocation = function(value) {
             customerLocation = value || 'Kasama, Northern Province, Zambia';
             render();
+            updateMapLocation(customerLocation);
         };
 
         window.shareLocation = function() {
@@ -1358,13 +1428,7 @@
             }
         };
 
-        // Initial render
         render();
-
-        // Check if admin should be shown
-        if (isAdmin) {
-            document.getElementById('adminPanel')?.classList.add('show');
-        }
     }
 
     // Start the app
