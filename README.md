@@ -1,35 +1,35 @@
-
 # Laura Girls Food Delivery App
 
-A complete food delivery application with React frontend, Express backend, and Supabase database.
+A complete food delivery app hosted on GitHub Pages with Supabase backend.
 
-## 🚀 Features
+## 🌐 Live Demo
+[Your GitHub Pages URL here]
+
+## 📋 Features
 
 - **User Features:**
-  - Browse menu items
+  - Browse menu items from Supabase database
   - Add items to cart
   - Place orders with cash on delivery
   - View delivery location on Google Maps
 
 - **Admin Features:**
   - Add/remove delivery girls
-  - View all orders
-  - Update order status
+  - All data stored in Supabase
 
-- **Delivery Girl Features:**
-  - See customer location on map
-  - View assigned orders
+## 🚀 Deployment Instructions
 
-## 📋 Prerequisites
+### 1. Set Up Supabase
 
-- Node.js (v14 or higher)
-- npm or yarn
-- Supabase account
-- Google Maps API key
+1. Create a free account at [Supabase](https://supabase.com)
+2. Create a new project
+3. Go to SQL Editor and run the `supabase-schema.sql` script
+4. Get your Project URL and Anon Key from Settings > API
 
-## 🛠️ Installation
+### 2. Update the App
 
-1. **Clone the repository:**
-   ```bash
-   git clone <your-repo-url>
-   cd laura-girls-food-delivery
+1. Open `index.html` in a text editor
+2. Replace these values at the top of the script:
+   ```javascript
+   const SUPABASE_URL = 'https://your-project-url.supabase.co';
+   const SUPABASE_ANON_KEY = 'your-anon-key-here';
