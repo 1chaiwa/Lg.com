@@ -208,6 +208,10 @@
             border-radius: 24px;
             padding: 16px;
             border: 1px solid #ffe0e0;
+            display: none;
+        }
+        .admin-panel.show {
+            display: block;
         }
         .admin-input-group {
             display: flex;
@@ -409,17 +413,111 @@
         .whatsapp-btn:active {
             transform: scale(0.95);
         }
-        .kasama-flag {
-            font-size: 12px;
-            color: #cc0000;
+
+        /* Admin Login Styles */
+        .admin-login-btn {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: 0.15s;
         }
-        .order-count {
+        .admin-login-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        .admin-login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+        .admin-login-modal.show {
+            display: flex;
+        }
+        .admin-login-box {
+            background: white;
+            padding: 30px;
+            border-radius: 24px;
+            max-width: 340px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .admin-login-box h2 {
+            color: #cc0000;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .admin-login-box input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ffcccc;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            outline: none;
+        }
+        .admin-login-box input:focus {
+            border-color: #cc0000;
+        }
+        .admin-login-box button {
+            width: 100%;
+            padding: 12px;
             background: #cc0000;
             color: white;
-            border-radius: 50%;
-            padding: 2px 8px;
-            font-size: 11px;
-            margin-left: 6px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .admin-login-box .error {
+            color: #cc0000;
+            font-size: 13px;
+            text-align: center;
+            margin-top: 10px;
+            display: none;
+        }
+        .admin-login-box .error.show {
+            display: block;
+        }
+        .admin-logout-btn {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .admin-logout-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        .admin-header-badge {
+            background: #ffcc00;
+            color: #990000;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: 700;
+            display: none;
+        }
+        .admin-header-badge.show {
+            display: inline-block;
         }
     </style>
 </head>
@@ -432,6 +530,10 @@
             <i class="fas fa-map-marker-alt"></i> Kasama
         </span>
         <span class="badge"><i class="fas fa-motorcycle"></i> delivery</span>
+        <button class="admin-login-btn" id="adminToggleBtn" onclick="toggleAdminLogin()">
+            <i class="fas fa-user-shield"></i> Admin
+        </button>
+        <span class="admin-header-badge" id="adminBadge">👑 Admin</span>
     </div>
     <div id="app-container" class="app-body">
         <div class="loading" id="loadingDiv">
@@ -445,6 +547,20 @@
     </div>
 </div>
 
+<!-- Admin Login Modal -->
+<div class="admin-login-modal" id="adminModal">
+    <div class="admin-login-box">
+        <h2><i class="fas fa-user-shield"></i> Admin Login</h2>
+        <input type="password" id="adminPassword" placeholder="Enter admin password" onkeypress="if(event.key==='Enter') adminLogin()" />
+        <button onclick="adminLogin()">Login</button>
+        <div class="error" id="loginError">❌ Incorrect password. Please try again.</div>
+        <div style="margin-top:12px;text-align:center;font-size:12px;color:#999;">
+            <i class="fas fa-info-circle"></i> Default password: <strong>admin123</strong>
+        </div>
+        <button onclick="closeAdminModal()" style="margin-top:10px;background:#999;width:100%;padding:10px;border:none;border-radius:12px;color:white;font-weight:600;cursor:pointer;">Cancel</button>
+    </div>
+</div>
+
 <script>
     // ============================================
     // SUPABASE CONFIGURATION
@@ -452,12 +568,15 @@
     const SUPABASE_URL = 'https://ndwoqlxtaczwxsescemu.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kd29xbHh0YWN6d3hzZXNjZW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5Mjk2MTQsImV4cCI6MjA5ODUwNTYxNH0.43PgLQSdEESXboLGrdtZCHq-f8TwzItXaGuxmI4NEe8';
 
+    // Admin password (can be changed)
+    const ADMIN_PASSWORD = 'admin123';
+
+    let isAdmin = false;
+    let adminLoggedIn = false;
+
     const container = document.getElementById('app-container');
     const loadingDiv = document.getElementById('loadingDiv');
     const statusBox = document.getElementById('statusBox');
-
-    // Kasama District coordinates
-    const KASAMA_CENTER = { lat: -10.2129, lng: 31.1809 };
 
     function updateStatus(message) {
         console.log(message);
@@ -467,6 +586,70 @@
     }
 
     updateStatus('🚀 App starting... Kasama, Zambia');
+
+    // ============================================
+    // ADMIN FUNCTIONS
+    // ============================================
+    window.toggleAdminLogin = function() {
+        if (isAdmin) {
+            // Logout
+            isAdmin = false;
+            document.getElementById('adminBadge').classList.remove('show');
+            document.getElementById('adminToggleBtn').innerHTML = '<i class="fas fa-user-shield"></i> Admin';
+            document.querySelector('.admin-panel')?.classList.remove('show');
+            localStorage.removeItem('adminLoggedIn');
+            alert('👋 Logged out from admin panel');
+        } else {
+            // Show login modal
+            document.getElementById('adminModal').classList.add('show');
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('loginError').classList.remove('show');
+            document.getElementById('adminPassword').focus();
+        }
+    };
+
+    window.adminLogin = function() {
+        const password = document.getElementById('adminPassword').value;
+        if (password === ADMIN_PASSWORD) {
+            isAdmin = true;
+            adminLoggedIn = true;
+            localStorage.setItem('adminLoggedIn', 'true');
+            document.getElementById('adminModal').classList.remove('show');
+            document.getElementById('adminBadge').classList.add('show');
+            document.getElementById('adminToggleBtn').innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+            document.querySelector('.admin-panel')?.classList.add('show');
+            alert('✅ Welcome Admin! You can now manage delivery girls.');
+            
+            // Refresh the admin panel visibility
+            const panel = document.querySelector('.admin-panel');
+            if (panel) panel.classList.add('show');
+        } else {
+            document.getElementById('loginError').classList.add('show');
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('adminPassword').focus();
+        }
+    };
+
+    window.closeAdminModal = function() {
+        document.getElementById('adminModal').classList.remove('show');
+    };
+
+    // Check if admin was logged in before (session)
+    function checkAdminSession() {
+        if (localStorage.getItem('adminLoggedIn') === 'true') {
+            isAdmin = true;
+            document.getElementById('adminBadge').classList.add('show');
+            document.getElementById('adminToggleBtn').innerHTML = '<i class="fas fa-sign-out-alt"></i> Logout';
+            // The panel will be shown when it's rendered
+        }
+    }
+
+    // Close modal on outside click
+    document.getElementById('adminModal')?.addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeAdminModal();
+        }
+    });
 
     // ============================================
     // LOAD SUPABASE AND RUN APP
@@ -519,6 +702,9 @@
 
             if (girlsError) throw girlsError;
             updateStatus(`✅ Girls loaded: ${girlsData?.length || 0}`);
+
+            // Check admin session
+            checkAdminSession();
 
             // Render the app
             updateStatus('🎨 Rendering app...');
@@ -589,7 +775,6 @@
                     </span>
                 `).join('');
 
-            // Real-time Google Maps with Kasama location
             const mapSrc = `https://www.google.com/maps/embed/v1/place?key=AIzaSyC0X7LOV5Vqk7t7mGzN9eK8zP5yH9Qw0Jc&q=${encodeURIComponent(customerLocation)}&zoom=14`;
 
             container.innerHTML = `
@@ -671,8 +856,8 @@
                     </button>
                 </div>
 
-                <!-- Admin Panel -->
-                <div class="admin-panel">
+                <!-- Admin Panel (Hidden by default) -->
+                <div class="admin-panel ${isAdmin ? 'show' : ''}" id="adminPanel">
                     <div class="section-title">
                         <i class="fas fa-user-gear"></i> Admin · Delivery Girls
                         <span style="font-size:12px;font-weight:400;color:#6d6a7a;margin-left:auto;">${deliveryGirls.length} in Kasama</span>
@@ -691,6 +876,16 @@
                     </div>
                 </div>
             `;
+
+            // Re-apply admin visibility if admin is logged in
+            const panel = document.getElementById('adminPanel');
+            if (panel) {
+                if (isAdmin) {
+                    panel.classList.add('show');
+                } else {
+                    panel.classList.remove('show');
+                }
+            }
         }
 
         // ============================================
@@ -756,7 +951,6 @@
                 cart = [];
                 render();
                 
-                // Auto-hide order status after 10 seconds
                 setTimeout(() => {
                     orderPlaced = false;
                     orderStatus = '';
@@ -770,6 +964,11 @@
         };
 
         window.addDeliveryGirl = async function() {
+            if (!isAdmin) {
+                alert('⚠️ Admin access required. Please login first.');
+                return;
+            }
+
             const input = document.getElementById('newGirlInput');
             const name = input.value.trim();
             if (!name) {
@@ -778,7 +977,6 @@
             }
 
             try {
-                // Check if exists
                 const { data: existing } = await supabase
                     .from('delivery_girls')
                     .select('name')
@@ -796,7 +994,6 @@
 
                 if (error) throw error;
 
-                // Refresh list
                 const { data: girlsData } = await supabase
                     .from('delivery_girls')
                     .select('name')
@@ -812,6 +1009,11 @@
         };
 
         window.removeGirl = async function(name) {
+            if (!isAdmin) {
+                alert('⚠️ Admin access required. Please login first.');
+                return;
+            }
+
             if (!confirm(`Remove ${name} from delivery girls in Kasama?`)) return;
 
             try {
@@ -837,6 +1039,11 @@
 
         // Initial render
         render();
+
+        // Check if admin should be shown
+        if (isAdmin) {
+            document.getElementById('adminPanel')?.classList.add('show');
+        }
     }
 
     // Start the app
