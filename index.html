@@ -1,1 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Laura Girls · Food Delivery</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC0X7LOV5Vqk7t7mGzN9eK8zP5yH9Qw0Jc&libraries=places" async defer></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    body {
+      background: #f5f7fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 12px;
+    }
+    #root {
+      width: 100%;
+      max-width: 430px;
+      background: white;
+      border-radius: 32px 32px 24px 24px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08), 0 6px 12px rgba(0,0,0,0.05);
+      overflow: hidden;
+      position: relative;
+      min-height: 780px;
+      display: flex;
+      flex-direction: column;
+    }
+    .app-header {
+      background: linear-gradient(135deg, #6c2b8a, #8b3fa8);
+      padding: 18px 20px 14px;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+    }
+    .app-header i {
+      font-size: 26px;
+      color: #ffcc00;
+    }
+    .app-header h1 {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      flex: 1;
+    }
+    .app-header .badge {
+      background: #ffcc00;
+      color: #1f1f2e;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 40px;
+    }
+    .app-body {
+      flex: 1;
+      padding: 16px 16px 10px;
+      overflow-y: auto;
+      background: #fafafc;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 16px 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+      border: 1px solid #f0eff2;
+    }
+    .section-title {
+      font-weight: 600;
+      font-size: 15px;
+      color: #1a1a2e;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-title i {
+      color: #6c2b8a;
+      font-size: 16px;
+    }
+    .menu-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .menu-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 4px;
+      border-bottom: 1px solid #f0edf3;
+    }
+    .menu-item:last-child {
+      border-bottom: none;
+    }
+    .menu-item .info {
+      display: flex;
+      flex-direction: column;
+    }
+    .menu-item .name {
+      font-weight: 500;
+      color: #1f1f2e;
+    }
+    .menu-item .price {
+      font-size: 14px;
+      color: #6c2b8a;
+      font-weight: 600;
+    }
+    .menu-item .add-btn {
+      background: #6c2b8a;
+      color: white;
+      border: none;
+      border-radius: 30px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .menu-item .add-btn:active {
+      transform: scale(0.94);
+      background: #521f6b;
+    }
+    .order-summary {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 14px 14px 10px;
+      border: 1px solid #e9e6ed;
+      margin-top: 4px;
+    }
+    .order-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      padding: 6px 0;
+      border-bottom: 1px dashed #e3dfe9;
+    }
+    .order-row:last-child {
+      border-bottom: none;
+    }
+    .order-total {
+      font-weight: 700;
+      color: #1a1a2e;
+      font-size: 16px;
+    }
+    .order-total span {
+      color: #6c2b8a;
+    }
+    .action-btn {
+      background: #ffcc00;
+      border: none;
+      border-radius: 40px;
+      padding: 12px 0;
+      font-weight: 700;
+      font-size: 16px;
+      color: #1f1f2e;
+      width: 100%;
+      margin-top: 12px;
+      cursor: pointer;
+      transition: 0.15s;
+      box-shadow: 0 4px 8px rgba(108, 43, 138, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .action-btn:active {
+      transform: scale(0.97);
+      background: #e6b800;
+    }
+    .action-btn i {
+      font-size: 18px;
+    }
+    .map-container {
+      height: 160px;
+      background: #d9d2e3;
+      border-radius: 20px;
+      overflow: hidden;
+      margin: 4px 0 6px;
+      position: relative;
+    }
+    .map-container iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+    .admin-panel {
+      background: #f4f0f9;
+      border-radius: 24px;
+      padding: 14px;
+      margin-top: 4px;
+    }
+    .admin-input-group {
+      display: flex;
+      gap: 8px;
+      margin: 8px 0 6px;
+      flex-wrap: wrap;
+    }
+    .admin-input-group input {
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid #d6cee0;
+      border-radius: 40px;
+      background: white;
+      font-size: 14px;
+      outline: none;
+    }
+    .admin-input-group input:focus {
+      border-color: #6c2b8a;
+    }
+    .admin-input-group button {
+      background: #6c2b8a;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .delivery-girl-list {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .delivery-girl-tag {
+      background: white;
+      border-radius: 40px;
+      padding: 6px 14px 6px 12px;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid #d4cade;
+    }
+    .delivery-girl-tag i {
+      color: #6c2b8a;
+    }
+    .delivery-girl-tag .remove {
+      color: #b0003a;
+      cursor: pointer;
+      font-size: 14px;
+      margin-left: 4px;
+    }
+    .footnote {
+      font-size: 11px;
+      color: #6d6a7a;
+      text-align: center;
+      padding: 12px 0 6px;
+      border-top: 1px solid #ece9f0;
+      margin-top: 6px;
+    }
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: #6c2b8a;
+    }
+    .error-message {
+      background: #ffe6e6;
+      color: #b0003a;
+      padding: 10px;
+      border-radius: 12px;
+      font-size: 14px;
+      text-align: center;
+    }
+    .success-message {
+      background: #e6ffe6;
+      color: #1f8b4c;
+      padding: 10px;
+      border-radius: 12px;
+      font-size: 14px;
+      text-align: center;
+    }
+    .status-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-preparing { background: #cce5ff; color: #004085; }
+    .status-delivering { background: #d4edda; color: #155724; }
+    .status-delivered { background: #d1ecf1; color: #0c5460; }
+    .status-cancelled { background: #f8d7da; color: #721c24; }
+  </style>
+</head>
+<body>
+<div id="root">
+  <div class="app-header">
+    <i class="fas fa-utensils"></i>
+    <h1>Laura Girls Food</h1>
+    <span class="badge"><i class="fas fa-motorcycle"></i> delivery</span>
+  </div>
+  <div id="app-container" class="app-body"></div>
+  <div class="footnote">
+    <i class="fas fa-shield-alt"></i> Cash on delivery · MTN MoMo style
+  </div>
+</div>
 
+<script>
+  // React application with Supabase integration
+  (function() {
+    // Load React from CDN
+    const scriptReact = document.createElement('script');
+    scriptReact.src = 'https://unpkg.com/react@18/umd/react.production.min.js';
+    document.head.appendChild(scriptReact);
+    
+    const scriptReactDOM = document.createElement('script');
+    scriptReactDOM.src = 'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js';
+    document.head.appendChild(scriptReactDOM);
+
+    scriptReactDOM.onload = function() {
+      const { useState, useEffect } = React;
+
+      function App() {
+        const [menu, setMenu] = useState([]);
+        const [cart, setCart] = useState([]);
+        const [deliveryGirls, setDeliveryGirls] = useState([]);
+        const [newGirl, setNewGirl] = useState('');
+        const [orderPlaced, setOrderPlaced] = useState(false);
+        const [customerLocation, setCustomerLocation] = useState('Accra, Ghana');
+        const [loading, setLoading] = useState(true);
+        const [error, setError] = useState('');
+        const [orders, setOrders] = useState([]);
+        const [showAdmin, setShowAdmin] = useState(false);
+
+        // Fetch data from Supabase via backend API
+        useEffect(() => {
+          const fetchData = async () => {
+            setLoading(true);
+            try {
+              // Fetch menu
+              const menuRes = await fetch('/api/menu');
+              if (!menuRes.ok) throw new Error('Failed to fetch menu');
+              const menuData = await menuRes.json();
+              setMenu(menuData);
+
+              // Fetch delivery girls
+              const girlsRes = await fetch('/api/delivery-girls');
+              if (!girlsRes.ok) throw new Error('Failed to fetch delivery girls');
+              const girlsData = await girlsRes.json();
+              setDeliveryGirls(girlsData);
+
+              // Fetch orders (admin)
+              const ordersRes = await fetch('/api/orders');
+              if (ordersRes.ok) {
+                const ordersData = await ordersRes.json();
+                setOrders(ordersData);
+              }
+
+              setError('');
+            } catch (err) {
+              console.error('Error fetching data:', err);
+              setError('Failed to load data. Please refresh the page.');
+            } finally {
+              setLoading(false);
+            }
+          };
+
+          fetchData();
+        }, []);
+
+        const addToCart = (item) => {
+          setCart(prev => {
+            const existing = prev.find(i => i.id === item.id);
+            if (existing) {
+              return prev.map(i => i.id === item.id ? { ...i, qty: i.qty + 1 } : i);
+            }
+            return [...prev, { ...item, qty: 1 }];
+          });
+        };
+
+        const removeFromCart = (id) => {
+          setCart(prev => {
+            const existing = prev.find(i => i.id === id);
+            if (existing && existing.qty > 1) {
+              return prev.map(i => i.id === id ? { ...i, qty: i.qty - 1 } : i);
+            }
+            return prev.filter(i => i.id !== id);
+          });
+        };
+
+        const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
+
+        const placeOrder = async () => {
+          if (cart.length === 0) {
+            alert('Please add items to your order');
+            return;
+          }
+
+          try {
+            const response = await fetch('/api/order', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                items: cart,
+                total: totalPrice,
+                customerLocation: customerLocation
+              })
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+              setOrderPlaced(true);
+              setCart([]);
+              setTimeout(() => setOrderPlaced(false), 6000);
+              alert(`✅ ${data.message}\nA delivery girl will arrive soon!`);
+              
+              // Refresh orders
+              const ordersRes = await fetch('/api/orders');
+              if (ordersRes.ok) {
+                const ordersData = await ordersRes.json();
+                setOrders(ordersData);
+              }
+            } else {
+              alert('Error placing order: ' + data.error);
+            }
+          } catch (error) {
+            console.error('Error placing order:', error);
+            alert('Failed to place order. Please try again.');
+          }
+        };
+
+        const addDeliveryGirl = async () => {
+          if (!newGirl.trim()) {
+            alert('Please enter a delivery girl name');
+            return;
+          }
+
+          try {
+            const response = await fetch('/api/delivery-girls', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name: newGirl.trim() })
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+              setDeliveryGirls(data.girls);
+              setNewGirl('');
+              alert('✅ Delivery girl added successfully!');
+            } else {
+              alert('Error: ' + data.error);
+            }
+          } catch (error) {
+            console.error('Error adding delivery girl:', error);
+            alert('Failed to add delivery girl. Please try again.');
+          }
+        };
+
+        const removeGirl = async (name) => {
+          if (!confirm(`Remove ${name} from delivery girls?`)) return;
+
+          try {
+            const response = await fetch(`/api/delivery-girls/${encodeURIComponent(name)}`, {
+              method: 'DELETE'
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+              setDeliveryGirls(data.girls);
+              alert('✅ Delivery girl removed successfully!');
+            } else {
+              alert('Error: ' + data.error);
+            }
+          } catch (error) {
+            console.error('Error removing delivery girl:', error);
+            alert('Failed to remove delivery girl. Please try again.');
+          }
+        };
+
+        const updateOrderStatus = async (orderId, status) => {
+          try {
+            const response = await fetch(`/api/order/${orderId}/status`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ status })
+            });
+            
+            const data = await response.json();
+            if (data.success) {
+              // Refresh orders
+              const ordersRes = await fetch('/api/orders');
+              if (ordersRes.ok) {
+                const ordersData = await ordersRes.json();
+                setOrders(ordersData);
+              }
+            }
+          } catch (error) {
+            console.error('Error updating order status:', error);
+          }
+        };
+
+        const getStatusBadge = (status) => {
+          const classes = {
+            'pending': 'status-pending',
+            'preparing': 'status-preparing',
+            'delivering': 'status-delivering',
+            'delivered': 'status-delivered',
+            'cancelled': 'status-cancelled'
+          };
+          return <span className={`status-badge ${classes[status] || 'status-pending'}`}>{status}</span>;
+        };
+
+        // Google Map embed
+        const mapSrc = `https://www.google.com/maps/embed/v1/place?key=AIzaSyC0X7LOV5Vqk7t7mGzN9eK8zP5yH9Qw0Jc&q=${encodeURIComponent(customerLocation)}`;
+
+        if (loading) {
+          return (
+            <div className="loading">
+              <i className="fas fa-spinner fa-spin fa-2x"></i>
+              <p>Loading delicious food...</p>
+            </div>
+          );
+        }
+
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {error && (
+              <div className="error-message">
+                <i className="fas fa-exclamation-circle"></i> {error}
+              </div>
+            )}
+
+            {/* Menu Section */}
+            <div className="card">
+              <div className="section-title">
+                <i className="fas fa-list-ul"></i> Today's Menu
+              </div>
+              <div className="menu-grid">
+                {menu.length === 0 ? (
+                  <div style={{ textAlign: 'center', color: '#7a6e86', padding: '10px' }}>
+                    No menu items available
+                  </div>
+                ) : (
+                  menu.map(item => (
+                    <div className="menu-item" key={item.id}>
+                      <div className="info">
+                        <span className="name">{item.emoji} {item.name}</span>
+                        <span className="price">${item.price.toFixed(2)}</span>
+                      </div>
+                      <button className="add-btn" onClick={() => addToCart(item)}>
+                        <i className="fas fa-plus"></i> Add
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Order Summary */}
+            <div className="order-summary">
+              <div className="section-title" style={{ marginBottom: '6px' }}>
+                <i className="fas fa-shopping-bag"></i> Your Order
+              </div>
+              {cart.length === 0 ? (
+                <div style={{ color: '#7a6e86', fontSize: '14px', padding: '6px 0' }}>
+                  <i className="fas fa-shopping-cart"></i> Cart is empty
+                </div>
+              ) : (
+                cart.map(item => (
+                  <div className="order-row" key={item.id}>
+                    <span>{item.name} × {item.qty}</span>
+                    <span>
+                      ${(item.price * item.qty).toFixed(2)}
+                      <button 
+                        onClick={() => removeFromCart(item.id)} 
+                        style={{ 
+                          background: 'none', 
+                          border: 'none', 
+                          color: '#b0003a', 
+                          marginLeft: '8px', 
+                          cursor: 'pointer' 
+                        }}
+                      >
+                        <i className="fas fa-minus-circle"></i>
+                      </button>
+                    </span>
+                  </div>
+                ))
+              )}
+              <div className="order-row order-total">
+                <span>Total</span>
+                <span>${totalPrice.toFixed(2)}</span>
+              </div>
+              <button className="action-btn" onClick={placeOrder}>
+                <i className="fas fa-motorcycle"></i> Place Order · Cash
+              </button>
+              {orderPlaced && (
+                <div className="success-message" style={{ marginTop: '8px' }}>
+                  <i className="fas fa-check-circle"></i> Order placed! Delivery on the way.
+                </div>
+              )}
+            </div>
+
+            {/* Map Section */}
+            <div className="card">
+              <div className="section-title">
+                <i className="fas fa-map-pin"></i> Delivery Location
+              </div>
+              <div className="map-container">
+                <iframe 
+                  src={mapSrc} 
+                  loading="lazy" 
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Delivery Map"
+                ></iframe>
+              </div>
+              <div style={{ fontSize: '13px', color: '#2d2d44', marginTop: '6px' }}>
+                <i className="fas fa-location-dot" style={{ color: '#6c2b8a' }}></i> Customer: {customerLocation}
+              </div>
+              <div style={{ fontSize: '12px', color: '#5f556b', marginTop: '4px' }}>
+                <i className="fas fa-user-check"></i> Delivery girl sees this location
+              </div>
+            </div>
+
+            {/* Admin Toggle */}
+            <button 
+              onClick={() => setShowAdmin(!showAdmin)}
+              style={{
+                background: showAdmin ? '#6c2b8a' : '#f0edf5',
+                color: showAdmin ? 'white' : '#2d2d44',
+                border: 'none',
+                padding: '10px',
+                borderRadius: '40px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px'
+              }}
+            >
+              <i className="fas fa-user-gear"></i>
+              {showAdmin ? 'Hide Admin Panel' : 'Show Admin Panel'}
+            </button>
+
+            {/* Admin Panel */}
+            {showAdmin && (
+              <>
+                {/* Delivery Girls Management */}
+                <div className="admin-panel">
+                  <div className="section-title">
+                    <i className="fas fa-user-plus"></i> Manage Delivery Girls
+                  </div>
+                  <div className="admin-input-group">
+                    <input 
+                      placeholder="Enter delivery girl name" 
+                      value={newGirl} 
+                      onChange={e => setNewGirl(e.target.value)}
+                      onKeyPress={e => e.key === 'Enter' && addDeliveryGirl()}
+                    />
+                    <button onClick={addDeliveryGirl}>
+                      <i className="fas fa-plus"></i> Add
+                    </button>
+                  </div>
+                  <div className="delivery-girl-list">
+                    {deliveryGirls.length === 0 ? (
+                      <div style={{ color: '#7a6e86', fontSize: '13px', padding: '4px 0' }}>
+                        No delivery girls added yet
+                      </div>
+                    ) : (
+                      deliveryGirls.map(g => (
+                        <span className="delivery-girl-tag" key={g}>
+                          <i className="fas fa-female"></i> {g}
+                          <span className="remove" onClick={() => removeGirl(g)}>
+                            <i className="fas fa-times"></i>
+                          </span>
+                        </span>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Orders Management */}
+                <div className="admin-panel">
+                  <div className="section-title">
+                    <i className="fas fa-clipboard-list"></i> Recent Orders ({orders.length})
+                  </div>
+                  {orders.length === 0 ? (
+                    <div style={{ color: '#7a6e86', fontSize: '13px', padding: '8px 0' }}>
+                      No orders placed yet
+                    </div>
+                  ) : (
+                    orders.slice(0, 5).map(order => (
+                      <div key={order.id} style={{
+                        background: 'white',
+                        padding: '12px',
+                        borderRadius: '12px',
+                        marginBottom: '8px',
+                        border: '1px solid #e9e6ed'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div>
+                            <div style={{ fontWeight: '600', fontSize: '14px' }}>
+                              Order #{order.id}
+                            </div>
+                            <div style={{ fontSize: '12px', color: '#6d6a7a' }}>
+                              {new Date(order.created_at).toLocaleString()}
+                            </div>
+                            <div style={{ fontSize: '13px', marginTop: '4px' }}>
+                              Total: <strong>${order.total.toFixed(2)}</strong>
+                            </div>
+                          </div>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-end' }}>
+                            {getStatusBadge(order.status)}
+                            <select 
+                              value={order.status}
+                              onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                              style={{
+                                padding: '4px 8px',
+                                borderRadius: '20px',
+                                border: '1px solid #d6cee0',
+                                fontSize: '11px',
+                                background: 'white'
+                              }}
+                            >
+                              <option value="pending">Pending</option>
+                              <option value="preparing">Preparing</option>
+                              <option value="delivering">Delivering</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="cancelled">Cancelled</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#6d6a7a', marginTop: '4px' }}>
+                          <i className="fas fa-map-pin"></i> {order.customer_location}
+                        </div>
+                      </div>
+                    ))
+                  )}
+                  {orders.length > 5 && (
+                    <div style={{ textAlign: 'center', fontSize: '12px', color: '#6d6a7a' }}>
+                      + {orders.length - 5} more orders
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        );
+      }
+
+      // Render React app
+      const container = document.getElementById('app-container');
+      if (container) {
+        const root = ReactDOM.createRoot(container);
+        root.render(React.createElement(App));
+      }
+    };
+  })();
+</script>
+</body>
+</html>
