@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Laura Girls · Food Delivery</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC0X7LOV5Vqk7t7mGzN9eK8zP5yH9Qw0Jc&libraries=places" async defer></script>
   <style>
     * {
       margin: 0;
@@ -266,16 +265,21 @@
     }
     .loading {
       text-align: center;
-      padding: 20px;
+      padding: 40px 20px;
       color: #6c2b8a;
+    }
+    .loading i {
+      font-size: 40px;
+      margin-bottom: 10px;
     }
     .error-message {
       background: #ffe6e6;
       color: #b0003a;
-      padding: 10px;
+      padding: 15px;
       border-radius: 12px;
       font-size: 14px;
       text-align: center;
+      margin: 10px 0;
     }
     .success-message {
       background: #e6ffe6;
@@ -284,6 +288,20 @@
       border-radius: 12px;
       font-size: 14px;
       text-align: center;
+    }
+    .debug-box {
+      background: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 12px;
+      color: #333;
+      max-height: 150px;
+      overflow-y: auto;
+      font-family: monospace;
+      white-space: pre-wrap;
+      word-break: break-all;
     }
   </style>
 </head>
@@ -294,7 +312,12 @@
     <h1>Laura Girls Food</h1>
     <span class="badge"><i class="fas fa-motorcycle"></i> delivery</span>
   </div>
-  <div id="app-container" class="app-body"></div>
+  <div id="app-container" class="app-body">
+    <div class="loading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Loading delicious food...</p>
+    </div>
+  </div>
   <div class="footnote">
     <i class="fas fa-shield-alt"></i> Cash on delivery · MTN MoMo style
   </div>
@@ -302,17 +325,42 @@
 
 <script>
   // ============================================
-  // 🔑 SUPABASE CONFIGURATION - EDIT THESE VALUES
+  // 🔑 SUPABASE CONFIGURATION
   // ============================================
-  const SUPABASE_URL = 'https://ndwoqlxtaczwxsescemu.supabase.co';  // ← CHANGE THIS
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kd29xbHh0YWN6d3hzZXNjZW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5Mjk2MTQsImV4cCI6MjA5ODUwNTYxNH0.43PgLQSdEESXboLGrdtZCHq-f8TwzItXaGuxmI4NEe8';          
-  // ← CHANGE THIS
+  const SUPABASE_URL = 'https://ndwoqlxtaczwxsescemu.supabase.co';
+  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kd29xbHh0YWN6d3hzZXNjZW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5Mjk2MTQsImV4cCI6MjA5ODUwNTYxNH0.43PgLQSdEESXboLGrdtZCHq-f8TwzItXaGuxmI4NEe8';
   
+  console.log('🚀 App Starting...');
+  console.log('📡 Supabase URL:', SUPABASE_URL);
+  console.log('🔑 Supabase Key:', SUPABASE_ANON_KEY ? '✅ Set' : '❌ Missing');
+
+  // Track loading status
+  let scriptsLoaded = 0;
+  const totalScripts = 3; // Supabase, React, ReactDOM
+
+  function checkAllScriptsLoaded() {
+    scriptsLoaded++;
+    console.log(`📦 Script ${scriptsLoaded}/${totalScripts} loaded`);
+    if (scriptsLoaded === totalScripts) {
+      console.log('✅ All scripts loaded, initializing app...');
+      initializeApp();
+    }
+  }
+
   // ============================================
   // LOAD SUPABASE CLIENT
   // ============================================
   const scriptSupabase = document.createElement('script');
   scriptSupabase.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+  scriptSupabase.onload = checkAllScriptsLoaded;
+  scriptSupabase.onerror = function() {
+    console.error('❌ Failed to load Supabase');
+    document.getElementById('app-container').innerHTML = `
+      <div class="error-message">
+        <i class="fas fa-exclamation-circle"></i> Failed to load Supabase library. Please check your internet connection.
+      </div>
+    `;
+  };
   document.head.appendChild(scriptSupabase);
 
   // ============================================
@@ -320,365 +368,423 @@
   // ============================================
   const scriptReact = document.createElement('script');
   scriptReact.src = 'https://unpkg.com/react@18/umd/react.production.min.js';
+  scriptReact.onload = checkAllScriptsLoaded;
+  scriptReact.onerror = function() {
+    console.error('❌ Failed to load React');
+    document.getElementById('app-container').innerHTML = `
+      <div class="error-message">
+        <i class="fas fa-exclamation-circle"></i> Failed to load React library.
+      </div>
+    `;
+  };
   document.head.appendChild(scriptReact);
   
+  // ============================================
+  // LOAD REACTDOM
+  // ============================================
   const scriptReactDOM = document.createElement('script');
   scriptReactDOM.src = 'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js';
+  scriptReactDOM.onload = checkAllScriptsLoaded;
+  scriptReactDOM.onerror = function() {
+    console.error('❌ Failed to load ReactDOM');
+    document.getElementById('app-container').innerHTML = `
+      <div class="error-message">
+        <i class="fas fa-exclamation-circle"></i> Failed to load ReactDOM library.
+      </div>
+    `;
+  };
   document.head.appendChild(scriptReactDOM);
 
   // ============================================
-  // REACT APP
+  // INITIALIZE APP
   // ============================================
-  scriptReactDOM.onload = function() {
-    const { useState, useEffect } = React;
+  function initializeApp() {
+    console.log('⚛️ Initializing React App...');
+    
+    try {
+      // Check if all required libraries are loaded
+      if (typeof React === 'undefined') {
+        throw new Error('React is not loaded');
+      }
+      if (typeof ReactDOM === 'undefined') {
+        throw new Error('ReactDOM is not loaded');
+      }
+      if (typeof supabase === 'undefined' && typeof window.supabase === 'undefined') {
+        throw new Error('Supabase is not loaded');
+      }
 
-    function App() {
-      const [menu, setMenu] = useState([]);
-      const [cart, setCart] = useState([]);
-      const [deliveryGirls, setDeliveryGirls] = useState([]);
-      const [newGirl, setNewGirl] = useState('');
-      const [orderPlaced, setOrderPlaced] = useState(false);
-      const [customerLocation, setCustomerLocation] = useState('Accra, Ghana');
-      const [loading, setLoading] = useState(true);
-      const [error, setError] = useState('');
-      const [supabase, setSupabase] = useState(null);
+      const { useState, useEffect } = React;
+      const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      console.log('✅ Supabase client created');
 
-      // Initialize Supabase client
-      useEffect(() => {
-        if (window.supabase) {
-          const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-          setSupabase(client);
-        }
-      }, []);
+      function App() {
+        const [menu, setMenu] = useState([]);
+        const [cart, setCart] = useState([]);
+        const [deliveryGirls, setDeliveryGirls] = useState([]);
+        const [newGirl, setNewGirl] = useState('');
+        const [orderPlaced, setOrderPlaced] = useState(false);
+        const [customerLocation] = useState('Accra, Ghana');
+        const [loading, setLoading] = useState(true);
+        const [error, setError] = useState('');
+        const [debug, setDebug] = useState('');
 
-      // Fetch data from Supabase
-      useEffect(() => {
-        if (!supabase) return;
+        // Fetch data from Supabase
+        useEffect(() => {
+          const fetchData = async () => {
+            console.log('📡 Fetching data from Supabase...');
+            setLoading(true);
+            try {
+              // Fetch menu
+              console.log('📋 Fetching menu...');
+              const { data: menuData, error: menuError } = await supabaseClient
+                .from('menu')
+                .select('*')
+                .order('id');
 
-        const fetchData = async () => {
-          setLoading(true);
+              if (menuError) {
+                console.error('❌ Menu error:', menuError);
+                throw menuError;
+              }
+              console.log('✅ Menu loaded:', menuData?.length || 0, 'items');
+              setMenu(menuData || []);
+              setDebug(prev => prev + `Menu: ${menuData?.length || 0} items\n`);
+
+              // Fetch delivery girls
+              console.log('👩 Fetching delivery girls...');
+              const { data: girlsData, error: girlsError } = await supabaseClient
+                .from('delivery_girls')
+                .select('name')
+                .order('name');
+
+              if (girlsError) {
+                console.error('❌ Girls error:', girlsError);
+                throw girlsError;
+              }
+              console.log('✅ Girls loaded:', girlsData?.length || 0);
+              setDeliveryGirls(girlsData?.map(g => g.name) || []);
+              setDebug(prev => prev + `Girls: ${girlsData?.length || 0}\n`);
+
+              setError('');
+              console.log('✅ All data loaded successfully!');
+            } catch (err) {
+              console.error('❌ Error:', err);
+              setError(`Failed to load: ${err.message}`);
+              setDebug(prev => prev + `❌ Error: ${err.message}\n`);
+            } finally {
+              setLoading(false);
+            }
+          };
+
+          fetchData();
+        }, []);
+
+        const addToCart = (item) => {
+          setCart(prev => {
+            const existing = prev.find(i => i.id === item.id);
+            if (existing) {
+              return prev.map(i => i.id === item.id ? { ...i, qty: i.qty + 1 } : i);
+            }
+            return [...prev, { ...item, qty: 1 }];
+          });
+        };
+
+        const removeFromCart = (id) => {
+          setCart(prev => {
+            const existing = prev.find(i => i.id === id);
+            if (existing && existing.qty > 1) {
+              return prev.map(i => i.id === id ? { ...i, qty: i.qty - 1 } : i);
+            }
+            return prev.filter(i => i.id !== id);
+          });
+        };
+
+        const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
+
+        const placeOrder = async () => {
+          if (cart.length === 0) {
+            alert('Please add items to your order');
+            return;
+          }
+
           try {
-            // Fetch menu
-            const { data: menuData, error: menuError } = await supabase
-              .from('menu')
-              .select('*')
-              .order('id');
+            console.log('📝 Placing order...');
+            const { data, error } = await supabaseClient
+              .from('orders')
+              .insert({
+                items: cart,
+                total: totalPrice,
+                customer_location: customerLocation,
+                status: 'pending'
+              })
+              .select();
 
-            if (menuError) throw menuError;
-            setMenu(menuData || []);
+            if (error) throw error;
 
-            // Fetch delivery girls
-            const { data: girlsData, error: girlsError } = await supabase
+            console.log('✅ Order placed!', data);
+            setOrderPlaced(true);
+            setCart([]);
+            setTimeout(() => setOrderPlaced(false), 6000);
+            alert('✅ Order placed successfully! A delivery girl will arrive soon.');
+          } catch (error) {
+            console.error('❌ Order error:', error);
+            alert('Failed to place order: ' + error.message);
+          }
+        };
+
+        const addDeliveryGirl = async () => {
+          if (!newGirl.trim()) {
+            alert('Please enter a delivery girl name');
+            return;
+          }
+
+          try {
+            // Check if girl already exists
+            const { data: existing } = await supabaseClient
+              .from('delivery_girls')
+              .select('name')
+              .eq('name', newGirl.trim())
+              .single();
+
+            if (existing) {
+              alert('Delivery girl already exists');
+              return;
+            }
+
+            const { error } = await supabaseClient
+              .from('delivery_girls')
+              .insert({ name: newGirl.trim() });
+
+            if (error) throw error;
+
+            // Refresh list
+            const { data: girlsData } = await supabaseClient
               .from('delivery_girls')
               .select('name')
               .order('name');
 
-            if (girlsError) throw girlsError;
-            setDeliveryGirls(girlsData.map(g => g.name) || []);
-
-            setError('');
-          } catch (err) {
-            console.error('Error fetching data:', err);
-            setError('Failed to load data. Please refresh the page.');
-          } finally {
-            setLoading(false);
+            setDeliveryGirls(girlsData.map(g => g.name));
+            setNewGirl('');
+            alert('✅ Delivery girl added successfully!');
+          } catch (error) {
+            console.error('Error adding girl:', error);
+            alert('Failed to add delivery girl: ' + error.message);
           }
         };
 
-        fetchData();
-      }, [supabase]);
+        const removeGirl = async (name) => {
+          if (!confirm(`Remove ${name} from delivery girls?`)) return;
 
-      const addToCart = (item) => {
-        setCart(prev => {
-          const existing = prev.find(i => i.id === item.id);
-          if (existing) {
-            return prev.map(i => i.id === item.id ? { ...i, qty: i.qty + 1 } : i);
+          try {
+            const { error } = await supabaseClient
+              .from('delivery_girls')
+              .delete()
+              .eq('name', name);
+
+            if (error) throw error;
+
+            const { data: girlsData } = await supabaseClient
+              .from('delivery_girls')
+              .select('name')
+              .order('name');
+
+            setDeliveryGirls(girlsData.map(g => g.name));
+            alert('✅ Delivery girl removed successfully!');
+          } catch (error) {
+            console.error('Error removing girl:', error);
+            alert('Failed to remove delivery girl: ' + error.message);
           }
-          return [...prev, { ...item, qty: 1 }];
-        });
-      };
+        };
 
-      const removeFromCart = (id) => {
-        setCart(prev => {
-          const existing = prev.find(i => i.id === id);
-          if (existing && existing.qty > 1) {
-            return prev.map(i => i.id === id ? { ...i, qty: i.qty - 1 } : i);
-          }
-          return prev.filter(i => i.id !== id);
-        });
-      };
+        const mapSrc = `https://www.google.com/maps/embed/v1/place?key=AIzaSyC0X7LOV5Vqk7t7mGzN9eK8zP5yH9Qw0Jc&q=${encodeURIComponent(customerLocation)}`;
 
-      const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
-
-      const placeOrder = async () => {
-        if (cart.length === 0) {
-          alert('Please add items to your order');
-          return;
+        if (loading) {
+          return (
+            <div className="loading">
+              <i className="fas fa-spinner fa-spin fa-2x"></i>
+              <p>Loading delicious food...</p>
+              <div className="debug-box">{debug}</div>
+            </div>
+          );
         }
 
-        if (!supabase) {
-          alert('Supabase not initialized');
-          return;
-        }
-
-        try {
-          const { data, error } = await supabase
-            .from('orders')
-            .insert({
-              items: cart,
-              total: totalPrice,
-              customer_location: customerLocation,
-              status: 'pending'
-            })
-            .select();
-
-          if (error) throw error;
-
-          setOrderPlaced(true);
-          setCart([]);
-          setTimeout(() => setOrderPlaced(false), 6000);
-          alert('✅ Order placed successfully! A delivery girl will arrive soon.');
-        } catch (error) {
-          console.error('Error placing order:', error);
-          alert('Failed to place order. Please try again.');
-        }
-      };
-
-      const addDeliveryGirl = async () => {
-        if (!newGirl.trim()) {
-          alert('Please enter a delivery girl name');
-          return;
-        }
-
-        if (!supabase) {
-          alert('Supabase not initialized');
-          return;
-        }
-
-        try {
-          // Check if girl already exists
-          const { data: existing } = await supabase
-            .from('delivery_girls')
-            .select('name')
-            .eq('name', newGirl.trim())
-            .single();
-
-          if (existing) {
-            alert('Delivery girl already exists');
-            return;
-          }
-
-          // Insert new girl
-          const { error } = await supabase
-            .from('delivery_girls')
-            .insert({ name: newGirl.trim() });
-
-          if (error) throw error;
-
-          // Refresh list
-          const { data: girlsData } = await supabase
-            .from('delivery_girls')
-            .select('name')
-            .order('name');
-
-          setDeliveryGirls(girlsData.map(g => g.name));
-          setNewGirl('');
-          alert('✅ Delivery girl added successfully!');
-        } catch (error) {
-          console.error('Error adding delivery girl:', error);
-          alert('Failed to add delivery girl. Please try again.');
-        }
-      };
-
-      const removeGirl = async (name) => {
-        if (!confirm(`Remove ${name} from delivery girls?`)) return;
-
-        if (!supabase) {
-          alert('Supabase not initialized');
-          return;
-        }
-
-        try {
-          const { error } = await supabase
-            .from('delivery_girls')
-            .delete()
-            .eq('name', name);
-
-          if (error) throw error;
-
-          // Refresh list
-          const { data: girlsData } = await supabase
-            .from('delivery_girls')
-            .select('name')
-            .order('name');
-
-          setDeliveryGirls(girlsData.map(g => g.name));
-          alert('✅ Delivery girl removed successfully!');
-        } catch (error) {
-          console.error('Error removing delivery girl:', error);
-          alert('Failed to remove delivery girl. Please try again.');
-        }
-      };
-
-      // Google Map embed
-      const mapSrc = `https://www.google.com/maps/embed/v1/place?key=AIzaSyC0X7LOV5Vqk7t7mGzN9eK8zP5yH9Qw0Jc&q=${encodeURIComponent(customerLocation)}`;
-
-      if (loading) {
         return (
-          <div className="loading">
-            <i className="fas fa-spinner fa-spin fa-2x"></i>
-            <p>Loading delicious food...</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {error && (
+              <div className="error-message">
+                <i className="fas fa-exclamation-circle"></i> {error}
+                <div className="debug-box">{debug}</div>
+              </div>
+            )}
+
+            {/* Menu Section */}
+            <div className="card">
+              <div className="section-title">
+                <i className="fas fa-list-ul"></i> Today's Menu
+              </div>
+              <div className="menu-grid">
+                {menu.length === 0 ? (
+                  <div style={{ textAlign: 'center', color: '#7a6e86', padding: '10px' }}>
+                    <i className="fas fa-utensils"></i> No menu items available
+                  </div>
+                ) : (
+                  menu.map(item => (
+                    <div className="menu-item" key={item.id}>
+                      <div className="info">
+                        <span className="name">{item.emoji} {item.name}</span>
+                        <span className="price">${item.price.toFixed(2)}</span>
+                      </div>
+                      <button className="add-btn" onClick={() => addToCart(item)}>
+                        <i className="fas fa-plus"></i> Add
+                      </button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Order Summary */}
+            <div className="order-summary">
+              <div className="section-title" style={{ marginBottom: '6px' }}>
+                <i className="fas fa-shopping-bag"></i> Your Order
+              </div>
+              {cart.length === 0 ? (
+                <div style={{ color: '#7a6e86', fontSize: '14px', padding: '6px 0' }}>
+                  <i className="fas fa-shopping-cart"></i> Cart is empty
+                </div>
+              ) : (
+                cart.map(item => (
+                  <div className="order-row" key={item.id}>
+                    <span>{item.name} × {item.qty}</span>
+                    <span>
+                      ${(item.price * item.qty).toFixed(2)}
+                      <button 
+                        onClick={() => removeFromCart(item.id)} 
+                        style={{ 
+                          background: 'none', 
+                          border: 'none', 
+                          color: '#b0003a', 
+                          marginLeft: '8px', 
+                          cursor: 'pointer' 
+                        }}
+                      >
+                        <i className="fas fa-minus-circle"></i>
+                      </button>
+                    </span>
+                  </div>
+                ))
+              )}
+              <div className="order-row order-total">
+                <span>Total</span>
+                <span>${totalPrice.toFixed(2)}</span>
+              </div>
+              <button className="action-btn" onClick={placeOrder}>
+                <i className="fas fa-motorcycle"></i> Place Order · Cash
+              </button>
+              {orderPlaced && (
+                <div className="success-message" style={{ marginTop: '8px' }}>
+                  <i className="fas fa-check-circle"></i> Order placed! Delivery on the way.
+                </div>
+              )}
+            </div>
+
+            {/* Map Section */}
+            <div className="card">
+              <div className="section-title">
+                <i className="fas fa-map-pin"></i> Delivery Location
+              </div>
+              <div className="map-container">
+                <iframe 
+                  src={mapSrc} 
+                  loading="lazy" 
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Delivery Map"
+                ></iframe>
+              </div>
+              <div style={{ fontSize: '13px', color: '#2d2d44', marginTop: '6px' }}>
+                <i className="fas fa-location-dot" style={{ color: '#6c2b8a' }}></i> Customer: {customerLocation}
+              </div>
+              <div style={{ fontSize: '12px', color: '#5f556b', marginTop: '4px' }}>
+                <i className="fas fa-user-check"></i> Delivery girl sees this location
+              </div>
+            </div>
+
+            {/* Admin Panel */}
+            <div className="admin-panel">
+              <div className="section-title">
+                <i className="fas fa-user-gear"></i> Admin · Delivery Girls
+              </div>
+              <div className="admin-input-group">
+                <input 
+                  placeholder="Enter delivery girl name" 
+                  value={newGirl} 
+                  onChange={e => setNewGirl(e.target.value)}
+                  onKeyPress={e => e.key === 'Enter' && addDeliveryGirl()}
+                />
+                <button onClick={addDeliveryGirl}>
+                  <i className="fas fa-plus"></i> Add
+                </button>
+              </div>
+              <div className="delivery-girl-list">
+                {deliveryGirls.length === 0 ? (
+                  <div style={{ color: '#7a6e86', fontSize: '13px', padding: '4px 0' }}>
+                    No delivery girls added yet
+                  </div>
+                ) : (
+                  deliveryGirls.map(g => (
+                    <span className="delivery-girl-tag" key={g}>
+                      <i className="fas fa-female"></i> {g}
+                      <span className="remove" onClick={() => removeGirl(g)}>
+                        <i className="fas fa-times"></i>
+                      </span>
+                    </span>
+                  ))
+                )}
+              </div>
+              <div style={{ fontSize: '12px', color: '#4d435a', marginTop: '8px' }}>
+                <i className="fas fa-info-circle"></i> Delivery girls see customer location on map
+              </div>
+            </div>
           </div>
         );
       }
 
-      return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {error && (
-            <div className="error-message">
-              <i className="fas fa-exclamation-circle"></i> {error}
-            </div>
-          )}
+      // Render React app
+      const container = document.getElementById('app-container');
+      if (container) {
+        const root = ReactDOM.createRoot(container);
+        root.render(React.createElement(App));
+        console.log('✅ App rendered successfully!');
+      } else {
+        console.error('❌ Container element not found');
+      }
 
-          {/* Menu Section */}
-          <div className="card">
-            <div className="section-title">
-              <i className="fas fa-list-ul"></i> Today's Menu
-            </div>
-            <div className="menu-grid">
-              {menu.length === 0 ? (
-                <div style={{ textAlign: 'center', color: '#7a6e86', padding: '10px' }}>
-                  No menu items available
-                </div>
-              ) : (
-                menu.map(item => (
-                  <div className="menu-item" key={item.id}>
-                    <div className="info">
-                      <span className="name">{item.emoji} {item.name}</span>
-                      <span className="price">${item.price.toFixed(2)}</span>
-                    </div>
-                    <button className="add-btn" onClick={() => addToCart(item)}>
-                      <i className="fas fa-plus"></i> Add
-                    </button>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Order Summary */}
-          <div className="order-summary">
-            <div className="section-title" style={{ marginBottom: '6px' }}>
-              <i className="fas fa-shopping-bag"></i> Your Order
-            </div>
-            {cart.length === 0 ? (
-              <div style={{ color: '#7a6e86', fontSize: '14px', padding: '6px 0' }}>
-                <i className="fas fa-shopping-cart"></i> Cart is empty
-              </div>
-            ) : (
-              cart.map(item => (
-                <div className="order-row" key={item.id}>
-                  <span>{item.name} × {item.qty}</span>
-                  <span>
-                    ${(item.price * item.qty).toFixed(2)}
-                    <button 
-                      onClick={() => removeFromCart(item.id)} 
-                      style={{ 
-                        background: 'none', 
-                        border: 'none', 
-                        color: '#b0003a', 
-                        marginLeft: '8px', 
-                        cursor: 'pointer' 
-                      }}
-                    >
-                      <i className="fas fa-minus-circle"></i>
-                    </button>
-                  </span>
-                </div>
-              ))
-            )}
-            <div className="order-row order-total">
-              <span>Total</span>
-              <span>${totalPrice.toFixed(2)}</span>
-            </div>
-            <button className="action-btn" onClick={placeOrder}>
-              <i className="fas fa-motorcycle"></i> Place Order · Cash
-            </button>
-            {orderPlaced && (
-              <div className="success-message" style={{ marginTop: '8px' }}>
-                <i className="fas fa-check-circle"></i> Order placed! Delivery on the way.
-              </div>
-            )}
-          </div>
-
-          {/* Map Section */}
-          <div className="card">
-            <div className="section-title">
-              <i className="fas fa-map-pin"></i> Delivery Location
-            </div>
-            <div className="map-container">
-              <iframe 
-                src={mapSrc} 
-                loading="lazy" 
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Delivery Map"
-              ></iframe>
-            </div>
-            <div style={{ fontSize: '13px', color: '#2d2d44', marginTop: '6px' }}>
-              <i className="fas fa-location-dot" style={{ color: '#6c2b8a' }}></i> Customer: {customerLocation}
-            </div>
-            <div style={{ fontSize: '12px', color: '#5f556b', marginTop: '4px' }}>
-              <i className="fas fa-user-check"></i> Delivery girl sees this location
-            </div>
-          </div>
-
-          {/* Admin Panel */}
-          <div className="admin-panel">
-            <div className="section-title">
-              <i className="fas fa-user-gear"></i> Admin · Delivery Girls
-            </div>
-            <div className="admin-input-group">
-              <input 
-                placeholder="Enter delivery girl name" 
-                value={newGirl} 
-                onChange={e => setNewGirl(e.target.value)}
-                onKeyPress={e => e.key === 'Enter' && addDeliveryGirl()}
-              />
-              <button onClick={addDeliveryGirl}>
-                <i className="fas fa-plus"></i> Add
-              </button>
-            </div>
-            <div className="delivery-girl-list">
-              {deliveryGirls.length === 0 ? (
-                <div style={{ color: '#7a6e86', fontSize: '13px', padding: '4px 0' }}>
-                  No delivery girls added yet
-                </div>
-              ) : (
-                deliveryGirls.map(g => (
-                  <span className="delivery-girl-tag" key={g}>
-                    <i className="fas fa-female"></i> {g}
-                    <span className="remove" onClick={() => removeGirl(g)}>
-                      <i className="fas fa-times"></i>
-                    </span>
-                  </span>
-                ))
-              )}
-            </div>
-            <div style={{ fontSize: '12px', color: '#4d435a', marginTop: '8px' }}>
-              <i className="fas fa-info-circle"></i> Delivery girls see customer location on map
-            </div>
-          </div>
+    } catch (error) {
+      console.error('❌ App initialization error:', error);
+      document.getElementById('app-container').innerHTML = `
+        <div class="error-message">
+          <i class="fas fa-exclamation-circle"></i> 
+          <strong>App Error:</strong> ${error.message}
+          <br><br>
+          <small>Check console (F12) for more details</small>
         </div>
-      );
+      `;
     }
+  }
 
-    // Render React app
-    const container = document.getElementById('app-container');
-    if (container) {
-      const root = ReactDOM.createRoot(container);
-      root.render(React.createElement(App));
+  // Fallback: If scripts don't load within 10 seconds
+  setTimeout(() => {
+    if (scriptsLoaded < totalScripts) {
+      console.warn('⚠️ Scripts taking too long to load, attempting to initialize...');
+      // Try to initialize anyway
+      try {
+        if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined' && typeof window.supabase !== 'undefined') {
+          initializeApp();
+        }
+      } catch (e) {
+        console.error('Fallback initialization failed:', e);
+      }
     }
-  };
+  }, 10000);
 </script>
 </body>
 </html>
