@@ -633,6 +633,57 @@
         .tab-content.active {
             display: block;
         }
+
+        /* Customer Details Form */
+        .customer-details {
+            background: #fff8f8;
+            border-radius: 16px;
+            padding: 12px;
+            margin-top: 8px;
+            border: 1px solid #ffe0e0;
+        }
+        .customer-details .form-group {
+            margin-bottom: 10px;
+        }
+        .customer-details .form-group:last-child {
+            margin-bottom: 0;
+        }
+        .customer-details label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: #6d6a7a;
+            margin-bottom: 4px;
+        }
+        .customer-details input,
+        .customer-details textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ffcccc;
+            border-radius: 12px;
+            font-size: 14px;
+            outline: none;
+            background: white;
+            transition: 0.15s;
+        }
+        .customer-details input:focus,
+        .customer-details textarea:focus {
+            border-color: #cc0000;
+        }
+        .customer-details textarea {
+            min-height: 50px;
+            resize: vertical;
+            font-family: inherit;
+        }
+        .customer-details .required {
+            color: #cc0000;
+            margin-left: 2px;
+        }
+        .customer-details .help-text {
+            font-size: 11px;
+            color: #999;
+            margin-top: 3px;
+        }
     </style>
 </head>
 <body>
@@ -711,13 +762,12 @@
             const mapContainer = document.getElementById('map');
             if (!mapContainer) return;
 
-            // Use Nominatim to geocode the location
             const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`;
             
             fetch(geocodeUrl)
                 .then(response => response.json())
                 .then(data => {
-                    let lat = -10.2129; // Kasama default
+                    let lat = -10.2129;
                     let lng = 31.1809;
                     
                     if (data && data.length > 0) {
@@ -725,7 +775,6 @@
                         lng = parseFloat(data[0].lon);
                     }
                     
-                    // Initialize map
                     if (map) {
                         map.remove();
                     }
@@ -736,7 +785,6 @@
                         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     }).addTo(map);
                     
-                    // Add marker
                     const markerIcon = L.divIcon({
                         html: '<i class="fas fa-map-marker-alt" style="color:#cc0000;font-size:30px;"></i>',
                         className: 'custom-marker',
@@ -747,12 +795,10 @@
                     mapMarker = L.marker([lat, lng], { icon: markerIcon }).addTo(map);
                     mapMarker.bindPopup(`<strong>📍 ${location}</strong>`).openPopup();
                     
-                    // Hide loading
                     document.getElementById('mapLoading')?.style.setProperty('display', 'none');
                 })
                 .catch(error => {
                     console.error('Geocoding error:', error);
-                    // Fallback to Kasama
                     showFallbackMap();
                 });
         } catch (error) {
@@ -967,10 +1013,12 @@
                 const statusClass = order.status || 'pending';
                 const date = new Date(order.created_at).toLocaleDateString();
                 const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const customerName = order.customer_name || 'Anonymous';
                 ordersHTML += `
                     <div class="order-item">
                         <div>
                             <div>${date} ${time}</div>
+                            <div style="font-size:11px;color:#999;">${customerName} · ${order.customer_phone || 'No phone'}</div>
                             <div style="font-size:11px;color:#999;">${order.customer_location || 'Kasama'}</div>
                         </div>
                         <div style="text-align:right;">
@@ -1135,6 +1183,8 @@
         let cart = [];
         let orderPlaced = false;
         let customerLocation = 'Kasama, Northern Province, Zambia';
+        let customerName = '';
+        let customerPhone = '';
         let orderStatus = '';
 
         function render() {
@@ -1211,6 +1261,28 @@
                         <span>Total</span>
                         <span>ZMW ${totalPrice.toFixed(2)}</span>
                     </div>
+                    
+                    <!-- Customer Details Form -->
+                    <div class="customer-details">
+                        <div style="font-size:13px;font-weight:600;color:#cc0000;margin-bottom:8px;">
+                            <i class="fas fa-user"></i> Delivery Details
+                        </div>
+                        <div class="form-group">
+                            <label>Full Name <span class="required">*</span></label>
+                            <input type="text" id="customerName" placeholder="Enter your full name" value="${customerName}" />
+                        </div>
+                        <div class="form-group">
+                            <label>Phone Number <span class="required">*</span></label>
+                            <input type="tel" id="customerPhone" placeholder="Enter phone number (e.g., 0977123456)" value="${customerPhone}" />
+                            <div class="help-text"><i class="fas fa-info-circle"></i> We'll call to confirm your order</div>
+                        </div>
+                        <div class="form-group">
+                            <label>Delivery Address <span class="required">*</span></label>
+                            <input type="text" id="customerAddress" placeholder="Enter your delivery address" value="${customerLocation}" />
+                            <div class="help-text"><i class="fas fa-map-marker-alt"></i> Landmarks help us find you faster</div>
+                        </div>
+                    </div>
+                    
                     <button class="action-btn" onclick="placeOrder()" ${cart.length === 0 ? 'disabled' : ''}>
                         <i class="fas fa-motorcycle"></i> Place Order · Cash
                     </button>
@@ -1242,8 +1314,6 @@
                             <span class="dot"></span> Real-time
                         </div>
                     </div>
-                    <input class="location-input" id="locationInput" value="${customerLocation}" 
-                           placeholder="Enter delivery address in Kasama" onchange="updateLocation(this.value)" />
                     <div style="font-size:12px;color:#5f556b;margin-top:4px;">
                         <i class="fas fa-user-check"></i> Delivery girls in Kasama see this location
                     </div>
@@ -1264,6 +1334,33 @@
                     initMap(customerLocation);
                 }
             }, 500);
+
+            // Update input values
+            const nameInput = document.getElementById('customerName');
+            const phoneInput = document.getElementById('customerPhone');
+            const addressInput = document.getElementById('customerAddress');
+            
+            if (nameInput) nameInput.value = customerName;
+            if (phoneInput) phoneInput.value = customerPhone;
+            if (addressInput) addressInput.value = customerLocation;
+
+            // Add input listeners
+            if (nameInput) {
+                nameInput.oninput = function() {
+                    customerName = this.value;
+                };
+            }
+            if (phoneInput) {
+                phoneInput.oninput = function() {
+                    customerPhone = this.value;
+                };
+            }
+            if (addressInput) {
+                addressInput.oninput = function() {
+                    customerLocation = this.value || 'Kasama, Northern Province, Zambia';
+                    updateMapLocation(customerLocation);
+                };
+            }
 
             const panel = document.getElementById('adminPanel');
             if (panel) {
@@ -1303,14 +1400,8 @@
             render();
         };
 
-        window.updateLocation = function(value) {
-            customerLocation = value || 'Kasama, Northern Province, Zambia';
-            render();
-            updateMapLocation(customerLocation);
-        };
-
         window.shareLocation = function() {
-            const message = `📍 I'm ordering from Laura Girls Food Delivery in Kasama!\n📍 Location: ${customerLocation}\n🍽️ Order ready for delivery!`;
+            const message = `📍 I'm ordering from Laura Girls Food Delivery in Kasama!\n📍 Location: ${customerLocation}\n👤 Name: ${customerName}\n📱 Phone: ${customerPhone}\n🍽️ Order ready for delivery!`;
             const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
             window.open(url, '_blank');
         };
@@ -1321,6 +1412,41 @@
                 return;
             }
 
+            // Validate customer details
+            const nameInput = document.getElementById('customerName');
+            const phoneInput = document.getElementById('customerPhone');
+            const addressInput = document.getElementById('customerAddress');
+            
+            const name = nameInput ? nameInput.value.trim() : '';
+            const phone = phoneInput ? phoneInput.value.trim() : '';
+            const address = addressInput ? addressInput.value.trim() : 'Kasama, Northern Province, Zambia';
+
+            if (!name) {
+                alert('⚠️ Please enter your full name');
+                nameInput?.focus();
+                return;
+            }
+
+            if (!phone) {
+                alert('⚠️ Please enter your phone number');
+                phoneInput?.focus();
+                return;
+            }
+
+            // Validate phone number (Zambian format)
+            const phoneRegex = /^[0-9]{9,12}$/;
+            if (!phoneRegex.test(phone.replace(/[^0-9]/g, ''))) {
+                alert('⚠️ Please enter a valid phone number (e.g., 0977123456)');
+                phoneInput?.focus();
+                return;
+            }
+
+            if (!address) {
+                alert('⚠️ Please enter your delivery address');
+                addressInput?.focus();
+                return;
+            }
+
             try {
                 const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
                 const { data, error } = await supabase
@@ -1328,7 +1454,9 @@
                     .insert({
                         items: cart,
                         total: totalPrice,
-                        customer_location: customerLocation,
+                        customer_location: address,
+                        customer_name: name,
+                        customer_phone: phone,
                         status: 'pending',
                         district: 'Kasama',
                         province: 'Northern Province'
@@ -1338,17 +1466,23 @@
                 if (error) throw error;
 
                 orderPlaced = true;
-                orderStatus = '🛵 Order confirmed! A delivery girl from Kasama will arrive in 20-30 minutes.';
+                orderStatus = `🛵 Order confirmed, ${name}! A delivery girl from Kasama will arrive in 20-30 minutes. We'll call you at ${phone}.`;
                 cart = [];
+                
+                // Update stored values
+                customerName = name;
+                customerPhone = phone;
+                customerLocation = address;
+                
                 render();
                 
                 setTimeout(() => {
                     orderPlaced = false;
                     orderStatus = '';
                     render();
-                }, 10000);
+                }, 15000);
                 
-                alert('✅ Order placed successfully! A delivery girl from Kasama will arrive soon.');
+                alert(`✅ Order placed successfully, ${name}!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}\n🛵 A delivery girl from Kasama will arrive soon.`);
             } catch (error) {
                 alert('Failed to place order: ' + error.message);
             }
