@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Laura Girls · Food Delivery</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyC0X7LOV5Vqk7t7mGzN9eK8zP5yH9Qw0Jc&libraries=places" async defer></script>
   <style>
     * {
       margin: 0;
@@ -41,6 +40,7 @@
       align-items: center;
       gap: 10px;
       border-bottom: 1px solid rgba(255,255,255,0.15);
+      flex-shrink: 0;
     }
     .app-header i {
       font-size: 26px;
@@ -65,9 +65,6 @@
       padding: 16px 16px 10px;
       overflow-y: auto;
       background: #fafafc;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
     }
     .card {
       background: white;
@@ -75,6 +72,7 @@
       padding: 16px 14px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.02);
       border: 1px solid #f0eff2;
+      margin-bottom: 16px;
     }
     .section-title {
       font-weight: 600;
@@ -140,7 +138,7 @@
       border-radius: 24px;
       padding: 14px 14px 10px;
       border: 1px solid #e9e6ed;
-      margin-top: 4px;
+      margin-bottom: 16px;
     }
     .order-row {
       display: flex;
@@ -202,7 +200,7 @@
       background: #f4f0f9;
       border-radius: 24px;
       padding: 14px;
-      margin-top: 4px;
+      margin-bottom: 16px;
     }
     .admin-input-group {
       display: flex;
@@ -262,12 +260,15 @@
       text-align: center;
       padding: 12px 0 6px;
       border-top: 1px solid #ece9f0;
-      margin-top: 6px;
+      flex-shrink: 0;
     }
     .loading {
       text-align: center;
-      padding: 20px;
+      padding: 40px 20px;
       color: #6c2b8a;
+    }
+    .loading i {
+      font-size: 32px;
     }
     .error-message {
       background: #ffe6e6;
@@ -276,6 +277,7 @@
       border-radius: 12px;
       font-size: 14px;
       text-align: center;
+      margin-bottom: 16px;
     }
     .success-message {
       background: #e6ffe6;
@@ -284,6 +286,7 @@
       border-radius: 12px;
       font-size: 14px;
       text-align: center;
+      margin-top: 8px;
     }
     .status-badge {
       display: inline-block;
@@ -297,6 +300,25 @@
     .status-delivering { background: #d4edda; color: #155724; }
     .status-delivered { background: #d1ecf1; color: #0c5460; }
     .status-cancelled { background: #f8d7da; color: #721c24; }
+    .toggle-btn {
+      background: #f0edf5;
+      color: #2d2d44;
+      border: none;
+      padding: 10px;
+      border-radius: 40px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      margin-bottom: 16px;
+    }
+    .toggle-btn.active {
+      background: #6c2b8a;
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -306,25 +328,38 @@
     <h1>Laura Girls Food</h1>
     <span class="badge"><i class="fas fa-motorcycle"></i> delivery</span>
   </div>
-  <div id="app-container" class="app-body"></div>
+  <div id="app-container" class="app-body">
+    <div class="loading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p style="margin-top: 12px;">Loading delicious food...</p>
+    </div>
+  </div>
   <div class="footnote">
     <i class="fas fa-shield-alt"></i> Cash on delivery · MTN MoMo style
   </div>
 </div>
 
 <script>
-  // React application with Supabase integration
-  (function() {
-    // Load React from CDN
-    const scriptReact = document.createElement('script');
-    scriptReact.src = 'https://unpkg.com/react@18/umd/react.production.min.js';
-    document.head.appendChild(scriptReact);
-    
-    const scriptReactDOM = document.createElement('script');
-    scriptReactDOM.src = 'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js';
-    document.head.appendChild(scriptReactDOM);
+  // Load React from CDN with error handling
+  function loadScript(src, callback) {
+    const script = document.createElement('script');
+    script.src = src;
+    script.onload = callback;
+    script.onerror = function() {
+      console.error('Failed to load script:', src);
+      document.getElementById('app-container').innerHTML = `
+        <div class="error-message">
+          <i class="fas fa-exclamation-circle"></i> Failed to load app. Please check your internet connection.
+        </div>
+      `;
+    };
+    document.head.appendChild(script);
+  }
 
-    scriptReactDOM.onload = function() {
+  // Load React and ReactDOM
+  loadScript('https://unpkg.com/react@18/umd/react.production.min.js', function() {
+    loadScript('https://unpkg.com/react-dom@18/umd/react-dom.production.min.js', function() {
+      // Now React is loaded, render the app
       const { useState, useEffect } = React;
 
       function App() {
@@ -339,7 +374,6 @@
         const [orders, setOrders] = useState([]);
         const [showAdmin, setShowAdmin] = useState(false);
 
-        // Fetch data from Supabase via backend API
         useEffect(() => {
           const fetchData = async () => {
             setLoading(true);
@@ -356,7 +390,7 @@
               const girlsData = await girlsRes.json();
               setDeliveryGirls(girlsData);
 
-              // Fetch orders (admin)
+              // Fetch orders
               const ordersRes = await fetch('/api/orders');
               if (ordersRes.ok) {
                 const ordersData = await ordersRes.json();
@@ -422,7 +456,6 @@
               setTimeout(() => setOrderPlaced(false), 6000);
               alert(`✅ ${data.message}\nA delivery girl will arrive soon!`);
               
-              // Refresh orders
               const ordersRes = await fetch('/api/orders');
               if (ordersRes.ok) {
                 const ordersData = await ordersRes.json();
@@ -497,7 +530,6 @@
             
             const data = await response.json();
             if (data.success) {
-              // Refresh orders
               const ordersRes = await fetch('/api/orders');
               if (ordersRes.ok) {
                 const ordersData = await ordersRes.json();
@@ -517,256 +549,210 @@
             'delivered': 'status-delivered',
             'cancelled': 'status-cancelled'
           };
-          return <span className={`status-badge ${classes[status] || 'status-pending'}`}>{status}</span>;
+          return React.createElement('span', { className: `status-badge ${classes[status] || 'status-pending'}` }, status);
         };
 
-        // Google Map embed
         const mapSrc = `https://www.google.com/maps/embed/v1/place?key=AIzaSyC0X7LOV5Vqk7t7mGzN9eK8zP5yH9Qw0Jc&q=${encodeURIComponent(customerLocation)}`;
 
         if (loading) {
-          return (
-            <div className="loading">
-              <i className="fas fa-spinner fa-spin fa-2x"></i>
-              <p>Loading delicious food...</p>
-            </div>
+          return React.createElement('div', { className: 'loading' },
+            React.createElement('i', { className: 'fas fa-spinner fa-spin', style: { fontSize: '32px' } }),
+            React.createElement('p', { style: { marginTop: '12px' } }, 'Loading delicious food...')
           );
         }
 
-        return (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {error && (
-              <div className="error-message">
-                <i className="fas fa-exclamation-circle"></i> {error}
-              </div>
-            )}
+        return React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: '16px' } },
+          // Error message
+          error ? React.createElement('div', { className: 'error-message' },
+            React.createElement('i', { className: 'fas fa-exclamation-circle' }), ' ', error
+          ) : null,
 
-            {/* Menu Section */}
-            <div className="card">
-              <div className="section-title">
-                <i className="fas fa-list-ul"></i> Today's Menu
-              </div>
-              <div className="menu-grid">
-                {menu.length === 0 ? (
-                  <div style={{ textAlign: 'center', color: '#7a6e86', padding: '10px' }}>
-                    No menu items available
-                  </div>
-                ) : (
-                  menu.map(item => (
-                    <div className="menu-item" key={item.id}>
-                      <div className="info">
-                        <span className="name">{item.emoji} {item.name}</span>
-                        <span className="price">${item.price.toFixed(2)}</span>
-                      </div>
-                      <button className="add-btn" onClick={() => addToCart(item)}>
-                        <i className="fas fa-plus"></i> Add
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
+          // Menu Section
+          React.createElement('div', { className: 'card' },
+            React.createElement('div', { className: 'section-title' },
+              React.createElement('i', { className: 'fas fa-list-ul' }), ' Today\'s Menu'
+            ),
+            React.createElement('div', { className: 'menu-grid' },
+              menu.length === 0 ? 
+                React.createElement('div', { style: { textAlign: 'center', color: '#7a6e86', padding: '10px' } }, 'No menu items available') :
+                menu.map(item => 
+                  React.createElement('div', { className: 'menu-item', key: item.id },
+                    React.createElement('div', { className: 'info' },
+                      React.createElement('span', { className: 'name' }, item.emoji, ' ', item.name),
+                      React.createElement('span', { className: 'price' }, '$', item.price.toFixed(2))
+                    ),
+                    React.createElement('button', { className: 'add-btn', onClick: () => addToCart(item) },
+                      React.createElement('i', { className: 'fas fa-plus' }), ' Add'
+                    )
+                  )
+                )
+            )
+          ),
 
-            {/* Order Summary */}
-            <div className="order-summary">
-              <div className="section-title" style={{ marginBottom: '6px' }}>
-                <i className="fas fa-shopping-bag"></i> Your Order
-              </div>
-              {cart.length === 0 ? (
-                <div style={{ color: '#7a6e86', fontSize: '14px', padding: '6px 0' }}>
-                  <i className="fas fa-shopping-cart"></i> Cart is empty
-                </div>
-              ) : (
-                cart.map(item => (
-                  <div className="order-row" key={item.id}>
-                    <span>{item.name} × {item.qty}</span>
-                    <span>
-                      ${(item.price * item.qty).toFixed(2)}
-                      <button 
-                        onClick={() => removeFromCart(item.id)} 
-                        style={{ 
-                          background: 'none', 
-                          border: 'none', 
-                          color: '#b0003a', 
-                          marginLeft: '8px', 
-                          cursor: 'pointer' 
-                        }}
-                      >
-                        <i className="fas fa-minus-circle"></i>
-                      </button>
-                    </span>
-                  </div>
-                ))
-              )}
-              <div className="order-row order-total">
-                <span>Total</span>
-                <span>${totalPrice.toFixed(2)}</span>
-              </div>
-              <button className="action-btn" onClick={placeOrder}>
-                <i className="fas fa-motorcycle"></i> Place Order · Cash
-              </button>
-              {orderPlaced && (
-                <div className="success-message" style={{ marginTop: '8px' }}>
-                  <i className="fas fa-check-circle"></i> Order placed! Delivery on the way.
-                </div>
-              )}
-            </div>
+          // Order Summary
+          React.createElement('div', { className: 'order-summary' },
+            React.createElement('div', { className: 'section-title', style: { marginBottom: '6px' } },
+              React.createElement('i', { className: 'fas fa-shopping-bag' }), ' Your Order'
+            ),
+            cart.length === 0 ?
+              React.createElement('div', { style: { color: '#7a6e86', fontSize: '14px', padding: '6px 0' } },
+                React.createElement('i', { className: 'fas fa-shopping-cart' }), ' Cart is empty'
+              ) :
+              cart.map(item =>
+                React.createElement('div', { className: 'order-row', key: item.id },
+                  React.createElement('span', null, item.name, ' × ', item.qty),
+                  React.createElement('span', null,
+                    '$', (item.price * item.qty).toFixed(2),
+                    React.createElement('button', {
+                      onClick: () => removeFromCart(item.id),
+                      style: { background: 'none', border: 'none', color: '#b0003a', marginLeft: '8px', cursor: 'pointer' }
+                    },
+                      React.createElement('i', { className: 'fas fa-minus-circle' })
+                    )
+                  )
+                )
+              ),
+            React.createElement('div', { className: 'order-row order-total' },
+              React.createElement('span', null, 'Total'),
+              React.createElement('span', null, '$', totalPrice.toFixed(2))
+            ),
+            React.createElement('button', { className: 'action-btn', onClick: placeOrder },
+              React.createElement('i', { className: 'fas fa-motorcycle' }), ' Place Order · Cash'
+            ),
+            orderPlaced ? 
+              React.createElement('div', { className: 'success-message' },
+                React.createElement('i', { className: 'fas fa-check-circle' }), ' Order placed! Delivery on the way.'
+              ) : null
+          ),
 
-            {/* Map Section */}
-            <div className="card">
-              <div className="section-title">
-                <i className="fas fa-map-pin"></i> Delivery Location
-              </div>
-              <div className="map-container">
-                <iframe 
-                  src={mapSrc} 
-                  loading="lazy" 
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Delivery Map"
-                ></iframe>
-              </div>
-              <div style={{ fontSize: '13px', color: '#2d2d44', marginTop: '6px' }}>
-                <i className="fas fa-location-dot" style={{ color: '#6c2b8a' }}></i> Customer: {customerLocation}
-              </div>
-              <div style={{ fontSize: '12px', color: '#5f556b', marginTop: '4px' }}>
-                <i className="fas fa-user-check"></i> Delivery girl sees this location
-              </div>
-            </div>
+          // Map Section
+          React.createElement('div', { className: 'card' },
+            React.createElement('div', { className: 'section-title' },
+              React.createElement('i', { className: 'fas fa-map-pin' }), ' Delivery Location'
+            ),
+            React.createElement('div', { className: 'map-container' },
+              React.createElement('iframe', {
+                src: mapSrc,
+                loading: 'lazy',
+                referrerPolicy: 'no-referrer-when-downgrade',
+                title: 'Delivery Map'
+              })
+            ),
+            React.createElement('div', { style: { fontSize: '13px', color: '#2d2d44', marginTop: '6px' } },
+              React.createElement('i', { className: 'fas fa-location-dot', style: { color: '#6c2b8a' } }), ' Customer: ', customerLocation
+            ),
+            React.createElement('div', { style: { fontSize: '12px', color: '#5f556b', marginTop: '4px' } },
+              React.createElement('i', { className: 'fas fa-user-check' }), ' Delivery girl sees this location'
+            )
+          ),
 
-            {/* Admin Toggle */}
-            <button 
-              onClick={() => setShowAdmin(!showAdmin)}
-              style={{
-                background: showAdmin ? '#6c2b8a' : '#f0edf5',
-                color: showAdmin ? 'white' : '#2d2d44',
-                border: 'none',
-                padding: '10px',
-                borderRadius: '40px',
-                fontWeight: '600',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px'
-              }}
-            >
-              <i className="fas fa-user-gear"></i>
-              {showAdmin ? 'Hide Admin Panel' : 'Show Admin Panel'}
-            </button>
+          // Admin Toggle
+          React.createElement('button', {
+            className: `toggle-btn ${showAdmin ? 'active' : ''}`,
+            onClick: () => setShowAdmin(!showAdmin)
+          },
+            React.createElement('i', { className: 'fas fa-user-gear' }),
+            showAdmin ? 'Hide Admin Panel' : 'Show Admin Panel'
+          ),
 
-            {/* Admin Panel */}
-            {showAdmin && (
-              <>
-                {/* Delivery Girls Management */}
-                <div className="admin-panel">
-                  <div className="section-title">
-                    <i className="fas fa-user-plus"></i> Manage Delivery Girls
-                  </div>
-                  <div className="admin-input-group">
-                    <input 
-                      placeholder="Enter delivery girl name" 
-                      value={newGirl} 
-                      onChange={e => setNewGirl(e.target.value)}
-                      onKeyPress={e => e.key === 'Enter' && addDeliveryGirl()}
-                    />
-                    <button onClick={addDeliveryGirl}>
-                      <i className="fas fa-plus"></i> Add
-                    </button>
-                  </div>
-                  <div className="delivery-girl-list">
-                    {deliveryGirls.length === 0 ? (
-                      <div style={{ color: '#7a6e86', fontSize: '13px', padding: '4px 0' }}>
-                        No delivery girls added yet
-                      </div>
-                    ) : (
-                      deliveryGirls.map(g => (
-                        <span className="delivery-girl-tag" key={g}>
-                          <i className="fas fa-female"></i> {g}
-                          <span className="remove" onClick={() => removeGirl(g)}>
-                            <i className="fas fa-times"></i>
-                          </span>
-                        </span>
-                      ))
-                    )}
-                  </div>
-                </div>
+          // Admin Panel
+          showAdmin ? [
+            // Delivery Girls Management
+            React.createElement('div', { className: 'admin-panel', key: 'girls' },
+              React.createElement('div', { className: 'section-title' },
+                React.createElement('i', { className: 'fas fa-user-plus' }), ' Manage Delivery Girls'
+              ),
+              React.createElement('div', { className: 'admin-input-group' },
+                React.createElement('input', {
+                  placeholder: 'Enter delivery girl name',
+                  value: newGirl,
+                  onChange: e => setNewGirl(e.target.value),
+                  onKeyPress: e => e.key === 'Enter' && addDeliveryGirl()
+                }),
+                React.createElement('button', { onClick: addDeliveryGirl },
+                  React.createElement('i', { className: 'fas fa-plus' }), ' Add'
+                )
+              ),
+              React.createElement('div', { className: 'delivery-girl-list' },
+                deliveryGirls.length === 0 ?
+                  React.createElement('div', { style: { color: '#7a6e86', fontSize: '13px', padding: '4px 0' } }, 'No delivery girls added yet') :
+                  deliveryGirls.map(g =>
+                    React.createElement('span', { className: 'delivery-girl-tag', key: g },
+                      React.createElement('i', { className: 'fas fa-female' }), ' ', g,
+                      React.createElement('span', { className: 'remove', onClick: () => removeGirl(g) },
+                        React.createElement('i', { className: 'fas fa-times' })
+                      )
+                    )
+                  )
+              ),
+              React.createElement('div', { style: { fontSize: '12px', color: '#4d435a', marginTop: '8px' } },
+                React.createElement('i', { className: 'fas fa-info-circle' }), ' Delivery girls see customer location on map'
+              )
+            ),
 
-                {/* Orders Management */}
-                <div className="admin-panel">
-                  <div className="section-title">
-                    <i className="fas fa-clipboard-list"></i> Recent Orders ({orders.length})
-                  </div>
-                  {orders.length === 0 ? (
-                    <div style={{ color: '#7a6e86', fontSize: '13px', padding: '8px 0' }}>
-                      No orders placed yet
-                    </div>
-                  ) : (
-                    orders.slice(0, 5).map(order => (
-                      <div key={order.id} style={{
-                        background: 'white',
-                        padding: '12px',
-                        borderRadius: '12px',
-                        marginBottom: '8px',
-                        border: '1px solid #e9e6ed'
-                      }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                          <div>
-                            <div style={{ fontWeight: '600', fontSize: '14px' }}>
-                              Order #{order.id}
-                            </div>
-                            <div style={{ fontSize: '12px', color: '#6d6a7a' }}>
-                              {new Date(order.created_at).toLocaleString()}
-                            </div>
-                            <div style={{ fontSize: '13px', marginTop: '4px' }}>
-                              Total: <strong>${order.total.toFixed(2)}</strong>
-                            </div>
-                          </div>
-                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-end' }}>
-                            {getStatusBadge(order.status)}
-                            <select 
-                              value={order.status}
-                              onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                              style={{
-                                padding: '4px 8px',
-                                borderRadius: '20px',
-                                border: '1px solid #d6cee0',
-                                fontSize: '11px',
-                                background: 'white'
-                              }}
-                            >
-                              <option value="pending">Pending</option>
-                              <option value="preparing">Preparing</option>
-                              <option value="delivering">Delivering</option>
-                              <option value="delivered">Delivered</option>
-                              <option value="cancelled">Cancelled</option>
-                            </select>
-                          </div>
-                        </div>
-                        <div style={{ fontSize: '12px', color: '#6d6a7a', marginTop: '4px' }}>
-                          <i className="fas fa-map-pin"></i> {order.customer_location}
-                        </div>
-                      </div>
-                    ))
-                  )}
-                  {orders.length > 5 && (
-                    <div style={{ textAlign: 'center', fontSize: '12px', color: '#6d6a7a' }}>
-                      + {orders.length - 5} more orders
-                    </div>
-                  )}
-                </div>
-              </>
-            )}
-          </div>
+            // Orders Management
+            React.createElement('div', { className: 'admin-panel', key: 'orders' },
+              React.createElement('div', { className: 'section-title' },
+                React.createElement('i', { className: 'fas fa-clipboard-list' }), ' Recent Orders (', orders.length, ')'
+              ),
+              orders.length === 0 ?
+                React.createElement('div', { style: { color: '#7a6e86', fontSize: '13px', padding: '8px 0' } }, 'No orders placed yet') :
+                orders.slice(0, 5).map(order =>
+                  React.createElement('div', {
+                    key: order.id,
+                    style: { background: 'white', padding: '12px', borderRadius: '12px', marginBottom: '8px', border: '1px solid #e9e6ed' }
+                  },
+                    React.createElement('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
+                      React.createElement('div', null,
+                        React.createElement('div', { style: { fontWeight: '600', fontSize: '14px' } }, 'Order #', order.id),
+                        React.createElement('div', { style: { fontSize: '12px', color: '#6d6a7a' } }, new Date(order.created_at).toLocaleString()),
+                        React.createElement('div', { style: { fontSize: '13px', marginTop: '4px' } }, 'Total: ', React.createElement('strong', null, '$', order.total.toFixed(2)))
+                      ),
+                      React.createElement('div', { style: { display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'flex-end' } },
+                        getStatusBadge(order.status),
+                        React.createElement('select', {
+                          value: order.status,
+                          onChange: e => updateOrderStatus(order.id, e.target.value),
+                          style: { padding: '4px 8px', borderRadius: '20px', border: '1px solid #d6cee0', fontSize: '11px', background: 'white' }
+                        },
+                          React.createElement('option', { value: 'pending' }, 'Pending'),
+                          React.createElement('option', { value: 'preparing' }, 'Preparing'),
+                          React.createElement('option', { value: 'delivering' }, 'Delivering'),
+                          React.createElement('option', { value: 'delivered' }, 'Delivered'),
+                          React.createElement('option', { value: 'cancelled' }, 'Cancelled')
+                        )
+                      )
+                    ),
+                    React.createElement('div', { style: { fontSize: '12px', color: '#6d6a7a', marginTop: '4px' } },
+                      React.createElement('i', { className: 'fas fa-map-pin' }), ' ', order.customer_location
+                    )
+                  )
+                ),
+              orders.length > 5 ?
+                React.createElement('div', { style: { textAlign: 'center', fontSize: '12px', color: '#6d6a7a' } }, '+ ', orders.length - 5, ' more orders') : null
+            )
+          ] : null
         );
       }
 
       // Render React app
       const container = document.getElementById('app-container');
       if (container) {
-        const root = ReactDOM.createRoot(container);
-        root.render(React.createElement(App));
+        try {
+          const root = ReactDOM.createRoot(container);
+          root.render(React.createElement(App));
+        } catch (err) {
+          console.error('Failed to render app:', err);
+          container.innerHTML = `
+            <div class="error-message">
+              <i class="fas fa-exclamation-circle"></i> Failed to render app. Please refresh the page.
+              <br><small>${err.message}</small>
+            </div>
+          `;
+        }
       }
-    };
-  })();
+    });
+  });
 </script>
 </body>
 </html>
