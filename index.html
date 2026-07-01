@@ -68,6 +68,7 @@
             padding: 16px;
             margin-bottom: 16px;
             border: 1px solid #f0eff2;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
         .section-title {
             font-weight: 600;
@@ -89,12 +90,18 @@
         .menu-item:last-child {
             border-bottom: none;
         }
+        .menu-item .info {
+            display: flex;
+            flex-direction: column;
+        }
         .menu-item .name {
             font-weight: 500;
+            color: #1f1f2e;
         }
         .menu-item .price {
             color: #6c2b8a;
             font-weight: 600;
+            font-size: 14px;
         }
         .menu-item .add-btn {
             background: #6c2b8a;
@@ -104,6 +111,13 @@
             padding: 6px 16px;
             font-weight: 600;
             cursor: pointer;
+            transition: 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .menu-item .add-btn:active {
+            transform: scale(0.95);
         }
         .order-summary {
             background: white;
@@ -125,6 +139,8 @@
             font-weight: 700;
             font-size: 16px;
             padding-top: 8px;
+            border-top: 2px solid #6c2b8a;
+            margin-top: 4px;
         }
         .order-total span {
             color: #6c2b8a;
@@ -139,6 +155,15 @@
             width: 100%;
             margin-top: 12px;
             cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 4px 12px rgba(108, 43, 138, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .action-btn:active {
+            transform: scale(0.97);
         }
         .map-container {
             height: 160px;
@@ -170,6 +195,9 @@
             font-size: 14px;
             outline: none;
         }
+        .admin-input-group input:focus {
+            border-color: #6c2b8a;
+        }
         .admin-input-group button {
             background: #6c2b8a;
             color: white;
@@ -178,19 +206,31 @@
             border-radius: 40px;
             font-weight: 600;
             cursor: pointer;
+            white-space: nowrap;
+        }
+        .delivery-girl-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
         }
         .delivery-girl-tag {
             background: white;
             border-radius: 40px;
             padding: 6px 14px;
-            display: inline-block;
-            margin: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
             border: 1px solid #d4cade;
+            font-size: 13px;
+        }
+        .delivery-girl-tag i {
+            color: #6c2b8a;
         }
         .delivery-girl-tag .remove {
             color: #b0003a;
             cursor: pointer;
-            margin-left: 8px;
+            margin-left: 4px;
         }
         .footnote {
             font-size: 11px;
@@ -198,6 +238,27 @@
             text-align: center;
             padding: 12px;
             border-top: 1px solid #ece9f0;
+        }
+        .success-message {
+            background: #e6ffe6;
+            color: #1f8b4c;
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 10px;
+            animation: fadeIn 0.5s;
+        }
+        .badge-count {
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            padding: 1px 7px;
+            font-size: 11px;
+            margin-left: 5px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .loading {
             text-align: center;
@@ -216,17 +277,6 @@
             margin: 10px 0;
             text-align: center;
         }
-        .success-message {
-            background: #e6ffe6;
-            color: #1f8b4c;
-            padding: 10px;
-            border-radius: 12px;
-            text-align: center;
-            margin-top: 10px;
-        }
-        .hidden {
-            display: none;
-        }
         .status-box {
             background: #f0f0f0;
             padding: 10px;
@@ -234,6 +284,38 @@
             font-size: 13px;
             margin: 10px 0;
             color: #333;
+            font-family: monospace;
+        }
+        .cart-count {
+            background: #ffcc00;
+            color: #1f1f2e;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+        .location-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d6cee0;
+            border-radius: 30px;
+            font-size: 13px;
+            margin-top: 6px;
+            outline: none;
+        }
+        .location-input:focus {
+            border-color: #6c2b8a;
+        }
+        .order-placed-banner {
+            background: #00c853;
+            color: white;
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: 600;
+            animation: fadeIn 0.5s;
         }
     </style>
 </head>
@@ -277,13 +359,12 @@
     updateStatus('🚀 App starting...');
 
     // ============================================
-    // SIMPLE DIRECT APPROACH - NO REACT
+    // LOAD SUPABASE AND RUN APP
     // ============================================
     async function loadSupabaseAndRun() {
         try {
             updateStatus('📦 Loading Supabase library...');
             
-            // Load Supabase dynamically
             await new Promise((resolve, reject) => {
                 const script = document.createElement('script');
                 script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
@@ -294,7 +375,6 @@
 
             updateStatus('✅ Supabase loaded!');
             
-            // Create Supabase client
             const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
             updateStatus('🔗 Connected to Supabase');
 
@@ -330,9 +410,9 @@
             if (girlsError) throw girlsError;
             updateStatus(`✅ Girls loaded: ${girlsData?.length || 0}`);
 
-            // Now render the app
+            // Render the app
             updateStatus('🎨 Rendering app...');
-            renderApp(menuData || [], girlsData || [], supabase);
+            renderApp(menuData || [], girlsData?.map(g => g.name) || [], supabase);
             updateStatus('✅ App ready!');
 
         } catch (error) {
@@ -354,45 +434,43 @@
 
     function renderApp(menu, deliveryGirls, supabase) {
         let cart = [];
-        let newGirl = '';
         let orderPlaced = false;
-        const customerLocation = 'Accra, Ghana';
+        let customerLocation = 'Accra, Ghana';
 
         function render() {
             const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
+            const cartCount = cart.reduce((acc, i) => acc + i.qty, 0);
 
             let cartHTML = cart.length === 0 ? 
                 '<div style="color:#7a6e86;padding:10px 0;"><i class="fas fa-shopping-cart"></i> Cart is empty</div>' :
                 cart.map(item => `
-                    <div class="order-row" key="${item.id}">
-                        <span>${item.name} × ${item.qty}</span>
+                    <div class="order-row">
+                        <span>${item.emoji} ${item.name} × ${item.qty}</span>
                         <span>
                             $${(item.price * item.qty).toFixed(2)}
-                            <button onclick="removeFromCart(${item.id})" style="background:none;border:none;color:#b0003a;margin-left:8px;cursor:pointer;">
+                            <button onclick="removeFromCart(${item.id})" style="background:none;border:none;color:#b0003a;margin-left:8px;cursor:pointer;font-size:14px;">
                                 <i class="fas fa-minus-circle"></i>
                             </button>
                         </span>
                     </div>
                 `).join('');
 
-            let menuHTML = menu.length === 0 ?
-                '<div style="text-align:center;color:#7a6e86;padding:20px;"><i class="fas fa-utensils"></i><br />No menu items available</div>' :
-                menu.map(item => `
-                    <div class="menu-item" key="${item.id}">
-                        <div>
-                            <div class="name">${item.emoji} ${item.name}</div>
-                            <div class="price">$${item.price.toFixed(2)}</div>
-                        </div>
-                        <button class="add-btn" onclick="addToCart(${item.id})">
-                            <i class="fas fa-plus"></i> Add
-                        </button>
+            let menuHTML = menu.map(item => `
+                <div class="menu-item">
+                    <div class="info">
+                        <span class="name">${item.emoji} ${item.name}</span>
+                        <span class="price">$${item.price.toFixed(2)}</span>
                     </div>
-                `).join('');
+                    <button class="add-btn" onclick="addToCart(${item.id})">
+                        <i class="fas fa-plus"></i> Add
+                    </button>
+                </div>
+            `).join('');
 
             let girlsHTML = deliveryGirls.length === 0 ?
                 '<div style="color:#7a6e86;padding:8px 0;">No delivery girls added yet</div>' :
                 deliveryGirls.map(g => `
-                    <span class="delivery-girl-tag" key="${g}">
+                    <span class="delivery-girl-tag">
                         <i class="fas fa-female"></i> ${g}
                         <span class="remove" onclick="removeGirl('${g}')">
                             <i class="fas fa-times"></i>
@@ -415,16 +493,17 @@
                 <div class="order-summary">
                     <div class="section-title">
                         <i class="fas fa-shopping-bag"></i> Your Order
+                        ${cartCount > 0 ? `<span class="cart-count">${cartCount}</span>` : ''}
                     </div>
                     ${cartHTML}
                     <div class="order-row order-total">
                         <span>Total</span>
                         <span>$${totalPrice.toFixed(2)}</span>
                     </div>
-                    <button class="action-btn" onclick="placeOrder()">
+                    <button class="action-btn" onclick="placeOrder()" ${cart.length === 0 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
                         <i class="fas fa-motorcycle"></i> Place Order · Cash
                     </button>
-                    ${orderPlaced ? '<div class="success-message"><i class="fas fa-check-circle"></i> Order placed! Delivery on the way.</div>' : ''}
+                    ${orderPlaced ? '<div class="order-placed-banner"><i class="fas fa-check-circle"></i> ✅ Order placed! Delivery on the way.</div>' : ''}
                 </div>
 
                 <!-- Map Section -->
@@ -436,7 +515,13 @@
                         <iframe src="${mapSrc}" loading="lazy" title="Delivery Map"></iframe>
                     </div>
                     <div style="font-size:13px;margin-top:6px;">
-                        <i class="fas fa-location-dot" style="color:#6c2b8a;"></i> Customer: ${customerLocation}
+                        <i class="fas fa-location-dot" style="color:#6c2b8a;"></i> 
+                        <strong>Customer:</strong> ${customerLocation}
+                    </div>
+                    <input class="location-input" id="locationInput" value="${customerLocation}" 
+                           placeholder="Enter delivery address" onchange="updateLocation(this.value)" />
+                    <div style="font-size:12px;color:#5f556b;margin-top:4px;">
+                        <i class="fas fa-user-check"></i> Delivery girl sees this location
                     </div>
                 </div>
 
@@ -444,6 +529,7 @@
                 <div class="admin-panel">
                     <div class="section-title">
                         <i class="fas fa-user-gear"></i> Admin · Delivery Girls
+                        <span style="font-size:12px;font-weight:400;color:#6d6a7a;margin-left:auto;">${deliveryGirls.length} girls</span>
                     </div>
                     <div class="admin-input-group">
                         <input id="newGirlInput" placeholder="Enter delivery girl name" onkeypress="if(event.key==='Enter') addDeliveryGirl()" />
@@ -451,14 +537,19 @@
                             <i class="fas fa-plus"></i> Add
                         </button>
                     </div>
-                    <div>
+                    <div class="delivery-girl-list">
                         ${girlsHTML}
+                    </div>
+                    <div style="font-size:11px;color:#6d6a7a;margin-top:8px;">
+                        <i class="fas fa-info-circle"></i> Delivery girls can see customer location on map
                     </div>
                 </div>
             `;
         }
 
-        // Global functions
+        // ============================================
+        // GLOBAL FUNCTIONS
+        // ============================================
         window.addToCart = function(id) {
             const item = menu.find(i => i.id === id);
             if (!item) return;
@@ -481,6 +572,11 @@
             render();
         };
 
+        window.updateLocation = function(value) {
+            customerLocation = value || 'Accra, Ghana';
+            render();
+        };
+
         window.placeOrder = async function() {
             if (cart.length === 0) {
                 alert('Please add items to your order');
@@ -488,11 +584,12 @@
             }
 
             try {
+                const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
                 const { data, error } = await supabase
                     .from('orders')
                     .insert({
                         items: cart,
-                        total: cart.reduce((acc, i) => acc + i.price * i.qty, 0),
+                        total: totalPrice,
                         customer_location: customerLocation,
                         status: 'pending'
                     })
@@ -506,7 +603,7 @@
                 setTimeout(() => {
                     orderPlaced = false;
                     render();
-                }, 6000);
+                }, 8000);
                 alert('✅ Order placed successfully! A delivery girl will arrive soon.');
             } catch (error) {
                 alert('Failed to place order: ' + error.message);
