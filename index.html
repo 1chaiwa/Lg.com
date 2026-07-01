@@ -1,790 +1,723 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Laura Girls · Food Delivery</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-    }
-    body {
-      background: #f5f7fa;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 12px;
-    }
-    #root {
-      width: 100%;
-      max-width: 430px;
-      background: white;
-      border-radius: 32px 32px 24px 24px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.08), 0 6px 12px rgba(0,0,0,0.05);
-      overflow: hidden;
-      position: relative;
-      min-height: 780px;
-      display: flex;
-      flex-direction: column;
-    }
-    .app-header {
-      background: linear-gradient(135deg, #6c2b8a, #8b3fa8);
-      padding: 18px 20px 14px;
-      color: white;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border-bottom: 1px solid rgba(255,255,255,0.15);
-    }
-    .app-header i {
-      font-size: 26px;
-      color: #ffcc00;
-    }
-    .app-header h1 {
-      font-size: 20px;
-      font-weight: 600;
-      letter-spacing: -0.3px;
-      flex: 1;
-    }
-    .app-header .badge {
-      background: #ffcc00;
-      color: #1f1f2e;
-      font-size: 11px;
-      font-weight: 700;
-      padding: 4px 12px;
-      border-radius: 40px;
-    }
-    .app-body {
-      flex: 1;
-      padding: 16px 16px 10px;
-      overflow-y: auto;
-      background: #fafafc;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-    .card {
-      background: white;
-      border-radius: 20px;
-      padding: 16px 14px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.02);
-      border: 1px solid #f0eff2;
-    }
-    .section-title {
-      font-weight: 600;
-      font-size: 15px;
-      color: #1a1a2e;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .section-title i {
-      color: #6c2b8a;
-      font-size: 16px;
-    }
-    .menu-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .menu-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 4px;
-      border-bottom: 1px solid #f0edf3;
-    }
-    .menu-item:last-child {
-      border-bottom: none;
-    }
-    .menu-item .info {
-      display: flex;
-      flex-direction: column;
-    }
-    .menu-item .name {
-      font-weight: 500;
-      color: #1f1f2e;
-    }
-    .menu-item .price {
-      font-size: 14px;
-      color: #6c2b8a;
-      font-weight: 600;
-    }
-    .menu-item .add-btn {
-      background: #6c2b8a;
-      color: white;
-      border: none;
-      border-radius: 30px;
-      padding: 6px 16px;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.15s;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .menu-item .add-btn:active {
-      transform: scale(0.94);
-      background: #521f6b;
-    }
-    .order-summary {
-      background: #ffffff;
-      border-radius: 24px;
-      padding: 14px 14px 10px;
-      border: 1px solid #e9e6ed;
-      margin-top: 4px;
-    }
-    .order-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 14px;
-      padding: 6px 0;
-      border-bottom: 1px dashed #e3dfe9;
-    }
-    .order-row:last-child {
-      border-bottom: none;
-    }
-    .order-total {
-      font-weight: 700;
-      color: #1a1a2e;
-      font-size: 16px;
-    }
-    .order-total span {
-      color: #6c2b8a;
-    }
-    .action-btn {
-      background: #ffcc00;
-      border: none;
-      border-radius: 40px;
-      padding: 12px 0;
-      font-weight: 700;
-      font-size: 16px;
-      color: #1f1f2e;
-      width: 100%;
-      margin-top: 12px;
-      cursor: pointer;
-      transition: 0.15s;
-      box-shadow: 0 4px 8px rgba(108, 43, 138, 0.15);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .action-btn:active {
-      transform: scale(0.97);
-      background: #e6b800;
-    }
-    .action-btn i {
-      font-size: 18px;
-    }
-    .map-container {
-      height: 160px;
-      background: #d9d2e3;
-      border-radius: 20px;
-      overflow: hidden;
-      margin: 4px 0 6px;
-      position: relative;
-    }
-    .map-container iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
-    .admin-panel {
-      background: #f4f0f9;
-      border-radius: 24px;
-      padding: 14px;
-      margin-top: 4px;
-    }
-    .admin-input-group {
-      display: flex;
-      gap: 8px;
-      margin: 8px 0 6px;
-      flex-wrap: wrap;
-    }
-    .admin-input-group input {
-      flex: 1;
-      padding: 10px 12px;
-      border: 1px solid #d6cee0;
-      border-radius: 40px;
-      background: white;
-      font-size: 14px;
-      outline: none;
-    }
-    .admin-input-group input:focus {
-      border-color: #6c2b8a;
-    }
-    .admin-input-group button {
-      background: #6c2b8a;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 40px;
-      font-weight: 600;
-      cursor: pointer;
-    }
-    .delivery-girl-list {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .delivery-girl-tag {
-      background: white;
-      border-radius: 40px;
-      padding: 6px 14px 6px 12px;
-      font-size: 13px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      border: 1px solid #d4cade;
-    }
-    .delivery-girl-tag i {
-      color: #6c2b8a;
-    }
-    .delivery-girl-tag .remove {
-      color: #b0003a;
-      cursor: pointer;
-      font-size: 14px;
-      margin-left: 4px;
-    }
-    .footnote {
-      font-size: 11px;
-      color: #6d6a7a;
-      text-align: center;
-      padding: 12px 0 6px;
-      border-top: 1px solid #ece9f0;
-      margin-top: 6px;
-    }
-    .loading {
-      text-align: center;
-      padding: 40px 20px;
-      color: #6c2b8a;
-    }
-    .loading i {
-      font-size: 40px;
-      margin-bottom: 10px;
-    }
-    .error-message {
-      background: #ffe6e6;
-      color: #b0003a;
-      padding: 15px;
-      border-radius: 12px;
-      font-size: 14px;
-      text-align: center;
-      margin: 10px 0;
-    }
-    .success-message {
-      background: #e6ffe6;
-      color: #1f8b4c;
-      padding: 10px;
-      border-radius: 12px;
-      font-size: 14px;
-      text-align: center;
-    }
-    .debug-box {
-      background: #f8f8f8;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 10px;
-      margin: 10px 0;
-      font-size: 12px;
-      color: #333;
-      max-height: 150px;
-      overflow-y: auto;
-      font-family: monospace;
-      white-space: pre-wrap;
-      word-break: break-all;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Laura Girls · Food Delivery</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: #f5f7fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 12px;
+        }
+        #root {
+            width: 100%;
+            max-width: 430px;
+            background: white;
+            border-radius: 32px 32px 24px 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+            min-height: 780px;
+            display: flex;
+            flex-direction: column;
+        }
+        .app-header {
+            background: linear-gradient(135deg, #6c2b8a, #8b3fa8);
+            padding: 18px 20px 14px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .app-header i {
+            font-size: 26px;
+            color: #ffcc00;
+        }
+        .app-header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            flex: 1;
+        }
+        .app-header .badge {
+            background: #ffcc00;
+            color: #1f1f2e;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 40px;
+        }
+        .app-body {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            background: #fafafc;
+        }
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid #f0eff2;
+        }
+        .section-title {
+            font-weight: 600;
+            font-size: 15px;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+        }
+        .section-title i {
+            color: #6c2b8a;
+            margin-right: 8px;
+        }
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0edf3;
+        }
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        .menu-item .name {
+            font-weight: 500;
+        }
+        .menu-item .price {
+            color: #6c2b8a;
+            font-weight: 600;
+        }
+        .menu-item .add-btn {
+            background: #6c2b8a;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 6px 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .order-summary {
+            background: white;
+            border-radius: 24px;
+            padding: 16px;
+            border: 1px solid #e9e6ed;
+            margin-bottom: 16px;
+        }
+        .order-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px dashed #e3dfe9;
+        }
+        .order-row:last-child {
+            border-bottom: none;
+        }
+        .order-total {
+            font-weight: 700;
+            font-size: 16px;
+            padding-top: 8px;
+        }
+        .order-total span {
+            color: #6c2b8a;
+        }
+        .action-btn {
+            background: #ffcc00;
+            border: none;
+            border-radius: 40px;
+            padding: 12px;
+            font-weight: 700;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 12px;
+            cursor: pointer;
+        }
+        .map-container {
+            height: 160px;
+            background: #d9d2e3;
+            border-radius: 20px;
+            overflow: hidden;
+            margin: 4px 0;
+        }
+        .map-container iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .admin-panel {
+            background: #f4f0f9;
+            border-radius: 24px;
+            padding: 16px;
+        }
+        .admin-input-group {
+            display: flex;
+            gap: 8px;
+            margin: 8px 0;
+        }
+        .admin-input-group input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #d6cee0;
+            border-radius: 40px;
+            font-size: 14px;
+            outline: none;
+        }
+        .admin-input-group button {
+            background: #6c2b8a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .delivery-girl-tag {
+            background: white;
+            border-radius: 40px;
+            padding: 6px 14px;
+            display: inline-block;
+            margin: 4px;
+            border: 1px solid #d4cade;
+        }
+        .delivery-girl-tag .remove {
+            color: #b0003a;
+            cursor: pointer;
+            margin-left: 8px;
+        }
+        .footnote {
+            font-size: 11px;
+            color: #6d6a7a;
+            text-align: center;
+            padding: 12px;
+            border-top: 1px solid #ece9f0;
+        }
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c2b8a;
+        }
+        .loading i {
+            font-size: 40px;
+            margin-bottom: 15px;
+        }
+        .error-message {
+            background: #ffe6e6;
+            color: #b0003a;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .success-message {
+            background: #e6ffe6;
+            color: #1f8b4c;
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 10px;
+        }
+        .debug-box {
+            background: #1a1a2e;
+            color: #00ff88;
+            padding: 12px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .retry-btn {
+            background: #6c2b8a;
+            color: white;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
 <div id="root">
-  <div class="app-header">
-    <i class="fas fa-utensils"></i>
-    <h1>Laura Girls Food</h1>
-    <span class="badge"><i class="fas fa-motorcycle"></i> delivery</span>
-  </div>
-  <div id="app-container" class="app-body">
-    <div class="loading">
-      <i class="fas fa-spinner fa-spin"></i>
-      <p>Loading delicious food...</p>
+    <div class="app-header">
+        <i class="fas fa-utensils"></i>
+        <h1>Laura Girls Food</h1>
+        <span class="badge"><i class="fas fa-motorcycle"></i> delivery</span>
     </div>
-  </div>
-  <div class="footnote">
-    <i class="fas fa-shield-alt"></i> Cash on delivery · MTN MoMo style
-  </div>
+    <div id="app-container" class="app-body">
+        <div class="loading">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading delicious food...</p>
+        </div>
+    </div>
+    <div class="footnote">
+        <i class="fas fa-shield-alt"></i> Cash on delivery · MTN MoMo style
+    </div>
 </div>
 
 <script>
-  // ============================================
-  // 🔑 SUPABASE CONFIGURATION
-  // ============================================
-  const SUPABASE_URL = 'https://ndwoqlxtaczwxsescemu.supabase.co';
-  const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kd29xbHh0YWN6d3hzZXNjZW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5Mjk2MTQsImV4cCI6MjA5ODUwNTYxNH0.43PgLQSdEESXboLGrdtZCHq-f8TwzItXaGuxmI4NEe8';
-  
-  console.log('🚀 App Starting...');
-  console.log('📡 Supabase URL:', SUPABASE_URL);
-  console.log('🔑 Supabase Key:', SUPABASE_ANON_KEY ? '✅ Set' : '❌ Missing');
+    // ============================================
+    // SUPABASE CONFIGURATION
+    // ============================================
+    const SUPABASE_URL = 'https://ndwoqlxtaczwxsescemu.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kd29xbHh0YWN6d3hzZXNjZW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5Mjk2MTQsImV4cCI6MjA5ODUwNTYxNH0.43PgLQSdEESXboLGrdtZCHq-f8TwzItXaGuxmI4NEe8';
 
-  // Track loading status
-  let scriptsLoaded = 0;
-  const totalScripts = 3; // Supabase, React, ReactDOM
+    console.log('🚀 App Starting...');
+    console.log('📡 URL:', SUPABASE_URL);
+    console.log('🔑 Key:', SUPABASE_ANON_KEY ? '✅ Present' : '❌ Missing');
 
-  function checkAllScriptsLoaded() {
-    scriptsLoaded++;
-    console.log(`📦 Script ${scriptsLoaded}/${totalScripts} loaded`);
-    if (scriptsLoaded === totalScripts) {
-      console.log('✅ All scripts loaded, initializing app...');
-      initializeApp();
+    const container = document.getElementById('app-container');
+
+    // ============================================
+    // LOAD SCRIPTS SEQUENTIALLY
+    // ============================================
+    function loadScript(src) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
     }
-  }
 
-  // ============================================
-  // LOAD SUPABASE CLIENT
-  // ============================================
-  const scriptSupabase = document.createElement('script');
-  scriptSupabase.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-  scriptSupabase.onload = checkAllScriptsLoaded;
-  scriptSupabase.onerror = function() {
-    console.error('❌ Failed to load Supabase');
-    document.getElementById('app-container').innerHTML = `
-      <div class="error-message">
-        <i class="fas fa-exclamation-circle"></i> Failed to load Supabase library. Please check your internet connection.
-      </div>
-    `;
-  };
-  document.head.appendChild(scriptSupabase);
+    async function loadAllScripts() {
+        try {
+            console.log('📦 Loading Supabase...');
+            await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js');
+            console.log('✅ Supabase loaded');
 
-  // ============================================
-  // LOAD REACT
-  // ============================================
-  const scriptReact = document.createElement('script');
-  scriptReact.src = 'https://unpkg.com/react@18/umd/react.production.min.js';
-  scriptReact.onload = checkAllScriptsLoaded;
-  scriptReact.onerror = function() {
-    console.error('❌ Failed to load React');
-    document.getElementById('app-container').innerHTML = `
-      <div class="error-message">
-        <i class="fas fa-exclamation-circle"></i> Failed to load React library.
-      </div>
-    `;
-  };
-  document.head.appendChild(scriptReact);
-  
-  // ============================================
-  // LOAD REACTDOM
-  // ============================================
-  const scriptReactDOM = document.createElement('script');
-  scriptReactDOM.src = 'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js';
-  scriptReactDOM.onload = checkAllScriptsLoaded;
-  scriptReactDOM.onerror = function() {
-    console.error('❌ Failed to load ReactDOM');
-    document.getElementById('app-container').innerHTML = `
-      <div class="error-message">
-        <i class="fas fa-exclamation-circle"></i> Failed to load ReactDOM library.
-      </div>
-    `;
-  };
-  document.head.appendChild(scriptReactDOM);
+            console.log('⚛️ Loading React...');
+            await loadScript('https://unpkg.com/react@18/umd/react.production.min.js');
+            console.log('✅ React loaded');
 
-  // ============================================
-  // INITIALIZE APP
-  // ============================================
-  function initializeApp() {
-    console.log('⚛️ Initializing React App...');
-    
-    try {
-      // Check if all required libraries are loaded
-      if (typeof React === 'undefined') {
-        throw new Error('React is not loaded');
-      }
-      if (typeof ReactDOM === 'undefined') {
-        throw new Error('ReactDOM is not loaded');
-      }
-      if (typeof supabase === 'undefined' && typeof window.supabase === 'undefined') {
-        throw new Error('Supabase is not loaded');
-      }
+            console.log('⚛️ Loading ReactDOM...');
+            await loadScript('https://unpkg.com/react-dom@18/umd/react-dom.production.min.js');
+            console.log('✅ ReactDOM loaded');
 
-      const { useState, useEffect } = React;
-      const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-      console.log('✅ Supabase client created');
+            return true;
+        } catch (error) {
+            console.error('❌ Failed to load scripts:', error);
+            return false;
+        }
+    }
 
-      function App() {
-        const [menu, setMenu] = useState([]);
-        const [cart, setCart] = useState([]);
-        const [deliveryGirls, setDeliveryGirls] = useState([]);
-        const [newGirl, setNewGirl] = useState('');
-        const [orderPlaced, setOrderPlaced] = useState(false);
-        const [customerLocation] = useState('Accra, Ghana');
-        const [loading, setLoading] = useState(true);
-        const [error, setError] = useState('');
-        const [debug, setDebug] = useState('');
+    // ============================================
+    // MAIN APP
+    // ============================================
+    async function initApp() {
+        const scriptsLoaded = await loadAllScripts();
 
-        // Fetch data from Supabase
-        useEffect(() => {
-          const fetchData = async () => {
-            console.log('📡 Fetching data from Supabase...');
-            setLoading(true);
-            try {
-              // Fetch menu
-              console.log('📋 Fetching menu...');
-              const { data: menuData, error: menuError } = await supabaseClient
-                .from('menu')
-                .select('*')
-                .order('id');
-
-              if (menuError) {
-                console.error('❌ Menu error:', menuError);
-                throw menuError;
-              }
-              console.log('✅ Menu loaded:', menuData?.length || 0, 'items');
-              setMenu(menuData || []);
-              setDebug(prev => prev + `Menu: ${menuData?.length || 0} items\n`);
-
-              // Fetch delivery girls
-              console.log('👩 Fetching delivery girls...');
-              const { data: girlsData, error: girlsError } = await supabaseClient
-                .from('delivery_girls')
-                .select('name')
-                .order('name');
-
-              if (girlsError) {
-                console.error('❌ Girls error:', girlsError);
-                throw girlsError;
-              }
-              console.log('✅ Girls loaded:', girlsData?.length || 0);
-              setDeliveryGirls(girlsData?.map(g => g.name) || []);
-              setDebug(prev => prev + `Girls: ${girlsData?.length || 0}\n`);
-
-              setError('');
-              console.log('✅ All data loaded successfully!');
-            } catch (err) {
-              console.error('❌ Error:', err);
-              setError(`Failed to load: ${err.message}`);
-              setDebug(prev => prev + `❌ Error: ${err.message}\n`);
-            } finally {
-              setLoading(false);
-            }
-          };
-
-          fetchData();
-        }, []);
-
-        const addToCart = (item) => {
-          setCart(prev => {
-            const existing = prev.find(i => i.id === item.id);
-            if (existing) {
-              return prev.map(i => i.id === item.id ? { ...i, qty: i.qty + 1 } : i);
-            }
-            return [...prev, { ...item, qty: 1 }];
-          });
-        };
-
-        const removeFromCart = (id) => {
-          setCart(prev => {
-            const existing = prev.find(i => i.id === id);
-            if (existing && existing.qty > 1) {
-              return prev.map(i => i.id === id ? { ...i, qty: i.qty - 1 } : i);
-            }
-            return prev.filter(i => i.id !== id);
-          });
-        };
-
-        const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
-
-        const placeOrder = async () => {
-          if (cart.length === 0) {
-            alert('Please add items to your order');
+        if (!scriptsLoaded) {
+            container.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p><strong>Failed to load required libraries</strong></p>
+                    <p style="margin-top:8px;font-size:13px;">Please check your internet connection and refresh.</p>
+                    <button class="retry-btn" onclick="location.reload()">
+                        <i class="fas fa-sync"></i> Retry
+                    </button>
+                </div>
+            `;
             return;
-          }
-
-          try {
-            console.log('📝 Placing order...');
-            const { data, error } = await supabaseClient
-              .from('orders')
-              .insert({
-                items: cart,
-                total: totalPrice,
-                customer_location: customerLocation,
-                status: 'pending'
-              })
-              .select();
-
-            if (error) throw error;
-
-            console.log('✅ Order placed!', data);
-            setOrderPlaced(true);
-            setCart([]);
-            setTimeout(() => setOrderPlaced(false), 6000);
-            alert('✅ Order placed successfully! A delivery girl will arrive soon.');
-          } catch (error) {
-            console.error('❌ Order error:', error);
-            alert('Failed to place order: ' + error.message);
-          }
-        };
-
-        const addDeliveryGirl = async () => {
-          if (!newGirl.trim()) {
-            alert('Please enter a delivery girl name');
-            return;
-          }
-
-          try {
-            // Check if girl already exists
-            const { data: existing } = await supabaseClient
-              .from('delivery_girls')
-              .select('name')
-              .eq('name', newGirl.trim())
-              .single();
-
-            if (existing) {
-              alert('Delivery girl already exists');
-              return;
-            }
-
-            const { error } = await supabaseClient
-              .from('delivery_girls')
-              .insert({ name: newGirl.trim() });
-
-            if (error) throw error;
-
-            // Refresh list
-            const { data: girlsData } = await supabaseClient
-              .from('delivery_girls')
-              .select('name')
-              .order('name');
-
-            setDeliveryGirls(girlsData.map(g => g.name));
-            setNewGirl('');
-            alert('✅ Delivery girl added successfully!');
-          } catch (error) {
-            console.error('Error adding girl:', error);
-            alert('Failed to add delivery girl: ' + error.message);
-          }
-        };
-
-        const removeGirl = async (name) => {
-          if (!confirm(`Remove ${name} from delivery girls?`)) return;
-
-          try {
-            const { error } = await supabaseClient
-              .from('delivery_girls')
-              .delete()
-              .eq('name', name);
-
-            if (error) throw error;
-
-            const { data: girlsData } = await supabaseClient
-              .from('delivery_girls')
-              .select('name')
-              .order('name');
-
-            setDeliveryGirls(girlsData.map(g => g.name));
-            alert('✅ Delivery girl removed successfully!');
-          } catch (error) {
-            console.error('Error removing girl:', error);
-            alert('Failed to remove delivery girl: ' + error.message);
-          }
-        };
-
-        const mapSrc = `https://www.google.com/maps/embed/v1/place?key=AIzaSyC0X7LOV5Vqk7t7mGzN9eK8zP5yH9Qw0Jc&q=${encodeURIComponent(customerLocation)}`;
-
-        if (loading) {
-          return (
-            <div className="loading">
-              <i className="fas fa-spinner fa-spin fa-2x"></i>
-              <p>Loading delicious food...</p>
-              <div className="debug-box">{debug}</div>
-            </div>
-          );
         }
 
-        return (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            {error && (
-              <div className="error-message">
-                <i className="fas fa-exclamation-circle"></i> {error}
-                <div className="debug-box">{debug}</div>
-              </div>
-            )}
+        // Check if libraries are available
+        if (typeof React === 'undefined' || typeof ReactDOM === 'undefined' || typeof window.supabase === 'undefined') {
+            container.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p><strong>Libraries not available</strong></p>
+                    <p style="margin-top:8px;font-size:13px;">React: ${typeof React !== 'undefined' ? '✅' : '❌'}</p>
+                    <p style="font-size:13px;">ReactDOM: ${typeof ReactDOM !== 'undefined' ? '✅' : '❌'}</p>
+                    <p style="font-size:13px;">Supabase: ${typeof window.supabase !== 'undefined' ? '✅' : '❌'}</p>
+                    <button class="retry-btn" onclick="location.reload()">
+                        <i class="fas fa-sync"></i> Retry
+                    </button>
+                </div>
+            `;
+            return;
+        }
 
-            {/* Menu Section */}
-            <div className="card">
-              <div className="section-title">
-                <i className="fas fa-list-ul"></i> Today's Menu
-              </div>
-              <div className="menu-grid">
-                {menu.length === 0 ? (
-                  <div style={{ textAlign: 'center', color: '#7a6e86', padding: '10px' }}>
-                    <i className="fas fa-utensils"></i> No menu items available
-                  </div>
-                ) : (
-                  menu.map(item => (
-                    <div className="menu-item" key={item.id}>
-                      <div className="info">
-                        <span className="name">{item.emoji} {item.name}</span>
-                        <span className="price">${item.price.toFixed(2)}</span>
-                      </div>
-                      <button className="add-btn" onClick={() => addToCart(item)}>
-                        <i className="fas fa-plus"></i> Add
-                      </button>
+        try {
+            const { useState, useEffect } = React;
+            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+            function App() {
+                const [menu, setMenu] = useState([]);
+                const [cart, setCart] = useState([]);
+                const [deliveryGirls, setDeliveryGirls] = useState([]);
+                const [newGirl, setNewGirl] = useState('');
+                const [orderPlaced, setOrderPlaced] = useState(false);
+                const [customerLocation] = useState('Accra, Ghana');
+                const [loading, setLoading] = useState(true);
+                const [error, setError] = useState('');
+                const [debug, setDebug] = useState('⏳ Initializing...\n');
+
+                useEffect(() => {
+                    async function fetchData() {
+                        try {
+                            setDebug(prev => prev + '📡 Testing Supabase connection...\n');
+
+                            // Test connection first
+                            const { data: testData, error: testError } = await supabase
+                                .from('menu')
+                                .select('count')
+                                .limit(1);
+
+                            if (testError) {
+                                throw new Error(`Connection failed: ${testError.message}`);
+                            }
+
+                            setDebug(prev => prev + '✅ Connection successful!\n');
+
+                            // Fetch menu
+                            setDebug(prev => prev + '📋 Fetching menu...\n');
+                            const { data: menuData, error: menuError } = await supabase
+                                .from('menu')
+                                .select('*')
+                                .order('id');
+
+                            if (menuError) throw menuError;
+                            setMenu(menuData || []);
+                            setDebug(prev => prev + `✅ Menu loaded: ${menuData?.length || 0} items\n`);
+
+                            // Fetch delivery girls
+                            setDebug(prev => prev + '👩 Fetching delivery girls...\n');
+                            const { data: girlsData, error: girlsError } = await supabase
+                                .from('delivery_girls')
+                                .select('name')
+                                .order('name');
+
+                            if (girlsError) throw girlsError;
+                            setDeliveryGirls(girlsData?.map(g => g.name) || []);
+                            setDebug(prev => prev + `✅ Girls loaded: ${girlsData?.length || 0}\n`);
+
+                            setError('');
+                            setDebug(prev => prev + '✅ All data loaded!\n');
+                        } catch (err) {
+                            console.error('❌ Error:', err);
+                            setError(err.message);
+                            setDebug(prev => prev + `❌ ERROR: ${err.message}\n`);
+                        } finally {
+                            setLoading(false);
+                        }
+                    }
+
+                    fetchData();
+                }, []);
+
+                const addToCart = (item) => {
+                    setCart(prev => {
+                        const existing = prev.find(i => i.id === item.id);
+                        if (existing) {
+                            return prev.map(i => i.id === item.id ? { ...i, qty: i.qty + 1 } : i);
+                        }
+                        return [...prev, { ...item, qty: 1 }];
+                    });
+                };
+
+                const removeFromCart = (id) => {
+                    setCart(prev => {
+                        const existing = prev.find(i => i.id === id);
+                        if (existing && existing.qty > 1) {
+                            return prev.map(i => i.id === id ? { ...i, qty: i.qty - 1 } : i);
+                        }
+                        return prev.filter(i => i.id !== id);
+                    });
+                };
+
+                const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
+
+                const placeOrder = async () => {
+                    if (cart.length === 0) {
+                        alert('Please add items to your order');
+                        return;
+                    }
+
+                    try {
+                        setDebug(prev => prev + '📝 Placing order...\n');
+                        const { data, error } = await supabase
+                            .from('orders')
+                            .insert({
+                                items: cart,
+                                total: totalPrice,
+                                customer_location: customerLocation,
+                                status: 'pending'
+                            })
+                            .select();
+
+                        if (error) throw error;
+
+                        setDebug(prev => prev + '✅ Order placed!\n');
+                        setOrderPlaced(true);
+                        setCart([]);
+                        setTimeout(() => setOrderPlaced(false), 6000);
+                        alert('✅ Order placed successfully! A delivery girl will arrive soon.');
+                    } catch (error) {
+                        console.error('❌ Order error:', error);
+                        setDebug(prev => prev + `❌ Order failed: ${error.message}\n`);
+                        alert('Failed to place order: ' + error.message);
+                    }
+                };
+
+                const addDeliveryGirl = async () => {
+                    if (!newGirl.trim()) {
+                        alert('Please enter a delivery girl name');
+                        return;
+                    }
+
+                    try {
+                        // Check if exists
+                        const { data: existing } = await supabase
+                            .from('delivery_girls')
+                            .select('name')
+                            .eq('name', newGirl.trim())
+                            .single();
+
+                        if (existing) {
+                            alert('Delivery girl already exists');
+                            return;
+                        }
+
+                        const { error } = await supabase
+                            .from('delivery_girls')
+                            .insert({ name: newGirl.trim() });
+
+                        if (error) throw error;
+
+                        // Refresh list
+                        const { data: girlsData } = await supabase
+                            .from('delivery_girls')
+                            .select('name')
+                            .order('name');
+
+                        setDeliveryGirls(girlsData.map(g => g.name));
+                        setNewGirl('');
+                        alert('✅ Delivery girl added successfully!');
+                    } catch (error) {
+                        alert('Failed to add delivery girl: ' + error.message);
+                    }
+                };
+
+                const removeGirl = async (name) => {
+                    if (!confirm(`Remove ${name} from delivery girls?`)) return;
+
+                    try {
+                        const { error } = await supabase
+                            .from('delivery_girls')
+                            .delete()
+                            .eq('name', name);
+
+                        if (error) throw error;
+
+                        const { data: girlsData } = await supabase
+                            .from('delivery_girls')
+                            .select('name')
+                            .order('name');
+
+                        setDeliveryGirls(girlsData.map(g => g.name));
+                        alert('✅ Delivery girl removed successfully!');
+                    } catch (error) {
+                        alert('Failed to remove delivery girl: ' + error.message);
+                    }
+                };
+
+                const mapSrc = `https://www.google.com/maps/embed/v1/place?key=AIzaSyC0X7LOV5Vqk7t7mGzN9eK8zP5yH9Qw0Jc&q=${encodeURIComponent(customerLocation)}`;
+
+                if (loading) {
+                    return (
+                        <div>
+                            <div className="loading">
+                                <i className="fas fa-spinner fa-spin"></i>
+                                <p>Loading delicious food...</p>
+                                <div className="debug-box">{debug}</div>
+                            </div>
+                        </div>
+                    );
+                }
+
+                if (error) {
+                    return (
+                        <div>
+                            <div className="error-message">
+                                <i className="fas fa-exclamation-circle"></i>
+                                <p><strong>Error loading data:</strong></p>
+                                <p style={{ marginTop: '8px' }}>{error}</p>
+                                <button className="retry-btn" onClick={() => window.location.reload()}>
+                                    <i className="fas fa-sync"></i> Retry
+                                </button>
+                            </div>
+                            <div className="debug-box">{debug}</div>
+                        </div>
+                    );
+                }
+
+                return (
+                    <div>
+                        {/* Menu Section */}
+                        <div className="card">
+                            <div className="section-title">
+                                <i className="fas fa-list-ul"></i> Today's Menu
+                            </div>
+                            {menu.length === 0 ? (
+                                <div style={{ textAlign: 'center', color: '#7a6e86', padding: '20px' }}>
+                                    <i className="fas fa-utensils"></i><br />
+                                    No menu items available
+                                </div>
+                            ) : (
+                                menu.map(item => (
+                                    <div className="menu-item" key={item.id}>
+                                        <div>
+                                            <div className="name">{item.emoji} {item.name}</div>
+                                            <div className="price">${item.price.toFixed(2)}</div>
+                                        </div>
+                                        <button className="add-btn" onClick={() => addToCart(item)}>
+                                            <i className="fas fa-plus"></i> Add
+                                        </button>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+
+                        {/* Order Summary */}
+                        <div className="order-summary">
+                            <div className="section-title">
+                                <i className="fas fa-shopping-bag"></i> Your Order
+                            </div>
+                            {cart.length === 0 ? (
+                                <div style={{ color: '#7a6e86', padding: '10px 0' }}>
+                                    <i className="fas fa-shopping-cart"></i> Cart is empty
+                                </div>
+                            ) : (
+                                cart.map(item => (
+                                    <div className="order-row" key={item.id}>
+                                        <span>{item.name} × {item.qty}</span>
+                                        <span>
+                                            ${(item.price * item.qty).toFixed(2)}
+                                            <button 
+                                                onClick={() => removeFromCart(item.id)} 
+                                                style={{ 
+                                                    background: 'none', 
+                                                    border: 'none', 
+                                                    color: '#b0003a', 
+                                                    marginLeft: '8px', 
+                                                    cursor: 'pointer' 
+                                                }}
+                                            >
+                                                <i className="fas fa-minus-circle"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                ))
+                            )}
+                            <div className="order-row order-total">
+                                <span>Total</span>
+                                <span>${totalPrice.toFixed(2)}</span>
+                            </div>
+                            <button className="action-btn" onClick={placeOrder}>
+                                <i className="fas fa-motorcycle"></i> Place Order · Cash
+                            </button>
+                            {orderPlaced && (
+                                <div className="success-message">
+                                    <i className="fas fa-check-circle"></i> Order placed! Delivery on the way.
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Map Section */}
+                        <div className="card">
+                            <div className="section-title">
+                                <i className="fas fa-map-pin"></i> Delivery Location
+                            </div>
+                            <div className="map-container">
+                                <iframe 
+                                    src={mapSrc} 
+                                    loading="lazy" 
+                                    title="Delivery Map"
+                                ></iframe>
+                            </div>
+                            <div style={{ fontSize: '13px', marginTop: '6px' }}>
+                                <i className="fas fa-location-dot" style={{ color: '#6c2b8a' }}></i> Customer: {customerLocation}
+                            </div>
+                        </div>
+
+                        {/* Admin Panel */}
+                        <div className="admin-panel">
+                            <div className="section-title">
+                                <i className="fas fa-user-gear"></i> Admin · Delivery Girls
+                            </div>
+                            <div className="admin-input-group">
+                                <input 
+                                    placeholder="Enter delivery girl name" 
+                                    value={newGirl} 
+                                    onChange={e => setNewGirl(e.target.value)}
+                                    onKeyPress={e => e.key === 'Enter' && addDeliveryGirl()}
+                                />
+                                <button onClick={addDeliveryGirl}>
+                                    <i className="fas fa-plus"></i> Add
+                                </button>
+                            </div>
+                            <div>
+                                {deliveryGirls.length === 0 ? (
+                                    <div style={{ color: '#7a6e86', padding: '8px 0' }}>
+                                        No delivery girls added yet
+                                    </div>
+                                ) : (
+                                    deliveryGirls.map(g => (
+                                        <span className="delivery-girl-tag" key={g}>
+                                            <i className="fas fa-female"></i> {g}
+                                            <span className="remove" onClick={() => removeGirl(g)}>
+                                                <i className="fas fa-times"></i>
+                                            </span>
+                                        </span>
+                                    ))
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Debug info */}
+                        <div className="debug-box" style={{ fontSize: '11px' }}>
+                            {debug}
+                        </div>
                     </div>
-                  ))
-                )}
-              </div>
-            </div>
+                );
+            }
 
-            {/* Order Summary */}
-            <div className="order-summary">
-              <div className="section-title" style={{ marginBottom: '6px' }}>
-                <i className="fas fa-shopping-bag"></i> Your Order
-              </div>
-              {cart.length === 0 ? (
-                <div style={{ color: '#7a6e86', fontSize: '14px', padding: '6px 0' }}>
-                  <i className="fas fa-shopping-cart"></i> Cart is empty
+            const root = ReactDOM.createRoot(container);
+            root.render(React.createElement(App));
+            console.log('✅ App rendered!');
+
+        } catch (error) {
+            console.error('❌ Fatal error:', error);
+            container.innerHTML = `
+                <div class="error-message">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <p><strong>Fatal Error:</strong></p>
+                    <p style="margin-top:8px;">${error.message}</p>
+                    <p style="margin-top:8px;font-size:13px;">Check console (F12) for details.</p>
+                    <button class="retry-btn" onclick="location.reload()">
+                        <i class="fas fa-sync"></i> Retry
+                    </button>
                 </div>
-              ) : (
-                cart.map(item => (
-                  <div className="order-row" key={item.id}>
-                    <span>{item.name} × {item.qty}</span>
-                    <span>
-                      ${(item.price * item.qty).toFixed(2)}
-                      <button 
-                        onClick={() => removeFromCart(item.id)} 
-                        style={{ 
-                          background: 'none', 
-                          border: 'none', 
-                          color: '#b0003a', 
-                          marginLeft: '8px', 
-                          cursor: 'pointer' 
-                        }}
-                      >
-                        <i className="fas fa-minus-circle"></i>
-                      </button>
-                    </span>
-                  </div>
-                ))
-              )}
-              <div className="order-row order-total">
-                <span>Total</span>
-                <span>${totalPrice.toFixed(2)}</span>
-              </div>
-              <button className="action-btn" onClick={placeOrder}>
-                <i className="fas fa-motorcycle"></i> Place Order · Cash
-              </button>
-              {orderPlaced && (
-                <div className="success-message" style={{ marginTop: '8px' }}>
-                  <i className="fas fa-check-circle"></i> Order placed! Delivery on the way.
-                </div>
-              )}
-            </div>
-
-            {/* Map Section */}
-            <div className="card">
-              <div className="section-title">
-                <i className="fas fa-map-pin"></i> Delivery Location
-              </div>
-              <div className="map-container">
-                <iframe 
-                  src={mapSrc} 
-                  loading="lazy" 
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Delivery Map"
-                ></iframe>
-              </div>
-              <div style={{ fontSize: '13px', color: '#2d2d44', marginTop: '6px' }}>
-                <i className="fas fa-location-dot" style={{ color: '#6c2b8a' }}></i> Customer: {customerLocation}
-              </div>
-              <div style={{ fontSize: '12px', color: '#5f556b', marginTop: '4px' }}>
-                <i className="fas fa-user-check"></i> Delivery girl sees this location
-              </div>
-            </div>
-
-            {/* Admin Panel */}
-            <div className="admin-panel">
-              <div className="section-title">
-                <i className="fas fa-user-gear"></i> Admin · Delivery Girls
-              </div>
-              <div className="admin-input-group">
-                <input 
-                  placeholder="Enter delivery girl name" 
-                  value={newGirl} 
-                  onChange={e => setNewGirl(e.target.value)}
-                  onKeyPress={e => e.key === 'Enter' && addDeliveryGirl()}
-                />
-                <button onClick={addDeliveryGirl}>
-                  <i className="fas fa-plus"></i> Add
-                </button>
-              </div>
-              <div className="delivery-girl-list">
-                {deliveryGirls.length === 0 ? (
-                  <div style={{ color: '#7a6e86', fontSize: '13px', padding: '4px 0' }}>
-                    No delivery girls added yet
-                  </div>
-                ) : (
-                  deliveryGirls.map(g => (
-                    <span className="delivery-girl-tag" key={g}>
-                      <i className="fas fa-female"></i> {g}
-                      <span className="remove" onClick={() => removeGirl(g)}>
-                        <i className="fas fa-times"></i>
-                      </span>
-                    </span>
-                  ))
-                )}
-              </div>
-              <div style={{ fontSize: '12px', color: '#4d435a', marginTop: '8px' }}>
-                <i className="fas fa-info-circle"></i> Delivery girls see customer location on map
-              </div>
-            </div>
-          </div>
-        );
-      }
-
-      // Render React app
-      const container = document.getElementById('app-container');
-      if (container) {
-        const root = ReactDOM.createRoot(container);
-        root.render(React.createElement(App));
-        console.log('✅ App rendered successfully!');
-      } else {
-        console.error('❌ Container element not found');
-      }
-
-    } catch (error) {
-      console.error('❌ App initialization error:', error);
-      document.getElementById('app-container').innerHTML = `
-        <div class="error-message">
-          <i class="fas fa-exclamation-circle"></i> 
-          <strong>App Error:</strong> ${error.message}
-          <br><br>
-          <small>Check console (F12) for more details</small>
-        </div>
-      `;
-    }
-  }
-
-  // Fallback: If scripts don't load within 10 seconds
-  setTimeout(() => {
-    if (scriptsLoaded < totalScripts) {
-      console.warn('⚠️ Scripts taking too long to load, attempting to initialize...');
-      // Try to initialize anyway
-      try {
-        if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined' && typeof window.supabase !== 'undefined') {
-          initializeApp();
+            `;
         }
-      } catch (e) {
-        console.error('Fallback initialization failed:', e);
-      }
     }
-  }, 10000);
+
+    // Start the app
+    initApp();
 </script>
 </body>
 </html>
