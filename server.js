@@ -7,21 +7,13 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Supabase configuration
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_ANON_KEY;
-
-console.log('🔐 Connecting to Supabase...');
-console.log(`📡 URL: ${supabaseUrl}`);
-
-if (!supabaseUrl || !supabaseKey) {
-  console.error('❌ Missing Supabase credentials. Please check your .env file.');
-  process.exit(1);
-}
+// Your Supabase credentials
+const supabaseUrl = 'https://ndwoqlxtaczwxsescemu.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kd29xbHh0YWN6d3hzZXNjZW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5Mjk2MTQsImV4cCI6MjA5ODUwNTYxNH0.43PgLQSdEESXboLGrdtZCHq-f8TwzItXaGuxmI4NEe8';
 
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Test Supabase connection
+// Test connection
 async function testConnection() {
   try {
     const { data, error } = await supabase.from('menu').select('count').limit(1);
@@ -41,11 +33,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// ============================================
-// API ROUTES
-// ============================================
-
-// Get all menu items
+// API Routes
 app.get('/api/menu', async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -61,7 +49,6 @@ app.get('/api/menu', async (req, res) => {
   }
 });
 
-// Get all delivery girls
 app.get('/api/delivery-girls', async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -77,7 +64,6 @@ app.get('/api/delivery-girls', async (req, res) => {
   }
 });
 
-// Add a new delivery girl
 app.post('/api/delivery-girls', async (req, res) => {
   const { name } = req.body;
   
@@ -86,7 +72,6 @@ app.post('/api/delivery-girls', async (req, res) => {
   }
 
   try {
-    // Check if girl already exists
     const { data: existing } = await supabase
       .from('delivery_girls')
       .select('name')
@@ -97,14 +82,12 @@ app.post('/api/delivery-girls', async (req, res) => {
       return res.status(400).json({ error: 'Delivery girl already exists' });
     }
 
-    // Insert new girl
     const { error } = await supabase
       .from('delivery_girls')
       .insert({ name: name.trim() });
 
     if (error) throw error;
 
-    // Get updated list
     const { data: allGirls } = await supabase
       .from('delivery_girls')
       .select('name')
@@ -121,7 +104,6 @@ app.post('/api/delivery-girls', async (req, res) => {
   }
 });
 
-// Remove a delivery girl
 app.delete('/api/delivery-girls/:name', async (req, res) => {
   const name = req.params.name;
   
@@ -133,7 +115,6 @@ app.delete('/api/delivery-girls/:name', async (req, res) => {
 
     if (error) throw error;
 
-    // Get updated list
     const { data: allGirls } = await supabase
       .from('delivery_girls')
       .select('name')
@@ -150,7 +131,6 @@ app.delete('/api/delivery-girls/:name', async (req, res) => {
   }
 });
 
-// Place a new order
 app.post('/api/order', async (req, res) => {
   const { items, total, customerLocation } = req.body;
   
@@ -182,7 +162,6 @@ app.post('/api/order', async (req, res) => {
   }
 });
 
-// Get all orders (for admin dashboard)
 app.get('/api/orders', async (req, res) => {
   try {
     const { data, error } = await supabase
@@ -198,7 +177,6 @@ app.get('/api/orders', async (req, res) => {
   }
 });
 
-// Update order status
 app.put('/api/order/:id/status', async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
@@ -218,15 +196,13 @@ app.put('/api/order/:id/status', async (req, res) => {
   }
 });
 
-// Serve the main HTML file
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Start server
 app.listen(PORT, () => {
   console.log(`🚀 Laura Girls Food Delivery App`);
   console.log(`📡 Server running on http://localhost:${PORT}`);
-  console.log(`🗄️  Connected to Supabase: ${supabaseUrl}`);
+  console.log(`🗄️  Connected to Supabase`);
   console.log(`✅ Ready to accept orders!`);
 });
