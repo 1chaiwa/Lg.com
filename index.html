@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Laura Girls · Food Delivery</title>
+    <title>Laura Girls · Kasama Food Delivery</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <style>
         * {
@@ -13,7 +13,7 @@
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
         body {
-            background: #f5f7fa;
+            background: #f5f5f5;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -32,7 +32,7 @@
             flex-direction: column;
         }
         .app-header {
-            background: linear-gradient(135deg, #6c2b8a, #8b3fa8);
+            background: linear-gradient(135deg, #cc0000, #990000);
             padding: 18px 20px 14px;
             color: white;
             display: flex;
@@ -50,11 +50,20 @@
         }
         .app-header .badge {
             background: #ffcc00;
-            color: #1f1f2e;
+            color: #990000;
             font-size: 11px;
             font-weight: 700;
             padding: 4px 12px;
             border-radius: 40px;
+        }
+        .app-header .location-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
         .app-body {
             flex: 1;
@@ -77,7 +86,7 @@
             margin-bottom: 12px;
         }
         .section-title i {
-            color: #6c2b8a;
+            color: #cc0000;
             margin-right: 8px;
         }
         .menu-item {
@@ -99,12 +108,12 @@
             color: #1f1f2e;
         }
         .menu-item .price {
-            color: #6c2b8a;
+            color: #cc0000;
             font-weight: 600;
             font-size: 14px;
         }
         .menu-item .add-btn {
-            background: #6c2b8a;
+            background: #cc0000;
             color: white;
             border: none;
             border-radius: 30px;
@@ -118,6 +127,7 @@
         }
         .menu-item .add-btn:active {
             transform: scale(0.95);
+            background: #990000;
         }
         .order-summary {
             background: white;
@@ -139,14 +149,15 @@
             font-weight: 700;
             font-size: 16px;
             padding-top: 8px;
-            border-top: 2px solid #6c2b8a;
+            border-top: 2px solid #cc0000;
             margin-top: 4px;
         }
         .order-total span {
-            color: #6c2b8a;
+            color: #cc0000;
         }
         .action-btn {
-            background: #ffcc00;
+            background: #cc0000;
+            color: white;
             border: none;
             border-radius: 40px;
             padding: 12px;
@@ -156,7 +167,7 @@
             margin-top: 12px;
             cursor: pointer;
             transition: 0.15s;
-            box-shadow: 0 4px 12px rgba(108, 43, 138, 0.15);
+            box-shadow: 0 4px 12px rgba(204, 0, 0, 0.3);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -164,23 +175,39 @@
         }
         .action-btn:active {
             transform: scale(0.97);
+            background: #990000;
+        }
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         .map-container {
-            height: 160px;
-            background: #d9d2e3;
+            height: 250px;
+            background: #e8e0e0;
             border-radius: 20px;
             overflow: hidden;
             margin: 4px 0;
+            position: relative;
         }
         .map-container iframe {
             width: 100%;
             height: 100%;
             border: 0;
         }
+        .map-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #cc0000;
+            font-size: 14px;
+            text-align: center;
+        }
         .admin-panel {
-            background: #f4f0f9;
+            background: #fff5f5;
             border-radius: 24px;
             padding: 16px;
+            border: 1px solid #ffe0e0;
         }
         .admin-input-group {
             display: flex;
@@ -190,16 +217,16 @@
         .admin-input-group input {
             flex: 1;
             padding: 10px 12px;
-            border: 1px solid #d6cee0;
+            border: 1px solid #ffcccc;
             border-radius: 40px;
             font-size: 14px;
             outline: none;
         }
         .admin-input-group input:focus {
-            border-color: #6c2b8a;
+            border-color: #cc0000;
         }
         .admin-input-group button {
-            background: #6c2b8a;
+            background: #cc0000;
             color: white;
             border: none;
             padding: 10px 20px;
@@ -207,6 +234,9 @@
             font-weight: 600;
             cursor: pointer;
             white-space: nowrap;
+        }
+        .admin-input-group button:active {
+            background: #990000;
         }
         .delivery-girl-list {
             display: flex;
@@ -221,16 +251,20 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            border: 1px solid #d4cade;
+            border: 1px solid #ffcccc;
             font-size: 13px;
         }
         .delivery-girl-tag i {
-            color: #6c2b8a;
+            color: #cc0000;
         }
         .delivery-girl-tag .remove {
-            color: #b0003a;
+            color: #cc0000;
             cursor: pointer;
             margin-left: 4px;
+            font-weight: 700;
+        }
+        .delivery-girl-tag .remove:hover {
+            color: #990000;
         }
         .footnote {
             font-size: 11px;
@@ -238,6 +272,7 @@
             text-align: center;
             padding: 12px;
             border-top: 1px solid #ece9f0;
+            background: #fff5f5;
         }
         .success-message {
             background: #e6ffe6;
@@ -249,7 +284,7 @@
             animation: fadeIn 0.5s;
         }
         .badge-count {
-            background: #ff4444;
+            background: #cc0000;
             color: white;
             border-radius: 50%;
             padding: 1px 7px;
@@ -263,32 +298,34 @@
         .loading {
             text-align: center;
             padding: 60px 20px;
-            color: #6c2b8a;
+            color: #cc0000;
         }
         .loading i {
             font-size: 40px;
             margin-bottom: 15px;
+            color: #cc0000;
         }
         .error-message {
             background: #ffe6e6;
-            color: #b0003a;
+            color: #cc0000;
             padding: 15px;
             border-radius: 12px;
             margin: 10px 0;
             text-align: center;
         }
         .status-box {
-            background: #f0f0f0;
+            background: #fff5f5;
             padding: 10px;
             border-radius: 8px;
             font-size: 13px;
             margin: 10px 0;
             color: #333;
             font-family: monospace;
+            border: 1px solid #ffe0e0;
         }
         .cart-count {
-            background: #ffcc00;
-            color: #1f1f2e;
+            background: #cc0000;
+            color: white;
             border-radius: 50%;
             padding: 2px 8px;
             font-size: 12px;
@@ -298,17 +335,17 @@
         .location-input {
             width: 100%;
             padding: 8px 12px;
-            border: 1px solid #d6cee0;
+            border: 1px solid #ffcccc;
             border-radius: 30px;
             font-size: 13px;
             margin-top: 6px;
             outline: none;
         }
         .location-input:focus {
-            border-color: #6c2b8a;
+            border-color: #cc0000;
         }
         .order-placed-banner {
-            background: #00c853;
+            background: #cc0000;
             color: white;
             padding: 10px;
             border-radius: 12px;
@@ -317,6 +354,73 @@
             font-weight: 600;
             animation: fadeIn 0.5s;
         }
+        .kasama-badge {
+            background: #ffcc00;
+            color: #990000;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .real-time-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #cc0000;
+            margin-top: 4px;
+        }
+        .real-time-indicator .dot {
+            width: 8px;
+            height: 8px;
+            background: #00cc44;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        .order-status {
+            background: #fff5f5;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            color: #cc0000;
+            margin-top: 6px;
+            border: 1px solid #ffe0e0;
+        }
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 8px 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            margin-top: 8px;
+        }
+        .whatsapp-btn:active {
+            transform: scale(0.95);
+        }
+        .kasama-flag {
+            font-size: 12px;
+            color: #cc0000;
+        }
+        .order-count {
+            background: #cc0000;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 8px;
+            font-size: 11px;
+            margin-left: 6px;
+        }
     </style>
 </head>
 <body>
@@ -324,17 +428,20 @@
     <div class="app-header">
         <i class="fas fa-utensils"></i>
         <h1>Laura Girls Food</h1>
+        <span class="location-badge">
+            <i class="fas fa-map-marker-alt"></i> Kasama
+        </span>
         <span class="badge"><i class="fas fa-motorcycle"></i> delivery</span>
     </div>
     <div id="app-container" class="app-body">
         <div class="loading" id="loadingDiv">
             <i class="fas fa-spinner fa-spin"></i>
-            <p>Loading delicious food...</p>
+            <p>Loading delicious food from Kasama...</p>
             <div class="status-box" id="statusBox">⏳ Initializing...</div>
         </div>
     </div>
     <div class="footnote">
-        <i class="fas fa-shield-alt"></i> Cash on delivery · MTN MoMo style
+        <i class="fas fa-shield-alt"></i> Cash on delivery · Serving Kasama District, Northern Province, Zambia
     </div>
 </div>
 
@@ -349,6 +456,9 @@
     const loadingDiv = document.getElementById('loadingDiv');
     const statusBox = document.getElementById('statusBox');
 
+    // Kasama District coordinates
+    const KASAMA_CENTER = { lat: -10.2129, lng: 31.1809 };
+
     function updateStatus(message) {
         console.log(message);
         if (statusBox) {
@@ -356,7 +466,7 @@
         }
     }
 
-    updateStatus('🚀 App starting...');
+    updateStatus('🚀 App starting... Kasama, Zambia');
 
     // ============================================
     // LOAD SUPABASE AND RUN APP
@@ -413,7 +523,7 @@
             // Render the app
             updateStatus('🎨 Rendering app...');
             renderApp(menuData || [], girlsData?.map(g => g.name) || [], supabase);
-            updateStatus('✅ App ready!');
+            updateStatus('✅ App ready! Serving Kasama District');
 
         } catch (error) {
             console.error('❌ Error:', error);
@@ -435,7 +545,8 @@
     function renderApp(menu, deliveryGirls, supabase) {
         let cart = [];
         let orderPlaced = false;
-        let customerLocation = 'Accra, Ghana';
+        let customerLocation = 'Kasama, Northern Province, Zambia';
+        let orderStatus = '';
 
         function render() {
             const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
@@ -447,8 +558,8 @@
                     <div class="order-row">
                         <span>${item.emoji} ${item.name} × ${item.qty}</span>
                         <span>
-                            $${(item.price * item.qty).toFixed(2)}
-                            <button onclick="removeFromCart(${item.id})" style="background:none;border:none;color:#b0003a;margin-left:8px;cursor:pointer;font-size:14px;">
+                            ZMW ${(item.price * item.qty).toFixed(2)}
+                            <button onclick="removeFromCart(${item.id})" style="background:none;border:none;color:#cc0000;margin-left:8px;cursor:pointer;font-size:14px;">
                                 <i class="fas fa-minus-circle"></i>
                             </button>
                         </span>
@@ -459,7 +570,7 @@
                 <div class="menu-item">
                     <div class="info">
                         <span class="name">${item.emoji} ${item.name}</span>
-                        <span class="price">$${item.price.toFixed(2)}</span>
+                        <span class="price">ZMW ${item.price.toFixed(2)}</span>
                     </div>
                     <button class="add-btn" onclick="addToCart(${item.id})">
                         <i class="fas fa-plus"></i> Add
@@ -478,13 +589,27 @@
                     </span>
                 `).join('');
 
-            const mapSrc = `https://www.google.com/maps/embed/v1/place?key=AIzaSyC0X7LOV5Vqk7t7mGzN9eK8zP5yH9Qw0Jc&q=${encodeURIComponent(customerLocation)}`;
+            // Real-time Google Maps with Kasama location
+            const mapSrc = `https://www.google.com/maps/embed/v1/place?key=AIzaSyC0X7LOV5Vqk7t7mGzN9eK8zP5yH9Qw0Jc&q=${encodeURIComponent(customerLocation)}&zoom=14`;
 
             container.innerHTML = `
+                <!-- Kasama Location Banner -->
+                <div style="background:linear-gradient(135deg,#cc0000,#990000);color:white;padding:10px 16px;border-radius:16px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;">
+                    <div>
+                        <i class="fas fa-map-marker-alt"></i> 
+                        <strong>Kasama District</strong>
+                        <span style="font-size:11px;opacity:0.8;display:block;">Northern Province, Zambia</span>
+                    </div>
+                    <div class="real-time-indicator" style="color:white;">
+                        <span class="dot"></span> Live
+                    </div>
+                </div>
+
                 <!-- Menu Section -->
                 <div class="card">
                     <div class="section-title">
                         <i class="fas fa-list-ul"></i> Today's Menu
+                        <span class="kasama-badge" style="margin-left:auto;">Local</span>
                     </div>
                     ${menuHTML}
                 </div>
@@ -498,38 +623,59 @@
                     ${cartHTML}
                     <div class="order-row order-total">
                         <span>Total</span>
-                        <span>$${totalPrice.toFixed(2)}</span>
+                        <span>ZMW ${totalPrice.toFixed(2)}</span>
                     </div>
-                    <button class="action-btn" onclick="placeOrder()" ${cart.length === 0 ? 'disabled style="opacity:0.5;cursor:not-allowed;"' : ''}>
+                    <button class="action-btn" onclick="placeOrder()" ${cart.length === 0 ? 'disabled' : ''}>
                         <i class="fas fa-motorcycle"></i> Place Order · Cash
                     </button>
-                    ${orderPlaced ? '<div class="order-placed-banner"><i class="fas fa-check-circle"></i> ✅ Order placed! Delivery on the way.</div>' : ''}
+                    ${orderPlaced ? '<div class="order-placed-banner"><i class="fas fa-check-circle"></i> ✅ Order placed! A delivery girl from Kasama is on the way.</div>' : ''}
+                    ${orderStatus ? `<div class="order-status"><i class="fas fa-info-circle"></i> ${orderStatus}</div>` : ''}
                 </div>
 
-                <!-- Map Section -->
+                <!-- Real-time Map Section -->
                 <div class="card">
                     <div class="section-title">
-                        <i class="fas fa-map-pin"></i> Delivery Location
+                        <i class="fas fa-map-marked-alt"></i> Real-time Location
+                        <span style="font-size:10px;color:#cc0000;margin-left:auto;">
+                            <i class="fas fa-satellite"></i> GPS Live
+                        </span>
                     </div>
                     <div class="map-container">
-                        <iframe src="${mapSrc}" loading="lazy" title="Delivery Map"></iframe>
+                        <div class="map-loading" id="mapLoading">
+                            <i class="fas fa-spinner fa-spin"></i><br>
+                            Loading Kasama map...
+                        </div>
+                        <iframe 
+                            src="${mapSrc}" 
+                            loading="lazy" 
+                            title="Kasama Delivery Map"
+                            onload="document.getElementById('mapLoading').style.display='none'"
+                        ></iframe>
                     </div>
-                    <div style="font-size:13px;margin-top:6px;">
-                        <i class="fas fa-location-dot" style="color:#6c2b8a;"></i> 
-                        <strong>Customer:</strong> ${customerLocation}
+                    <div style="font-size:13px;margin-top:6px;display:flex;justify-content:space-between;align-items:center;">
+                        <div>
+                            <i class="fas fa-location-dot" style="color:#cc0000;"></i> 
+                            <strong>Customer:</strong> ${customerLocation}
+                        </div>
+                        <div class="real-time-indicator">
+                            <span class="dot"></span> Real-time
+                        </div>
                     </div>
                     <input class="location-input" id="locationInput" value="${customerLocation}" 
-                           placeholder="Enter delivery address" onchange="updateLocation(this.value)" />
+                           placeholder="Enter delivery address in Kasama" onchange="updateLocation(this.value)" />
                     <div style="font-size:12px;color:#5f556b;margin-top:4px;">
-                        <i class="fas fa-user-check"></i> Delivery girl sees this location
+                        <i class="fas fa-user-check"></i> Delivery girls in Kasama see this location
                     </div>
+                    <button class="whatsapp-btn" onclick="shareLocation()">
+                        <i class="fab fa-whatsapp"></i> Share Location via WhatsApp
+                    </button>
                 </div>
 
                 <!-- Admin Panel -->
                 <div class="admin-panel">
                     <div class="section-title">
                         <i class="fas fa-user-gear"></i> Admin · Delivery Girls
-                        <span style="font-size:12px;font-weight:400;color:#6d6a7a;margin-left:auto;">${deliveryGirls.length} girls</span>
+                        <span style="font-size:12px;font-weight:400;color:#6d6a7a;margin-left:auto;">${deliveryGirls.length} in Kasama</span>
                     </div>
                     <div class="admin-input-group">
                         <input id="newGirlInput" placeholder="Enter delivery girl name" onkeypress="if(event.key==='Enter') addDeliveryGirl()" />
@@ -541,7 +687,7 @@
                         ${girlsHTML}
                     </div>
                     <div style="font-size:11px;color:#6d6a7a;margin-top:8px;">
-                        <i class="fas fa-info-circle"></i> Delivery girls can see customer location on map
+                        <i class="fas fa-info-circle"></i> Delivery girls in Kasama can see customer location on map
                     </div>
                 </div>
             `;
@@ -573,8 +719,14 @@
         };
 
         window.updateLocation = function(value) {
-            customerLocation = value || 'Accra, Ghana';
+            customerLocation = value || 'Kasama, Northern Province, Zambia';
             render();
+        };
+
+        window.shareLocation = function() {
+            const message = `📍 I'm ordering from Laura Girls Food Delivery in Kasama!\n📍 Location: ${customerLocation}\n🍽️ Order ready for delivery!`;
+            const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+            window.open(url, '_blank');
         };
 
         window.placeOrder = async function() {
@@ -591,20 +743,27 @@
                         items: cart,
                         total: totalPrice,
                         customer_location: customerLocation,
-                        status: 'pending'
+                        status: 'pending',
+                        district: 'Kasama',
+                        province: 'Northern Province'
                     })
                     .select();
 
                 if (error) throw error;
 
                 orderPlaced = true;
+                orderStatus = '🛵 Order confirmed! A delivery girl from Kasama will arrive in 20-30 minutes.';
                 cart = [];
                 render();
+                
+                // Auto-hide order status after 10 seconds
                 setTimeout(() => {
                     orderPlaced = false;
+                    orderStatus = '';
                     render();
-                }, 8000);
-                alert('✅ Order placed successfully! A delivery girl will arrive soon.');
+                }, 10000);
+                
+                alert('✅ Order placed successfully! A delivery girl from Kasama will arrive soon.');
             } catch (error) {
                 alert('Failed to place order: ' + error.message);
             }
@@ -646,14 +805,14 @@
                 deliveryGirls = girlsData.map(g => g.name);
                 input.value = '';
                 render();
-                alert('✅ Delivery girl added successfully!');
+                alert(`✅ ${name} added as a delivery girl in Kasama!`);
             } catch (error) {
                 alert('Failed to add delivery girl: ' + error.message);
             }
         };
 
         window.removeGirl = async function(name) {
-            if (!confirm(`Remove ${name} from delivery girls?`)) return;
+            if (!confirm(`Remove ${name} from delivery girls in Kasama?`)) return;
 
             try {
                 const { error } = await supabase
