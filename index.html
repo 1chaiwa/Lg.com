@@ -48,8 +48,8 @@
             gap: 8px;
         }
         .app-header .brand img {
-            width: 40px;
-            height: 40px;
+            width: 45px;
+            height: 45px;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid #ffcc00;
@@ -380,16 +380,35 @@
             min-width: 16px;
             text-align: center;
         }
+        .empty-slot {
+            background: #f9f9f9;
+            border: 2px dashed #ddd;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 150px;
+            color: #999;
+            font-size: 11px;
+            padding: 10px;
+            text-align: center;
+        }
+        .empty-slot i {
+            font-size: 30px;
+            color: #ccc;
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
 <div id="root">
     <div class="app-header">
         <div class="brand">
-            <img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/logo1.jpg" alt="Laura girls">
+            <img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/logo1.jpg" alt="Chikorlando Restaurant">
             <div>
-                <h1>Chikorland Restaurant </h1>
-                <span class="subtitle">Food Delivery</span>
+                <h1>Chikorlando</h1>
+                <span class="subtitle">Restaurant & Food Delivery</span>
             </div>
         </div>
         <div>
@@ -406,23 +425,23 @@
 
 <script>
 // ============================================
-// MENU WITH YOUR IMAGES - USING IMG TAG FORMAT
+// MENU WITH YOUR IMAGES - 5 EMPTY SLOTS ADDED
 // ============================================
 const MENU = [
     { 
-       id: 1, 
-        name: 'Flied Fish', 
+        id: 1, 
+        name: 'Fried Fish', 
         price: 60.00, 
-        emoji: '🍔',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/burger.jpg" alt="Burger">',
-        description: 'Classic beef burger with chips'
+        emoji: '🐟',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fish.jpg" alt="Fried Fish" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🐟</span>\'">',
+        description: 'Crispy fried fish with chips'
     },
     { 
         id: 2, 
         name: 'Beef Burger', 
         price: 35.00, 
         emoji: '🍔',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/beef-burger.jpg" alt="Beef Burger">',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/beef-burger.jpg" alt="Beef Burger" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🍔</span>\'">',
         description: 'With lettuce, cheese & fries'
     },
     { 
@@ -430,7 +449,7 @@ const MENU = [
         name: 'Breakfast Roll', 
         price: 25.00, 
         emoji: '🥐',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/breakfast-roll.jpg" alt="Breakfast Roll">',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/breakfast-roll.jpg" alt="Breakfast Roll" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🥐</span>\'">',
         description: 'Egg, sausage & cheese roll'
     },
     { 
@@ -438,7 +457,7 @@ const MENU = [
         name: 'Burger', 
         price: 30.00, 
         emoji: '🍔',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/burger.jpg" alt="Burger">',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/burger.jpg" alt="Burger" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🍔</span>\'">',
         description: 'Classic beef burger with chips'
     },
     { 
@@ -446,7 +465,7 @@ const MENU = [
         name: 'ChiWing', 
         price: 40.00, 
         emoji: '🍗',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/chiWing.jpg" alt="ChiWing">',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/chiWing.jpg" alt="ChiWing" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🍗</span>\'">',
         description: 'Spicy chicken wings (6 pieces)'
     },
     { 
@@ -454,7 +473,7 @@ const MENU = [
         name: 'Chicken & Chips', 
         price: 38.00, 
         emoji: '🍗',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/CHI.jpg" alt="Chicken & Chips">',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/CHI.jpg" alt="Chicken & Chips" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🍗</span>\'">',
         description: 'Fried chicken with crispy chips'
     },
     { 
@@ -462,7 +481,7 @@ const MENU = [
         name: 'Coca-Cola', 
         price: 8.00, 
         emoji: '🥤',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/coc.jpg" alt="Coca-Cola">',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/coc.jpg" alt="Coca-Cola" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🥤</span>\'">',
         description: 'Ice cold Coca-Cola 1.5L'
     },
     { 
@@ -470,7 +489,7 @@ const MENU = [
         name: 'Fanta Orange', 
         price: 8.00, 
         emoji: '🥤',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/FANTA.jpg" alt="Fanta Orange">',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/FANTA.jpg" alt="Fanta Orange" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🥤</span>\'">',
         description: 'Fanta Orange 1.5L'
     },
     { 
@@ -478,7 +497,7 @@ const MENU = [
         name: 'Kapenta', 
         price: 25.00, 
         emoji: '🐟',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/kap.jpg" alt="Kapenta">',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/kap.jpg" alt="Kapenta" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🐟</span>\'">',
         description: 'Dried Kapenta fish with relish'
     },
     { 
@@ -486,7 +505,7 @@ const MENU = [
         name: 'Okra', 
         price: 20.00, 
         emoji: '🥬',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/OKRA.jpg" alt="Okra">',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/OKRA.jpg" alt="Okra" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🥬</span>\'">',
         description: 'Fresh okra vegetable stew'
     },
     { 
@@ -494,8 +513,52 @@ const MENU = [
         name: 'Pizza', 
         price: 55.00, 
         emoji: '🍕',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/pizza.jpg" alt="Pizza">',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/pizza.jpg" alt="Pizza" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🍕</span>\'">',
         description: 'Large margherita pizza'
+    },
+
+    // ============================================
+    // 5 EMPTY SLOTS - ADD YOUR FOOD ITEMS HERE
+    // ============================================
+    { 
+        id: 12, 
+        name: 'Add Food Item 1', 
+        price: 0.00, 
+        emoji: '🍽️',
+        imgTag: '<div class="empty-slot"><i class="fas fa-plus-circle"></i>Add Item<br><span style="font-size:9px;">Upload image & edit</span></div>',
+        description: 'Click to edit this item'
+    },
+    { 
+        id: 13, 
+        name: 'Add Food Item 2', 
+        price: 0.00, 
+        emoji: '🍽️',
+        imgTag: '<div class="empty-slot"><i class="fas fa-plus-circle"></i>Add Item<br><span style="font-size:9px;">Upload image & edit</span></div>',
+        description: 'Click to edit this item'
+    },
+    { 
+        id: 14, 
+        name: 'Add Food Item 3', 
+        price: 0.00, 
+        emoji: '🍽️',
+        imgTag: '<div class="empty-slot"><i class="fas fa-plus-circle"></i>Add Item<br><span style="font-size:9px;">Upload image & edit</span></div>',
+        description: 'Click to edit this item'
+    },
+    { 
+        id: 15, 
+        name: 'Add Food Item 4', 
+        price: 0.00, 
+        emoji: '🍽️',
+        imgTag: '<div class="empty-slot"><i class="fas fa-plus-circle"></i>Add Item<br><span style="font-size:9px;">Upload image & edit</span></div>',
+        description: 'Click to edit this item'
+    },
+    { 
+        id: 16, 
+        name: 'Add Food Item 5', 
+        price: 0.00, 
+        emoji: '🍽️',
+        imgTag: '<div class="empty-slot"><i class="fas fa-plus-circle"></i>Add Item<br><span style="font-size:9px;">Upload image & edit</span></div>',
+        description: 'Click to edit this item'
     }
 ];
 
@@ -535,26 +598,31 @@ function renderApp() {
     let menuHTML = MENU.map(item => {
         const qty = cart.find(i => i.id === item.id)?.qty || 0;
         
+        // If it's an empty slot, show it differently
+        const isSlot = item.id >= 12;
+        
         return `
-            <div class="menu-item-card">
+            <div class="menu-item-card" style="${isSlot ? 'opacity:0.7;' : ''}">
                 <div class="image-container">
                     ${item.imgTag}
                 </div>
                 <div class="item-info">
                     <div class="item-name">${item.emoji} ${item.name}</div>
                     <div style="font-size:9px;color:#888;">${item.description || ''}</div>
-                    <div class="item-price">ZMW ${item.price.toFixed(2)}</div>
+                    <div class="item-price">${item.price > 0 ? 'ZMW ' + item.price.toFixed(2) : 'Price TBD'}</div>
                     <div style="margin-top:4px;">
-                        ${qty === 0 ? `
+                        ${qty === 0 && item.price > 0 ? `
                             <button class="add-btn-grid" onclick="addToCart(${item.id})">
                                 <i class="fas fa-plus"></i> Add
                             </button>
-                        ` : `
+                        ` : qty > 0 ? `
                             <div class="qty-control">
                                 <button class="qty-btn-minus" onclick="removeFromCart(${item.id})">−</button>
                                 <span class="qty-number">${qty}</span>
                                 <button class="qty-btn-plus" onclick="addToCart(${item.id})">+</button>
                             </div>
+                        ` : `
+                            <div style="font-size:9px;color:#999;">Coming Soon</div>
                         `}
                     </div>
                 </div>
@@ -582,6 +650,9 @@ function renderApp() {
                 <span class="kasama-badge" style="margin-left:auto;">${MENU.length} items</span>
             </div>
             <div class="menu-grid">${menuHTML}</div>
+            <div style="font-size:9px;color:#999;margin-top:8px;text-align:center;border-top:1px solid #f0f0f0;padding-top:6px;">
+                <i class="fas fa-info-circle"></i> 5 empty slots available - Add your own food items!
+            </div>
         </div>
         
         <!-- Order Summary -->
@@ -726,7 +797,10 @@ function createMap(lat, lng, location) {
 // ============================================
 function addToCart(id) {
     const item = MENU.find(i => i.id === id);
-    if (!item) return;
+    if (!item || item.price === 0) {
+        alert('This item is not available yet. Check back soon!');
+        return;
+    }
     const existing = cart.find(i => i.id === id);
     if (existing) {
         cart = cart.map(i => i.id === id ? { ...i, qty: i.qty + 1 } : i);
@@ -809,7 +883,7 @@ function placeOrder() {
 }
 
 function shareLocation() {
-    const message = `📍 I'm ordering from Laura Girls Food Delivery in Kasama!\n📍 Location: ${customerLocation}\n👤 Name: ${customerName}\n📱 Phone: ${customerPhone}`;
+    const message = `📍 I'm ordering from Chikorlando Restaurant in Kasama!\n📍 Location: ${customerLocation}\n👤 Name: ${customerName}\n📱 Phone: ${customerPhone}`;
     const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(url, '_blank');
 }
@@ -823,8 +897,8 @@ function toggleAdmin() {
 // START THE APP
 // ============================================
 renderApp();
-console.log('✅ Laura Girls Food Delivery App Loaded!');
-console.log(`📋 ${MENU.length} menu items loaded with images`);
+console.log('✅ Chikorlando Restaurant App Loaded!');
+console.log(`📋 ${MENU.length} menu items (${MENU.length - 5} active, 5 slots available)`);
 console.log('📍 Serving Kasama District, Zambia');
 </script>
 </body>
