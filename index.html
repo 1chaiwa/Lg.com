@@ -35,19 +35,17 @@
         }
         .app-header {
             background: linear-gradient(135deg, #cc0000, #990000);
-            padding: 10px 14px;
+            padding: 14px 16px;
             color: white;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 6px;
-            min-height: 50px;
         }
         .app-header .brand {
             display: flex;
             align-items: center;
             gap: 8px;
-            flex: 1;
         }
         .app-header .brand i {
             font-size: 22px;
@@ -56,62 +54,29 @@
         .app-header .brand h1 {
             font-size: 16px;
             font-weight: 700;
-            letter-spacing: -0.5px;
         }
         .app-header .brand .subtitle {
             font-size: 7px;
             opacity: 0.8;
             display: block;
-            font-weight: 400;
-            letter-spacing: 0.5px;
         }
-        .app-header .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .app-header .header-btn {
+        .header-btn {
             background: rgba(255,255,255,0.12);
             color: white;
             border: none;
-            padding: 5px 10px;
+            padding: 4px 10px;
             border-radius: 20px;
             font-size: 10px;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 4px;
-            transition: 0.15s;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-        .app-header .header-btn:hover {
-            background: rgba(255,255,255,0.25);
-        }
-        .app-header .header-btn.active {
-            background: #ffcc00;
-            color: #990000;
-        }
-        .app-header .delivery-name {
-            font-size: 9px;
-            background: rgba(255,255,255,0.15);
-            padding: 2px 8px;
-            border-radius: 12px;
-            display: none;
-            max-width: 80px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        .app-header .delivery-name.show {
-            display: inline-block;
         }
         .app-body {
             flex: 1;
-            padding: 10px;
+            padding: 12px;
             overflow-y: auto;
             background: #fafafc;
-            max-height: 700px;
         }
         .card {
             background: white;
@@ -119,7 +84,6 @@
             padding: 12px;
             margin-bottom: 10px;
             border: 1px solid #f0eff2;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
         .section-title {
             font-weight: 600;
@@ -131,10 +95,6 @@
             color: #cc0000;
             margin-right: 5px;
         }
-
-        /* ============================================
-           GRID MENU STYLES
-           ============================================ */
         .menu-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -142,19 +102,13 @@
         }
         .menu-item-card {
             background: white;
-            border-radius: 14px;
+            border-radius: 12px;
             border: 1px solid #f0eff2;
             overflow: hidden;
-            transition: 0.2s;
-            cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-        }
-        .menu-item-card:active {
-            transform: scale(0.97);
         }
         .menu-item-card .image-container {
             width: 100%;
-            height: 120px;
+            height: 100px;
             background: #f5f0f5;
             overflow: hidden;
             display: flex;
@@ -168,107 +122,31 @@
             object-fit: cover;
         }
         .menu-item-card .image-container .emoji-placeholder {
-            font-size: 48px;
-            opacity: 0.6;
-        }
-        .menu-item-card .image-container .no-image {
-            font-size: 11px;
-            color: #999;
-            text-align: center;
+            font-size: 40px;
         }
         .menu-item-card .item-info {
-            padding: 8px 10px;
+            padding: 6px 8px;
         }
         .menu-item-card .item-name {
             font-weight: 600;
-            font-size: 13px;
-            color: #1a1a2e;
-            display: -webkit-box;
-            -webkit-line-clamp: 1;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
+            font-size: 12px;
         }
         .menu-item-card .item-price {
             color: #cc0000;
             font-weight: 700;
-            font-size: 14px;
-            margin-top: 2px;
-        }
-        .menu-item-card .item-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 6px;
-        }
-        .menu-item-card .item-description {
-            font-size: 10px;
-            color: #888;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            margin-top: 2px;
+            font-size: 13px;
         }
         .menu-item-card .add-btn-grid {
             background: #cc0000;
             color: white;
             border: none;
             border-radius: 30px;
-            padding: 4px 14px;
+            padding: 3px 12px;
             font-weight: 600;
-            font-size: 11px;
+            font-size: 10px;
             cursor: pointer;
-            transition: 0.15s;
+            margin-top: 4px;
         }
-        .menu-item-card .add-btn-grid:active {
-            transform: scale(0.95);
-            background: #990000;
-        }
-        .menu-item-card .qty-control {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .menu-item-card .qty-control button {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            border: none;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 14px;
-            transition: 0.15s;
-        }
-        .menu-item-card .qty-control button:active {
-            transform: scale(0.9);
-        }
-        .menu-item-card .qty-control .qty-btn-minus {
-            background: #f0f0f0;
-            color: #333;
-        }
-        .menu-item-card .qty-control .qty-btn-plus {
-            background: #cc0000;
-            color: white;
-        }
-        .menu-item-card .qty-control .qty-number {
-            font-weight: 700;
-            font-size: 14px;
-            min-width: 20px;
-            text-align: center;
-        }
-        .menu-item-card .badge-popular {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            background: #ffcc00;
-            color: #990000;
-            font-size: 8px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 12px;
-        }
-
-        /* Order Summary */
         .order-summary {
             background: white;
             border-radius: 16px;
@@ -282,9 +160,6 @@
             padding: 3px 0;
             font-size: 12px;
             border-bottom: 1px dashed #e3dfe9;
-        }
-        .order-row:last-child {
-            border-bottom: none;
         }
         .order-total {
             font-weight: 700;
@@ -312,12 +187,10 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
-
-        /* Map */
         .map-container {
-            height: 180px;
+            height: 150px;
             background: #e8e0e0;
-            border-radius: 14px;
+            border-radius: 12px;
             overflow: hidden;
             margin: 4px 0;
             position: relative;
@@ -327,80 +200,6 @@
             height: 100%;
             border: 0;
         }
-        .map-loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #cc0000;
-            font-size: 11px;
-            text-align: center;
-        }
-
-        /* Admin Panel */
-        .admin-panel {
-            background: #fff5f5;
-            border-radius: 16px;
-            padding: 12px;
-            border: 1px solid #ffe0e0;
-            display: none;
-        }
-        .admin-panel.show {
-            display: block;
-        }
-        .admin-input-group {
-            display: flex;
-            gap: 5px;
-            margin: 5px 0;
-        }
-        .admin-input-group input {
-            flex: 1;
-            padding: 6px 10px;
-            border: 1px solid #ffcccc;
-            border-radius: 40px;
-            font-size: 12px;
-            outline: none;
-        }
-        .admin-input-group input:focus {
-            border-color: #cc0000;
-        }
-        .admin-input-group button {
-            background: #cc0000;
-            color: white;
-            border: none;
-            padding: 6px 14px;
-            border-radius: 40px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 12px;
-            white-space: nowrap;
-        }
-        .delivery-girl-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-            margin-top: 5px;
-        }
-        .delivery-girl-tag {
-            background: white;
-            border-radius: 40px;
-            padding: 3px 10px;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            border: 1px solid #ffcccc;
-            font-size: 11px;
-        }
-        .delivery-girl-tag i {
-            color: #cc0000;
-        }
-        .delivery-girl-tag .remove {
-            color: #cc0000;
-            cursor: pointer;
-            margin-left: 3px;
-            font-weight: 700;
-        }
-
         .footnote {
             font-size: 9px;
             color: #6d6a7a;
@@ -409,193 +208,54 @@
             border-top: 1px solid #ece9f0;
             background: #fff5f5;
         }
-
-        /* Modals */
-        .admin-login-modal, .delivery-login-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.6);
-            z-index: 999;
-            justify-content: center;
-            align-items: center;
-        }
-        .admin-login-modal.show, .delivery-login-modal.show {
-            display: flex;
-        }
-        .admin-login-box, .delivery-login-box {
-            background: white;
-            padding: 20px;
-            border-radius: 24px;
-            max-width: 300px;
-            width: 90%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        .admin-login-box h2, .delivery-login-box h2 {
-            color: #cc0000;
-            margin-bottom: 14px;
-            text-align: center;
-            font-size: 16px;
-        }
-        .admin-login-box input, .delivery-login-box input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ffcccc;
-            border-radius: 12px;
-            margin-bottom: 8px;
-            font-size: 13px;
-            outline: none;
-        }
-        .admin-login-box input:focus, .delivery-login-box input:focus {
-            border-color: #cc0000;
-        }
-        .admin-login-box button, .delivery-login-box button {
-            width: 100%;
-            padding: 8px;
+        .cart-count {
             background: #cc0000;
             color: white;
-            border: none;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 13px;
-            cursor: pointer;
-        }
-        .admin-login-box .error, .delivery-login-box .error {
-            color: #cc0000;
-            font-size: 11px;
-            text-align: center;
-            margin-top: 6px;
-            display: none;
-        }
-        .admin-login-box .error.show, .delivery-login-box .error.show {
-            display: block;
-        }
-
-        /* Order Card for Delivery */
-        .order-card {
-            background: white;
-            border-radius: 12px;
-            padding: 10px;
-            margin-bottom: 8px;
-            border: 1px solid #e9e6ed;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
-        }
-        .order-card .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 4px;
-        }
-        .order-card .order-id {
-            font-weight: 600;
-            font-size: 11px;
-            color: #1a1a2e;
-        }
-        .order-card .order-time {
-            font-size: 9px;
-            color: #999;
-        }
-        .order-card .customer-info {
-            font-size: 11px;
-            color: #333;
-            margin: 3px 0;
-        }
-        .order-card .customer-info i {
-            color: #cc0000;
-            width: 14px;
-        }
-        .order-card .order-items {
+            border-radius: 50%;
+            padding: 0 6px;
             font-size: 10px;
-            color: #666;
-            margin: 3px 0;
-            padding: 3px 0;
-            border-top: 1px dashed #f0edf3;
-        }
-        .order-card .order-total {
             font-weight: 700;
+            margin-left: 5px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
             color: #cc0000;
-            font-size: 13px;
         }
-        .order-card .action-btns {
-            display: flex;
-            gap: 5px;
-            margin-top: 6px;
+        .loading i {
+            font-size: 30px;
+            margin-bottom: 10px;
         }
-        .order-card .action-btns button {
-            flex: 1;
-            padding: 5px;
-            border: none;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 10px;
-            cursor: pointer;
-            transition: 0.15s;
-        }
-        .order-card .action-btns button:active {
-            transform: scale(0.95);
-        }
-        .btn-accept {
-            background: #4caf50;
-            color: white;
-        }
-        .btn-pickup {
-            background: #ff9800;
-            color: white;
-        }
-        .btn-deliver {
-            background: #2196f3;
-            color: white;
-        }
-        .btn-decline {
-            background: #f44336;
-            color: white;
-        }
-        .order-card .status-badge {
-            padding: 2px 8px;
+        .error-message {
+            background: #ffe6e6;
+            color: #cc0000;
+            padding: 12px;
             border-radius: 12px;
-            font-size: 8px;
-            font-weight: 600;
-        }
-        .status-badge.pending { background: #ffe0b2; color: #e65100; }
-        .status-badge.delivered { background: #c8e6c9; color: #2e7d32; }
-        .status-badge.assigned { background: #b3e5fc; color: #01579b; }
-        .status-badge.picked_up { background: #fff9c4; color: #f57f17; }
-        .order-card .location-link {
-            font-size: 10px;
-            color: #2196f3;
-            cursor: pointer;
-            text-decoration: underline;
-        }
-
-        /* Stats */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 6px;
             margin: 6px 0;
-        }
-        .stat-card {
-            background: linear-gradient(135deg, #fff5f5, #ffffff);
-            padding: 8px;
-            border-radius: 10px;
-            border: 1px solid #ffe0e0;
             text-align: center;
+            font-size: 13px;
         }
-        .stat-card .number {
-            font-size: 16px;
-            font-weight: 700;
-            color: #cc0000;
+        .status-box {
+            background: #fff5f5;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin: 8px 0;
+            color: #333;
+            font-family: monospace;
+            border: 1px solid #ffe0e0;
         }
-        .stat-card .label {
-            font-size: 8px;
-            color: #6d6a7a;
-            margin-top: 1px;
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 11px;
+            margin-top: 4px;
         }
-
-        /* Customer Details */
         .customer-details {
             background: #fff8f8;
             border-radius: 12px;
@@ -606,9 +266,6 @@
         .customer-details .form-group {
             margin-bottom: 6px;
         }
-        .customer-details .form-group:last-child {
-            margin-bottom: 0;
-        }
         .customer-details label {
             display: block;
             font-size: 10px;
@@ -618,26 +275,23 @@
         }
         .customer-details input {
             width: 100%;
-            padding: 6px 8px;
+            padding: 5px 8px;
             border: 1px solid #ffcccc;
-            border-radius: 10px;
+            border-radius: 8px;
             font-size: 12px;
             outline: none;
-            background: white;
-        }
-        .customer-details input:focus {
-            border-color: #cc0000;
         }
         .customer-details .required {
             color: #cc0000;
-            margin-left: 2px;
         }
-        .customer-details .help-text {
-            font-size: 9px;
-            color: #999;
-            margin-top: 1px;
+        .kasama-badge {
+            background: #ffcc00;
+            color: #990000;
+            padding: 1px 6px;
+            border-radius: 12px;
+            font-size: 7px;
+            font-weight: 700;
         }
-
         .real-time-indicator .dot {
             width: 5px;
             height: 5px;
@@ -651,6 +305,13 @@
             50% { opacity: 0.3; }
             100% { opacity: 1; }
         }
+        .real-time-indicator {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            font-size: 9px;
+            color: #cc0000;
+        }
         .order-placed-banner {
             background: #cc0000;
             color: white;
@@ -658,7 +319,6 @@
             border-radius: 12px;
             text-align: center;
             margin-top: 6px;
-            font-weight: 600;
             font-size: 12px;
             animation: fadeIn 0.5s;
         }
@@ -666,113 +326,52 @@
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        .kasama-badge {
-            background: #ffcc00;
-            color: #990000;
-            padding: 1px 6px;
-            border-radius: 12px;
-            font-size: 7px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-        .cart-count {
-            background: #cc0000;
-            color: white;
-            border-radius: 50%;
-            padding: 1px 6px;
-            font-size: 10px;
-            font-weight: 700;
-            margin-left: 5px;
-        }
-        .whatsapp-btn {
-            background: #25D366;
-            color: white;
-            border: none;
-            border-radius: 40px;
-            padding: 5px 12px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            font-size: 11px;
-            margin-top: 4px;
-        }
-        .order-status {
+        .admin-panel {
             background: #fff5f5;
-            padding: 5px 8px;
-            border-radius: 12px;
-            font-size: 10px;
-            color: #cc0000;
-            margin-top: 3px;
+            border-radius: 16px;
+            padding: 12px;
             border: 1px solid #ffe0e0;
+            display: none;
         }
-        .real-time-indicator {
+        .admin-panel.show {
+            display: block;
+        }
+        .delivery-girl-tag {
+            background: white;
+            border-radius: 40px;
+            padding: 2px 10px;
+            display: inline-block;
+            border: 1px solid #ffcccc;
+            font-size: 11px;
+            margin: 2px;
+        }
+        .qty-control {
             display: flex;
             align-items: center;
-            gap: 3px;
-            font-size: 9px;
-            color: #cc0000;
-            margin-top: 2px;
+            gap: 4px;
         }
-        .success-message {
-            background: #e6ffe6;
-            color: #1f8b4c;
-            padding: 6px;
-            border-radius: 12px;
-            text-align: center;
-            margin-top: 6px;
-            font-size: 12px;
-            animation: fadeIn 0.5s;
-        }
-        .loading {
-            text-align: center;
-            padding: 30px 20px;
-            color: #cc0000;
-        }
-        .loading i {
-            font-size: 25px;
-            margin-bottom: 8px;
-        }
-        .error-message {
-            background: #ffe6e6;
-            color: #cc0000;
-            padding: 10px;
-            border-radius: 12px;
-            margin: 6px 0;
-            text-align: center;
-            font-size: 12px;
-        }
-        .status-box {
-            background: #fff5f5;
-            padding: 6px;
-            border-radius: 8px;
-            font-size: 11px;
-            margin: 6px 0;
-            color: #333;
-            font-family: monospace;
-            border: 1px solid #ffe0e0;
-        }
-        .location-input {
-            width: 100%;
-            padding: 5px 8px;
-            border: 1px solid #ffcccc;
-            border-radius: 30px;
-            font-size: 11px;
-            margin-top: 3px;
-            outline: none;
-        }
-        .location-input:focus {
-            border-color: #cc0000;
-        }
-        .cart-count-badge {
-            background: #ffcc00;
-            color: #990000;
+        .qty-control button {
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            padding: 1px 6px;
-            font-size: 9px;
+            border: none;
             font-weight: 700;
-            margin-left: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .qty-btn-minus {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .qty-btn-plus {
+            background: #cc0000;
+            color: white;
+        }
+        .qty-number {
+            font-weight: 700;
+            font-size: 13px;
+            min-width: 16px;
+            text-align: center;
         }
     </style>
 </head>
@@ -786,1312 +385,427 @@
                 <span class="subtitle">Kasama · Food Delivery</span>
             </div>
         </div>
-        <div class="header-actions">
-            <button class="header-btn" id="deliveryLoginBtn" onclick="openDeliveryLogin()">
-                <i class="fas fa-motorcycle"></i> 
-                <span id="deliveryBtnText">Delivery</span>
-            </button>
-            <button class="header-btn" id="adminToggleBtn" onclick="toggleAdminLogin()">
-                <i class="fas fa-user-shield"></i>
-            </button>
-            <span class="delivery-name" id="deliveryNameDisplay"></span>
+        <div>
+            <button class="header-btn" onclick="toggleAdmin()"><i class="fas fa-user-shield"></i></button>
         </div>
     </div>
     <div id="app-container" class="app-body">
-        <div class="loading" id="loadingDiv">
-            <i class="fas fa-spinner fa-spin"></i>
-            <p>Loading delicious food from Kasama...</p>
-            <div class="status-box" id="statusBox">⏳ Initializing...</div>
-        </div>
+        <!-- Content will be rendered here -->
     </div>
     <div class="footnote">
         <i class="fas fa-shield-alt"></i> Cash on delivery · Serving Kasama District, Northern Province, Zambia
     </div>
 </div>
 
-<!-- Admin Login Modal -->
-<div class="admin-login-modal" id="adminModal">
-    <div class="admin-login-box">
-        <h2><i class="fas fa-user-shield"></i> Admin Login</h2>
-        <input type="password" id="adminPassword" placeholder="Enter admin password" onkeypress="if(event.key==='Enter') adminLogin()" />
-        <button onclick="adminLogin()">Login</button>
-        <div class="error" id="loginError">❌ Incorrect password. Please try again.</div>
-        <div style="margin-top:8px;text-align:center;font-size:10px;color:#999;">
-            <i class="fas fa-info-circle"></i> Default: <strong>admin123</strong>
-        </div>
-        <button onclick="closeAdminModal()" style="margin-top:6px;background:#999;width:100%;padding:6px;border:none;border-radius:12px;color:white;font-weight:600;cursor:pointer;font-size:12px;">Cancel</button>
-    </div>
-</div>
-
-<!-- Delivery Girl Login Modal -->
-<div class="delivery-login-modal" id="deliveryLoginModal">
-    <div class="delivery-login-box">
-        <h2><i class="fas fa-motorcycle"></i> Delivery Login</h2>
-        <p style="font-size:11px;color:#666;text-align:center;margin-bottom:10px;">Enter your name to start delivering</p>
-        <input type="text" id="deliveryLoginName" placeholder="Enter your name" onkeypress="if(event.key==='Enter') deliveryLogin()" />
-        <button onclick="deliveryLogin()">Login</button>
-        <div class="error" id="deliveryLoginError">❌ Please enter your name</div>
-        <button onclick="closeDeliveryLogin()" style="margin-top:6px;background:#999;width:100%;padding:6px;border:none;border-radius:12px;color:white;font-weight:600;cursor:pointer;font-size:12px;">Cancel</button>
-    </div>
-</div>
-
 <script>
-    // ============================================
-    // MENU DATA WITH IMAGES
-    // ============================================
-    // 🔥 TO ADD YOUR OWN IMAGES:
-    // Replace the 'image' URL with your own image URL
-    // You can use: 
-    // - Direct image URLs (https://example.com/food.jpg)
-    // - Base64 encoded images
-    // - Or leave as null to use emoji placeholders
-    // ============================================
-    const MOCK_MENU = [
-        { 
-            id: 1, 
-            name: 'Grilled Chicken', 
-            price: 12.99, 
-            image: 'https://github.com/1chaiwa/Lg.com/images/nshima-chicken.jpg'
-            description: 'Juicy grilled chicken with spices',
-            popular: true
-        },
-        { 
-            id: 2, 
-            name: 'Jollof Rice', 
-            price: 9.49, 
-            emoji: '🍛',
-            image: null,
-            description: 'West African style jollof rice',
-            popular: false
-        },
-        { 
-            id: 3, 
-            name: 'Beef Burger', 
-            price: 11.99, 
-            emoji: '🍔',
-            image: null,
-            description: 'Beef patty with lettuce and cheese',
-            popular: true
-        },
-        { 
-            id: 4, 
-            name: 'Fruit Salad', 
-            price: 7.25, 
-            emoji: '🥗',
-            image: null,
-            description: 'Fresh mixed fruits',
-            popular: false
-        },
-        { 
-            id: 5, 
-            name: 'Mango Smoothie', 
-            price: 5.50, 
-            emoji: '🥭',
-            image: null,
-            description: 'Creamy mango smoothie',
-            popular: false
-        },
-        { 
-            id: 6, 
-            name: 'Pizza Margherita', 
-            price: 14.99, 
-            emoji: '🍕',
-            image: null,
-            description: 'Classic margherita pizza',
-            popular: true
-        },
-        { 
-            id: 7, 
-            name: 'Chocolate Cake', 
-            price: 6.99, 
-            emoji: '🍰',
-            image: null,
-            description: 'Rich chocolate cake',
-            popular: false
-        },
-        { 
-            id: 8, 
-            name: 'Fresh Juice', 
-            price: 4.50, 
-            emoji: '🧃',
-            image: null,
-            description: 'Freshly squeezed juice',
-            popular: false
-        }
-    ];
+// ============================================
+// SIMPLE WORKING VERSION - NO SUPABASE DEPENDENCY
+// ============================================
 
-    // ============================================
-    // 🔥 HOW TO ADD YOUR OWN IMAGES:
-    // ============================================
-    // Option 1: Use direct image URLs
-    // image: 'https://example.com/images/grilled-chicken.jpg',
-    //
-    // Option 2: Use emoji only (set image: null)
-    //
-    // Option 3: Use base64 encoded images
-    // image: 'data:image/jpeg;base64,/9j/4AAQSkZJRg...',
-    //
-    // Example with images:
-    // const MOCK_MENU = [
-    //     { 
-    //         id: 1, 
-    //         name: 'Grilled Chicken', 
-    //         price: 12.99, 
-    //         emoji: '🍗',
-    //         image: 'https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?w=300',
-    //         description: 'Juicy grilled chicken with spices',
-    //         popular: true
-    //     },
-    //     ...
-    // ];
+// Menu data with images from your GitHub
+const MENU = [
+    { 
+        id: 1, 
+        name: 'Grilled Chicken', 
+        price: 12.99, 
+        emoji: '🍗',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/nshima-chicken.jpg',
+        description: 'Juicy grilled chicken'
+    },
+    { 
+        id: 2, 
+        name: 'Jollof Rice', 
+        price: 9.49, 
+        emoji: '🍛',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/jollof-rice.jpg',
+        description: 'West African style'
+    },
+    { 
+        id: 3, 
+        name: 'Beef Burger', 
+        price: 11.99, 
+        emoji: '🍔',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/beef-burger.jpg',
+        description: 'With lettuce and cheese'
+    },
+    { 
+        id: 4, 
+        name: 'Fruit Salad', 
+        price: 7.25, 
+        emoji: '🥗',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fruit-salad.jpg',
+        description: 'Fresh mixed fruits'
+    },
+    { 
+        id: 5, 
+        name: 'Mango Smoothie', 
+        price: 5.50, 
+        emoji: '🥭',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/mango-smoothie.jpg',
+        description: 'Creamy and refreshing'
+    },
+    { 
+        id: 6, 
+        name: 'Pizza', 
+        price: 14.99, 
+        emoji: '🍕',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/pizza.jpg',
+        description: 'Classic margherita'
+    },
+    { 
+        id: 7, 
+        name: 'Chocolate Cake', 
+        price: 6.99, 
+        emoji: '🍰',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/chocolate-cake.jpg',
+        description: 'Rich chocolate cake'
+    },
+    { 
+        id: 8, 
+        name: 'Fresh Juice', 
+        price: 4.50, 
+        emoji: '🧃',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fresh-juice.jpg',
+        description: 'Freshly squeezed'
+    }
+];
 
-    const MOCK_GIRLS = ['Alice Johnson', 'Brenda Smith', 'Cathy Williams'];
+const DELIVERY_GIRLS = ['Alice Johnson', 'Brenda Smith', 'Cathy Williams'];
 
-    // ============================================
-    // SUPABASE CONFIGURATION
-    // ============================================
-    const SUPABASE_URL = 'https://ndwoqlxtaczwxsescemu.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kd29xbHh0YWN6d3hzZXNjZW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5Mjk2MTQsImV4cCI6MjA5ODUwNTYxNH0.43PgLQSdEESXboLGrdtZCHq-f8TwzItXaGuxmI4NEe8';
+let cart = [];
+let isAdmin = false;
+let customerName = '';
+let customerPhone = '';
+let customerLocation = 'Kasama, Northern Province, Zambia';
 
-    const ADMIN_PASSWORD = 'admin123';
-
-    let isAdmin = false;
-    let isDeliveryLoggedIn = false;
-    let deliveryGirlName = '';
-    let supabaseClient = null;
-    let useSupabase = false;
-    let map = null;
-    let mapMarker = null;
-    let deliveryMarker = null;
-    let currentTab = 'customer';
-    let animationInterval = null;
-    let currentPosition = { lat: -10.2129, lng: 31.1809 };
-
+// ============================================
+// RENDER APP
+// ============================================
+function renderApp() {
     const container = document.getElementById('app-container');
-    const loadingDiv = document.getElementById('loadingDiv');
-    const statusBox = document.getElementById('statusBox');
-
-    function updateStatus(message) {
-        console.log(message);
-        if (statusBox) {
-            statusBox.textContent = message;
-        }
-    }
-
-    updateStatus('🚀 App starting... Kasama, Zambia');
-
-    // ============================================
-    // DELIVERY GIRL LOGIN
-    // ============================================
-    window.openDeliveryLogin = function() {
-        document.getElementById('deliveryLoginModal').classList.add('show');
-        document.getElementById('deliveryLoginName').value = '';
-        document.getElementById('deliveryLoginError').classList.remove('show');
-        document.getElementById('deliveryLoginName').focus();
-    };
-
-    window.closeDeliveryLogin = function() {
-        document.getElementById('deliveryLoginModal').classList.remove('show');
-    };
-
-    window.deliveryLogin = function() {
-        const name = document.getElementById('deliveryLoginName').value.trim();
-        if (!name) {
-            document.getElementById('deliveryLoginError').textContent = '❌ Please enter your name';
-            document.getElementById('deliveryLoginError').classList.add('show');
-            return;
-        }
-
-        if (!currentGirls.includes(name)) {
-            document.getElementById('deliveryLoginError').textContent = '❌ Name not found. Please contact admin.';
-            document.getElementById('deliveryLoginError').classList.add('show');
-            return;
-        }
-
-        isDeliveryLoggedIn = true;
-        deliveryGirlName = name;
-        document.getElementById('deliveryLoginModal').classList.remove('show');
-        document.getElementById('deliveryNameDisplay').textContent = '👩 ' + name;
-        document.getElementById('deliveryNameDisplay').classList.add('show');
-        document.getElementById('deliveryBtnText').textContent = 'Logout';
-        document.getElementById('deliveryLoginBtn').onclick = deliveryLogout;
-        document.getElementById('deliveryLoginBtn').classList.add('active');
-        
-        alert('✅ Welcome ' + name + '! You are now logged in as a delivery girl.');
-        renderDeliveryView();
-    };
-
-    window.deliveryLogout = function() {
-        isDeliveryLoggedIn = false;
-        deliveryGirlName = '';
-        document.getElementById('deliveryNameDisplay').classList.remove('show');
-        document.getElementById('deliveryBtnText').textContent = 'Delivery';
-        document.getElementById('deliveryLoginBtn').onclick = openDeliveryLogin;
-        document.getElementById('deliveryLoginBtn').classList.remove('active');
-        
-        if (animationInterval) {
-            clearInterval(animationInterval);
+    
+    const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
+    const cartCount = cart.reduce((acc, i) => acc + i.qty, 0);
+    
+    // Cart HTML
+    let cartHTML = cart.length === 0 ? 
+        '<div style="color:#7a6e86;padding:4px 0;font-size:12px;"><i class="fas fa-shopping-cart"></i> Cart is empty</div>' :
+        cart.map(item => `
+            <div class="order-row">
+                <span>${item.emoji} ${item.name} × ${item.qty}</span>
+                <span>
+                    ZMW ${(item.price * item.qty).toFixed(2)}
+                    <button onclick="removeFromCart(${item.id})" style="background:none;border:none;color:#cc0000;margin-left:4px;cursor:pointer;font-size:11px;">
+                        <i class="fas fa-minus-circle"></i>
+                    </button>
+                </span>
+            </div>
+        `).join('');
+    
+    // Menu Grid HTML
+    let menuHTML = MENU.map(item => {
+        const qty = cart.find(i => i.id === item.id)?.qty || 0;
+        let imageHTML = '';
+        if (item.image) {
+            imageHTML = `<img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.style.display='none';this.parentElement.innerHTML='<span class=\\'emoji-placeholder\\'>${item.emoji}</span>'" />`;
+        } else {
+            imageHTML = `<span class="emoji-placeholder">${item.emoji}</span>`;
         }
         
-        alert('👋 Logged out from delivery');
-        renderCustomerView();
-    };
+        return `
+            <div class="menu-item-card">
+                <div class="image-container">${imageHTML}</div>
+                <div class="item-info">
+                    <div class="item-name">${item.emoji} ${item.name}</div>
+                    <div style="font-size:9px;color:#888;">${item.description || ''}</div>
+                    <div class="item-price">ZMW ${item.price.toFixed(2)}</div>
+                    <div style="margin-top:4px;">
+                        ${qty === 0 ? `
+                            <button class="add-btn-grid" onclick="addToCart(${item.id})">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        ` : `
+                            <div class="qty-control">
+                                <button class="qty-btn-minus" onclick="removeFromCart(${item.id})">−</button>
+                                <span class="qty-number">${qty}</span>
+                                <button class="qty-btn-plus" onclick="addToCart(${item.id})">+</button>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    container.innerHTML = `
+        <!-- Banner -->
+        <div style="background:linear-gradient(135deg,#cc0000,#990000);color:white;padding:6px 12px;border-radius:12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+                <i class="fas fa-map-marker-alt"></i> 
+                <strong>Kasama District</strong>
+                <span style="font-size:9px;opacity:0.8;display:block;">Northern Province, Zambia</span>
+            </div>
+            <div class="real-time-indicator" style="color:white;">
+                <span class="dot"></span> Live
+            </div>
+        </div>
+        
+        <!-- Menu -->
+        <div class="card">
+            <div class="section-title">
+                <i class="fas fa-th-large"></i> Today's Menu
+                <span class="kasama-badge" style="margin-left:auto;">${MENU.length} items</span>
+            </div>
+            <div class="menu-grid">${menuHTML}</div>
+        </div>
+        
+        <!-- Order Summary -->
+        <div class="order-summary">
+            <div class="section-title">
+                <i class="fas fa-shopping-bag"></i> Your Order
+                ${cartCount > 0 ? `<span class="cart-count">${cartCount}</span>` : ''}
+            </div>
+            ${cartHTML}
+            <div class="order-row order-total">
+                <span>Total</span>
+                <span>ZMW ${totalPrice.toFixed(2)}</span>
+            </div>
+            
+            <!-- Customer Details -->
+            <div class="customer-details">
+                <div style="font-size:11px;font-weight:600;color:#cc0000;margin-bottom:4px;">
+                    <i class="fas fa-user"></i> Delivery Details
+                </div>
+                <div class="form-group">
+                    <label>Full Name <span class="required">*</span></label>
+                    <input type="text" id="customerNameInput" placeholder="Enter your full name" value="${customerName}" />
+                </div>
+                <div class="form-group">
+                    <label>Phone Number <span class="required">*</span></label>
+                    <input type="tel" id="customerPhoneInput" placeholder="Enter phone number (e.g., 0977123456)" value="${customerPhone}" />
+                </div>
+                <div class="form-group">
+                    <label>Delivery Address <span class="required">*</span></label>
+                    <input type="text" id="customerAddressInput" placeholder="Enter your delivery address" value="${customerLocation}" />
+                </div>
+            </div>
+            
+            <button class="action-btn" onclick="placeOrder()" ${cart.length === 0 ? 'disabled' : ''}>
+                <i class="fas fa-motorcycle"></i> Place Order · Cash
+            </button>
+            <div id="orderStatus"></div>
+        </div>
+        
+        <!-- Map -->
+        <div class="card">
+            <div class="section-title">
+                <i class="fas fa-map-marked-alt"></i> Location
+            </div>
+            <div class="map-container">
+                <div id="map"></div>
+            </div>
+            <div style="font-size:11px;margin-top:3px;">
+                <i class="fas fa-location-dot" style="color:#cc0000;"></i> 
+                <strong>Customer:</strong> ${customerLocation}
+            </div>
+            <button class="whatsapp-btn" onclick="shareLocation()">
+                <i class="fab fa-whatsapp"></i> Share Location
+            </button>
+        </div>
+        
+        <!-- Admin Panel -->
+        <div class="admin-panel ${isAdmin ? 'show' : ''}">
+            <div class="section-title">
+                <i class="fas fa-user-gear"></i> Admin
+            </div>
+            <div style="font-size:12px;color:#666;">
+                <p><strong>Delivery Girls:</strong></p>
+                ${DELIVERY_GIRLS.map(g => `<span class="delivery-girl-tag"><i class="fas fa-female"></i> ${g}</span>`).join('')}
+            </div>
+            <div style="margin-top:6px;">
+                <button class="action-btn" onclick="toggleAdmin()" style="font-size:12px;padding:4px;margin-top:4px;background:#666;">
+                    <i class="fas fa-sign-out-alt"></i> Close Admin
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Update input listeners
+    document.getElementById('customerNameInput')?.addEventListener('input', function() {
+        customerName = this.value;
+    });
+    document.getElementById('customerPhoneInput')?.addEventListener('input', function() {
+        customerPhone = this.value;
+    });
+    document.getElementById('customerAddressInput')?.addEventListener('input', function() {
+        customerLocation = this.value || 'Kasama, Northern Province, Zambia';
+        initMap(customerLocation);
+    });
+    
+    // Initialize map
+    setTimeout(() => initMap(customerLocation), 300);
+}
 
-    // ============================================
-    // MAP FUNCTIONS
-    // ============================================
-    function initMap(location) {
-        try {
-            const mapContainer = document.getElementById('map');
-            if (!mapContainer) return;
+// ============================================
+// MAP FUNCTIONS
+// ============================================
+let map = null;
+let mapMarker = null;
 
-            const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`;
-            
-            fetch(geocodeUrl)
-                .then(response => response.json())
-                .then(data => {
-                    let lat = -10.2129;
-                    let lng = 31.1809;
-                    
-                    if (data && data.length > 0) {
-                        lat = parseFloat(data[0].lat);
-                        lng = parseFloat(data[0].lon);
-                    }
-                    
-                    if (map) {
-                        map.remove();
-                    }
-                    
-                    map = L.map('map').setView([lat, lng], 14);
-                    
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; OpenStreetMap'
-                    }).addTo(map);
-                    
-                    const markerIcon = L.divIcon({
-                        html: '<i class="fas fa-map-marker-alt" style="color:#cc0000;font-size:28px;"></i>',
-                        className: 'custom-marker',
-                        iconSize: [28, 28],
-                        iconAnchor: [14, 28]
-                    });
-                    
-                    mapMarker = L.marker([lat, lng], { icon: markerIcon }).addTo(map);
-                    mapMarker.bindPopup(`<strong>📍 ${location}</strong>`).openPopup();
-                    
-                    if (isDeliveryLoggedIn) {
-                        addDeliveryMarker(lat, lng);
-                    }
-                    
-                    document.getElementById('mapLoading')?.style.setProperty('display', 'none');
-                })
-                .catch(error => {
-                    console.error('Geocoding error:', error);
-                    showFallbackMap();
-                });
-        } catch (error) {
-            console.error('Map error:', error);
-            showFallbackMap();
-        }
-    }
-
-    function addDeliveryMarker(lat, lng) {
-        if (deliveryMarker) {
-            map.removeLayer(deliveryMarker);
-        }
-        
-        const deliveryIcon = L.divIcon({
-            html: '<i class="fas fa-motorcycle" style="color:#ff6600;font-size:28px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3));"></i>',
-            className: 'delivery-marker',
-            iconSize: [28, 28],
-            iconAnchor: [14, 28]
-        });
-        
-        deliveryMarker = L.marker([lat, lng], { icon: deliveryIcon }).addTo(map);
-        deliveryMarker.bindPopup(`<strong>🛵 ${deliveryGirlName}</strong><br>On the way!`).openPopup();
-        
-        startDeliveryAnimation(lat, lng);
-    }
-
-    function startDeliveryAnimation(startLat, startLng) {
-        if (animationInterval) {
-            clearInterval(animationInterval);
-        }
-        
-        let step = 0;
-        const totalSteps = 20;
-        const endLat = startLat + (Math.random() - 0.5) * 0.02;
-        const endLng = startLng + (Math.random() - 0.5) * 0.02;
-        
-        animationInterval = setInterval(() => {
-            step++;
-            if (step > totalSteps) {
-                const newStartLat = currentPosition.lat;
-                const newStartLng = currentPosition.lng;
-                const newEndLat = newStartLat + (Math.random() - 0.5) * 0.02;
-                const newEndLng = newStartLng + (Math.random() - 0.5) * 0.02;
-                animateToPosition(newStartLat, newStartLng, newEndLat, newEndLng);
-                return;
-            }
-            
-            const progress = step / totalSteps;
-            const lat = startLat + (endLat - startLat) * progress;
-            const lng = startLng + (endLng - startLng) * progress;
-            
-            currentPosition = { lat, lng };
-            
-            if (deliveryMarker) {
-                deliveryMarker.setLatLng([lat, lng]);
-                const status = ['Moving to customer...', 'On the way!', 'Almost there!'][Math.floor(Math.random() * 3)];
-                deliveryMarker.bindPopup(`<strong>🛵 ${deliveryGirlName}</strong><br>${status}`).openPopup();
-            }
-        }, 500);
-    }
-
-    function animateToPosition(fromLat, fromLng, toLat, toLng) {
-        let step = 0;
-        const totalSteps = 25;
-        
-        if (animationInterval) {
-            clearInterval(animationInterval);
-        }
-        
-        animationInterval = setInterval(() => {
-            step++;
-            if (step > totalSteps) {
-                const newStartLat = currentPosition.lat;
-                const newStartLng = currentPosition.lng;
-                const newEndLat = newStartLat + (Math.random() - 0.5) * 0.02;
-                const newEndLng = newStartLng + (Math.random() - 0.5) * 0.02;
-                animateToPosition(newStartLat, newStartLng, newEndLat, newEndLng);
-                return;
-            }
-            
-            const progress = step / totalSteps;
-            const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-            const lat = fromLat + (toLat - fromLat) * eased;
-            const lng = fromLng + (toLng - fromLng) * eased;
-            
-            currentPosition = { lat, lng };
-            
-            if (deliveryMarker) {
-                deliveryMarker.setLatLng([lat, lng]);
-                const status = ['📍 Approaching...', '🛵 On the way!', '📦 Almost there!', '📍 Near destination!'][Math.floor(Math.random() * 4)];
-                deliveryMarker.bindPopup(`<strong>🛵 ${deliveryGirlName}</strong><br>${status}`).openPopup();
-            }
-            
-            if (map) {
-                map.panTo([lat, lng], { animate: true, duration: 0.5 });
-            }
-        }, 600);
-    }
-
-    function updateMapLocation(location) {
-        if (!location || !map) return;
-        
-        const geocodeUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`;
-        
-        fetch(geocodeUrl)
-            .then(response => response.json())
-            .then(data => {
-                if (data && data.length > 0) {
-                    const lat = parseFloat(data[0].lat);
-                    const lng = parseFloat(data[0].lon);
-                    
-                    map.setView([lat, lng], 14);
-                    if (mapMarker) {
-                        mapMarker.setLatLng([lat, lng]);
-                        mapMarker.bindPopup(`<strong>📍 ${location}</strong>`).openPopup();
-                    }
-                }
-            })
-            .catch(error => console.error('Geocoding error:', error));
-    }
-
-    function showFallbackMap() {
+function initMap(location) {
+    try {
         const mapContainer = document.getElementById('map');
         if (!mapContainer) return;
         
-        if (map) {
-            map.remove();
-        }
+        // Default Kasama coordinates
+        let lat = -10.2129;
+        let lng = 31.1809;
         
-        map = L.map('map').setView([-10.2129, 31.1809], 13);
-        
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap'
-        }).addTo(map);
-        
-        const markerIcon = L.divIcon({
-            html: '<i class="fas fa-map-marker-alt" style="color:#cc0000;font-size:28px;"></i>',
-            className: 'custom-marker',
-            iconSize: [28, 28],
-            iconAnchor: [14, 28]
-        });
-        
-        mapMarker = L.marker([-10.2129, 31.1809], { icon: markerIcon }).addTo(map);
-        mapMarker.bindPopup('📍 Kasama, Zambia').openPopup();
-        
-        document.getElementById('mapLoading')?.style.setProperty('display', 'none');
+        // Try to geocode the location
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`)
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    lat = parseFloat(data[0].lat);
+                    lng = parseFloat(data[0].lon);
+                }
+                createMap(lat, lng, location);
+            })
+            .catch(() => createMap(lat, lng, location));
+    } catch (e) {
+        console.error('Map error:', e);
     }
+}
 
-    // ============================================
-    // ADMIN FUNCTIONS
-    // ============================================
-    window.toggleAdminLogin = function() {
-        if (isAdmin) {
-            isAdmin = false;
-            document.getElementById('adminToggleBtn').innerHTML = '<i class="fas fa-user-shield"></i>';
-            document.querySelector('.admin-panel')?.classList.remove('show');
-            localStorage.removeItem('adminLoggedIn');
-            alert('👋 Logged out from admin panel');
-            renderCustomerView();
-        } else {
-            document.getElementById('adminModal').classList.add('show');
-            document.getElementById('adminPassword').value = '';
-            document.getElementById('loginError').classList.remove('show');
-            document.getElementById('adminPassword').focus();
-        }
-    };
-
-    window.adminLogin = function() {
-        const password = document.getElementById('adminPassword').value;
-        if (password === ADMIN_PASSWORD) {
-            isAdmin = true;
-            localStorage.setItem('adminLoggedIn', 'true');
-            document.getElementById('adminModal').classList.remove('show');
-            document.getElementById('adminToggleBtn').innerHTML = '<i class="fas fa-sign-out-alt"></i>';
-            document.querySelector('.admin-panel')?.classList.add('show');
-            alert('✅ Welcome Admin!');
-            renderCustomerView();
-        } else {
-            document.getElementById('loginError').classList.add('show');
-            document.getElementById('adminPassword').value = '';
-            document.getElementById('adminPassword').focus();
-        }
-    };
-
-    window.closeAdminModal = function() {
-        document.getElementById('adminModal').classList.remove('show');
-    };
-
-    function checkAdminSession() {
-        if (localStorage.getItem('adminLoggedIn') === 'true') {
-            isAdmin = true;
-            document.getElementById('adminToggleBtn').innerHTML = '<i class="fas fa-sign-out-alt"></i>';
-            document.querySelector('.admin-panel')?.classList.add('show');
-        }
+function createMap(lat, lng, location) {
+    if (map) {
+        map.remove();
     }
-
-    document.getElementById('adminModal')?.addEventListener('click', function(e) {
-        if (e.target === this) {
-            closeAdminModal();
-        }
+    
+    map = L.map('map').setView([lat, lng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+    
+    const markerIcon = L.divIcon({
+        html: '<i class="fas fa-map-marker-alt" style="color:#cc0000;font-size:28px;"></i>',
+        className: 'custom-marker',
+        iconSize: [28, 28],
+        iconAnchor: [14, 28]
     });
+    
+    mapMarker = L.marker([lat, lng], { icon: markerIcon }).addTo(map);
+    mapMarker.bindPopup(`<strong>📍 ${location}</strong>`).openPopup();
+}
 
-    // ============================================
-    // CUSTOMER VIEW WITH GRID MENU
-    // ============================================
-    let cart = [];
-    let orderPlaced = false;
-    let customerLocation = 'Kasama, Northern Province, Zambia';
-    let customerName = '';
-    let customerPhone = '';
-    let orderStatus = '';
-    let currentMenu = MOCK_MENU;
-    let currentGirls = MOCK_GIRLS;
-
-    // Get quantity of an item in cart
-    function getItemQty(id) {
-        const item = cart.find(i => i.id === id);
-        return item ? item.qty : 0;
+// ============================================
+// APP FUNCTIONS
+// ============================================
+function addToCart(id) {
+    const item = MENU.find(i => i.id === id);
+    if (!item) return;
+    const existing = cart.find(i => i.id === id);
+    if (existing) {
+        cart = cart.map(i => i.id === id ? { ...i, qty: i.qty + 1 } : i);
+    } else {
+        cart.push({ ...item, qty: 1 });
     }
+    renderApp();
+}
 
-    function renderCustomerView() {
-        const menu = currentMenu || [];
-        const deliveryGirls = currentGirls || [];
-        
-        const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
-        const cartCount = cart.reduce((acc, i) => acc + i.qty, 0);
-
-        let cartHTML = cart.length === 0 ? 
-            '<div style="color:#7a6e86;padding:6px 0;font-size:12px;"><i class="fas fa-shopping-cart"></i> Cart is empty</div>' :
-            cart.map(item => `
-                <div class="order-row">
-                    <span>${item.emoji} ${item.name} × ${item.qty}</span>
-                    <span>
-                        ZMW ${(item.price * item.qty).toFixed(2)}
-                        <button onclick="removeFromCart(${item.id})" style="background:none;border:none;color:#cc0000;margin-left:4px;cursor:pointer;font-size:11px;">
-                            <i class="fas fa-minus-circle"></i>
-                        </button>
-                    </span>
-                </div>
-            `).join('');
-
-        // ============================================
-        // GRID MENU WITH IMAGES
-        // ============================================
-        let menuHTML = menu.map(item => {
-            const qty = getItemQty(item.id);
-            
-            // Image handling - if image URL is provided, use it, otherwise use emoji
-            let imageHTML = '';
-            if (item.image) {
-                imageHTML = `<img src="${item.image}" alt="${item.name}" loading="lazy" />`;
-            } else if (item.emoji) {
-                imageHTML = `<span class="emoji-placeholder">${item.emoji}</span>`;
-            } else {
-                imageHTML = `<span class="no-image">No image</span>`;
-            }
-
-            return `
-                <div class="menu-item-card">
-                    <div class="image-container">
-                        ${imageHTML}
-                        ${item.popular ? '<span class="badge-popular">⭐ Popular</span>' : ''}
-                    </div>
-                    <div class="item-info">
-                        <div class="item-name">${item.name}</div>
-                        ${item.description ? `<div class="item-description">${item.description}</div>` : ''}
-                        <div class="item-price">ZMW ${item.price.toFixed(2)}</div>
-                        <div class="item-actions">
-                            ${qty === 0 ? `
-                                <button class="add-btn-grid" onclick="addToCart(${item.id})">
-                                    <i class="fas fa-plus"></i> Add
-                                </button>
-                            ` : `
-                                <div class="qty-control">
-                                    <button class="qty-btn-minus" onclick="removeFromCart(${item.id})">−</button>
-                                    <span class="qty-number">${qty}</span>
-                                    <button class="qty-btn-plus" onclick="addToCart(${item.id})">+</button>
-                                </div>
-                            `}
-                        </div>
-                    </div>
-                </div>
-            `;
-        }).join('');
-
-        let girlsHTML = deliveryGirls.length === 0 ?
-            '<div style="color:#7a6e86;padding:6px 0;font-size:11px;">No delivery girls added yet</div>' :
-            deliveryGirls.map(g => `
-                <span class="delivery-girl-tag">
-                    <i class="fas fa-female"></i> ${g}
-                    ${isAdmin ? `<span class="remove" onclick="removeGirl('${g}')"><i class="fas fa-times"></i></span>` : ''}
-                </span>
-            `).join('');
-
-        container.innerHTML = `
-            <!-- Kasama Location Banner -->
-            <div style="background:linear-gradient(135deg,#cc0000,#990000);color:white;padding:6px 12px;border-radius:12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;">
-                <div>
-                    <i class="fas fa-map-marker-alt"></i> 
-                    <strong>Kasama District</strong>
-                    <span style="font-size:9px;opacity:0.8;display:block;">Northern Province, Zambia</span>
-                </div>
-                <div class="real-time-indicator" style="color:white;">
-                    <span class="dot"></span> Live
-                </div>
-            </div>
-
-            <!-- Menu Section - GRID VIEW -->
-            <div class="card">
-                <div class="section-title">
-                    <i class="fas fa-th-large"></i> Today's Menu
-                    <span class="kasama-badge" style="margin-left:auto;">2×2 Grid</span>
-                </div>
-                <div class="menu-grid">
-                    ${menuHTML}
-                </div>
-                <div style="font-size:9px;color:#999;margin-top:6px;text-align:center;">
-                    <i class="fas fa-info-circle"></i> Tap item to see details · ${menu.length} items available
-                </div>
-            </div>
-
-            <!-- Order Summary -->
-            <div class="order-summary">
-                <div class="section-title">
-                    <i class="fas fa-shopping-bag"></i> Your Order
-                    ${cartCount > 0 ? `<span class="cart-count">${cartCount}</span>` : ''}
-                </div>
-                ${cartHTML}
-                <div class="order-row order-total">
-                    <span>Total</span>
-                    <span>ZMW ${totalPrice.toFixed(2)}</span>
-                </div>
-                
-                <!-- Customer Details Form -->
-                <div class="customer-details">
-                    <div style="font-size:11px;font-weight:600;color:#cc0000;margin-bottom:4px;">
-                        <i class="fas fa-user"></i> Delivery Details
-                    </div>
-                    <div class="form-group">
-                        <label>Full Name <span class="required">*</span></label>
-                        <input type="text" id="customerName" placeholder="Enter your full name" value="${customerName}" />
-                    </div>
-                    <div class="form-group">
-                        <label>Phone Number <span class="required">*</span></label>
-                        <input type="tel" id="customerPhone" placeholder="Enter phone number (e.g., 0977123456)" value="${customerPhone}" />
-                        <div class="help-text"><i class="fas fa-info-circle"></i> We'll call to confirm your order</div>
-                    </div>
-                    <div class="form-group">
-                        <label>Delivery Address <span class="required">*</span></label>
-                        <input type="text" id="customerAddress" placeholder="Enter your delivery address" value="${customerLocation}" />
-                        <div class="help-text"><i class="fas fa-map-marker-alt"></i> Landmarks help us find you faster</div>
-                    </div>
-                </div>
-                
-                <button class="action-btn" onclick="placeOrder()" ${cart.length === 0 ? 'disabled' : ''}>
-                    <i class="fas fa-motorcycle"></i> Place Order · Cash
-                </button>
-                ${orderPlaced ? '<div class="order-placed-banner"><i class="fas fa-check-circle"></i> ✅ Order placed! A delivery girl from Kasama is on the way.</div>' : ''}
-                ${orderStatus ? `<div class="order-status"><i class="fas fa-info-circle"></i> ${orderStatus}</div>` : ''}
-            </div>
-
-            <!-- Real-time Map Section -->
-            <div class="card">
-                <div class="section-title">
-                    <i class="fas fa-map-marked-alt"></i> Real-time Location
-                    <span style="font-size:8px;color:#cc0000;margin-left:auto;">
-                        <i class="fas fa-globe-africa"></i> OpenStreetMap
-                    </span>
-                </div>
-                <div class="map-container">
-                    <div class="map-loading" id="mapLoading">
-                        <i class="fas fa-spinner fa-spin"></i><br>
-                        Loading Kasama map...
-                    </div>
-                    <div id="map"></div>
-                </div>
-                <div style="font-size:11px;margin-top:3px;display:flex;justify-content:space-between;align-items:center;">
-                    <div>
-                        <i class="fas fa-location-dot" style="color:#cc0000;"></i> 
-                        <strong>Customer:</strong> ${customerLocation}
-                    </div>
-                    <div class="real-time-indicator">
-                        <span class="dot"></span> Real-time
-                    </div>
-                </div>
-                ${isDeliveryLoggedIn ? `
-                    <div style="font-size:10px;color:#ff6600;margin-top:2px;">
-                        <i class="fas fa-motorcycle"></i> ${deliveryGirlName} is online and moving!
-                    </div>
-                ` : ''}
-                <button class="whatsapp-btn" onclick="shareLocation()">
-                    <i class="fab fa-whatsapp"></i> Share Location
-                </button>
-            </div>
-
-            <!-- Admin Panel -->
-            <div class="admin-panel ${isAdmin ? 'show' : ''}" id="adminPanel">
-                ${isAdmin ? `
-                    <div class="section-title">
-                        <i class="fas fa-user-gear"></i> Admin · Delivery Girls
-                        <span style="font-size:9px;font-weight:400;color:#6d6a7a;margin-left:auto;">${deliveryGirls.length} in Kasama</span>
-                    </div>
-                    <div class="admin-input-group">
-                        <input id="newGirlInput" placeholder="Enter delivery girl name" onkeypress="if(event.key==='Enter') addDeliveryGirl()" />
-                        <button onclick="addDeliveryGirl()"><i class="fas fa-plus"></i> Add</button>
-                    </div>
-                    <div class="delivery-girl-list">${girlsHTML}</div>
-                    <div style="font-size:9px;color:#6d6a7a;margin-top:4px;">
-                        <i class="fas fa-info-circle"></i> Delivery girls see customer location on map
-                    </div>
-                    <div id="dashboardContainer"></div>
-                ` : ''}
-            </div>
-        `;
-
-        setTimeout(() => {
-            if (document.getElementById('map')) {
-                initMap(customerLocation);
-            }
-        }, 500);
-
-        const nameInput = document.getElementById('customerName');
-        const phoneInput = document.getElementById('customerPhone');
-        const addressInput = document.getElementById('customerAddress');
-        
-        if (nameInput) {
-            nameInput.value = customerName;
-            nameInput.oninput = function() { customerName = this.value; };
-        }
-        if (phoneInput) {
-            phoneInput.value = customerPhone;
-            phoneInput.oninput = function() { customerPhone = this.value; };
-        }
-        if (addressInput) {
-            addressInput.value = customerLocation;
-            addressInput.oninput = function() {
-                customerLocation = this.value || 'Kasama, Northern Province, Zambia';
-                updateMapLocation(customerLocation);
-            };
-        }
+function removeFromCart(id) {
+    const existing = cart.find(i => i.id === id);
+    if (existing && existing.qty > 1) {
+        cart = cart.map(i => i.id === id ? { ...i, qty: i.qty - 1 } : i);
+    } else {
+        cart = cart.filter(i => i.id !== id);
     }
+    renderApp();
+}
 
-    // ============================================
-    // DELIVERY VIEW
-    // ============================================
-    let deliveryOrders = [];
-
-    async function renderDeliveryView() {
-        if (!isDeliveryLoggedIn) {
-            openDeliveryLogin();
-            return;
-        }
-
-        let orders = [];
-        
-        if (useSupabase && supabaseClient) {
-            try {
-                const { data, error } = await supabaseClient
-                    .from('orders')
-                    .select('*')
-                    .in('status', ['pending', 'assigned', 'picked_up'])
-                    .order('created_at', { ascending: true });
-
-                if (!error) {
-                    orders = data || [];
-                }
-            } catch (e) {
-                console.error('Error fetching orders:', e);
-            }
-        }
-
-        if (orders.length === 0) {
-            orders = [
-                {
-                    id: 1,
-                    customer_name: 'John Doe',
-                    customer_phone: '0977123456',
-                    customer_location: 'Lubwa, Kasama',
-                    items: [{ name: 'Grilled Chicken', qty: 2 }, { name: 'Jollof Rice', qty: 1 }],
-                    total: 35.47,
-                    status: 'pending',
-                    created_at: new Date().toISOString()
-                },
-                {
-                    id: 2,
-                    customer_name: 'Mary Mwansa',
-                    customer_phone: '0966234567',
-                    customer_location: 'Chambeshi, Kasama',
-                    items: [{ name: 'Beef Burger', qty: 1 }, { name: 'Fresh Juice', qty: 1 }],
-                    total: 16.49,
-                    status: 'assigned',
-                    created_at: new Date(Date.now() - 3600000).toISOString()
-                }
-            ];
-        }
-
-        deliveryOrders = orders;
-        const availableOrders = deliveryOrders.filter(o => o.status === 'pending' || o.status === 'assigned');
-
-        let ordersHTML = '';
-        if (availableOrders.length === 0) {
-            ordersHTML = '<div style="text-align:center;padding:16px;color:#7a6e86;font-size:12px;"><i class="fas fa-check-circle" style="color:#4caf50;font-size:20px;"></i><br>No pending orders</div>';
-        } else {
-            availableOrders.forEach(order => {
-                const statusClass = order.status || 'pending';
-                const statusLabels = {
-                    'pending': '🆕 New Order',
-                    'assigned': '📋 Assigned',
-                    'picked_up': '🛵 Picked Up'
-                };
-                const statusLabel = statusLabels[statusClass] || statusClass.toUpperCase();
-                
-                let itemsText = '';
-                try {
-                    const items = typeof order.items === 'string' ? JSON.parse(order.items) : order.items;
-                    itemsText = items.map(i => `${i.qty}x ${i.name}`).join(', ');
-                } catch (e) {
-                    itemsText = 'Items not available';
-                }
-                
-                ordersHTML += `
-                    <div class="order-card" id="order-${order.id}">
-                        <div class="header">
-                            <span class="order-id"><i class="fas fa-receipt"></i> Order #${order.id}</span>
-                            <span class="order-time">${new Date(order.created_at).toLocaleTimeString()}</span>
-                        </div>
-                        <div class="customer-info">
-                            <i class="fas fa-user"></i> <strong>${order.customer_name || 'Anonymous'}</strong>
-                        </div>
-                        <div class="customer-info">
-                            <i class="fas fa-phone"></i> ${order.customer_phone || 'No phone'}
-                        </div>
-                        <div class="customer-info">
-                            <i class="fas fa-map-marker-alt"></i> ${order.customer_location || 'Kasama'}
-                            <span class="location-link" onclick="window.open('https://www.google.com/maps?q=${encodeURIComponent(order.customer_location || 'Kasama')}', '_blank')">
-                                <i class="fas fa-external-link-alt"></i> View
-                            </span>
-                        </div>
-                        <div class="order-items">
-                            <i class="fas fa-utensils"></i> ${itemsText}
-                        </div>
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
-                            <span class="order-total">ZMW ${(order.total || 0).toFixed(2)}</span>
-                            <span class="status-badge ${statusClass}">${statusLabel}</span>
-                        </div>
-                        ${statusClass === 'pending' ? `
-                            <div class="action-btns">
-                                <button class="btn-accept" onclick="acceptOrder(${order.id})">
-                                    <i class="fas fa-check"></i> Accept
-                                </button>
-                                <button class="btn-decline" onclick="declineOrder(${order.id})">
-                                    <i class="fas fa-times"></i> Decline
-                                </button>
-                            </div>
-                        ` : ''}
-                        ${statusClass === 'assigned' ? `
-                            <div class="action-btns">
-                                <button class="btn-pickup" onclick="pickupOrder(${order.id})">
-                                    <i class="fas fa-box"></i> Picked Up
-                                </button>
-                            </div>
-                        ` : ''}
-                        ${statusClass === 'picked_up' ? `
-                            <div class="action-btns">
-                                <button class="btn-deliver" onclick="deliverOrder(${order.id})">
-                                    <i class="fas fa-check-circle"></i> Delivered
-                                </button>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            });
-        }
-
-        container.innerHTML = `
-            <div style="background:linear-gradient(135deg,#cc0000,#990000);color:white;padding:8px 12px;border-radius:12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;">
-                <div>
-                    <i class="fas fa-motorcycle"></i> 
-                    <strong>Delivery Portal</strong>
-                    <span style="font-size:9px;opacity:0.8;display:block;">Logged in as: ${deliveryGirlName}</span>
-                </div>
-                <div style="text-align:right;">
-                    <div style="font-size:16px;font-weight:700;">${availableOrders.length}</div>
-                    <div style="font-size:8px;opacity:0.8;">Pending Orders</div>
-                </div>
-            </div>
-
-            <div style="margin-top:6px;">
-                <div class="section-title" style="font-size:12px;">
-                    <i class="fas fa-list"></i> Available Orders
-                    ${useSupabase ? '' : '<span style="font-size:8px;color:#999;font-weight:400;"> (Demo Mode)</span>'}
-                </div>
-                ${ordersHTML}
-            </div>
-
-            <div class="card" style="padding:8px;">
-                <div class="section-title" style="font-size:11px;margin-bottom:4px;">
-                    <i class="fas fa-chart-simple"></i> Quick Stats
-                </div>
-                <div class="stats-grid">
-                    <div class="stat-card" style="padding:6px;">
-                        <div class="number" style="font-size:14px;">${availableOrders.filter(o => o.status === 'pending').length}</div>
-                        <div class="label">New</div>
-                    </div>
-                    <div class="stat-card" style="padding:6px;">
-                        <div class="number" style="font-size:14px;">${availableOrders.filter(o => o.status === 'assigned').length}</div>
-                        <div class="label">Assigned</div>
-                    </div>
-                    <div class="stat-card" style="padding:6px;">
-                        <div class="number" style="font-size:14px;">${availableOrders.filter(o => o.status === 'picked_up').length}</div>
-                        <div class="label">Picked Up</div>
-                    </div>
-                </div>
-            </div>
-
-            <button class="action-btn" onclick="renderDeliveryView()" style="font-size:12px;padding:6px;margin-top:3px;">
-                <i class="fas fa-sync"></i> Refresh Orders
-            </button>
-        `;
+function placeOrder() {
+    if (cart.length === 0) {
+        alert('Please add items to your order');
+        return;
     }
-
-    // ============================================
-    // DELIVERY GIRL ACTIONS
-    // ============================================
-    window.acceptOrder = async function(orderId) {
-        if (!isDeliveryLoggedIn) {
-            alert('Please login as a delivery girl first');
-            return;
-        }
-        
-        if (useSupabase && supabaseClient) {
-            try {
-                const { error } = await supabaseClient
-                    .from('orders')
-                    .update({ 
-                        status: 'assigned', 
-                        delivery_girl_name: deliveryGirlName,
-                        assigned_at: new Date().toISOString()
-                    })
-                    .eq('id', orderId);
-                
-                if (error) throw error;
-            } catch (error) {
-                alert('❌ Failed to accept order: ' + error.message);
-                return;
-            }
-        }
-        
-        alert(`✅ Order #${orderId} assigned to ${deliveryGirlName}!`);
-        deliveryOrders = deliveryOrders.filter(o => o.id !== orderId);
-        renderDeliveryView();
-    };
-
-    window.declineOrder = async function(orderId) {
-        if (!isDeliveryLoggedIn) {
-            alert('Please login as a delivery girl first');
-            return;
-        }
-        
-        if (!confirm('Are you sure you want to decline this order? It will be permanently deleted.')) return;
-        
-        if (useSupabase && supabaseClient) {
-            try {
-                const { error } = await supabaseClient
-                    .from('orders')
-                    .delete()
-                    .eq('id', orderId);
-                
-                if (error) throw error;
-            } catch (error) {
-                alert('Failed to delete order: ' + error.message);
-                return;
-            }
-        }
-        
-        deliveryOrders = deliveryOrders.filter(o => o.id !== orderId);
-        renderDeliveryView();
-        alert('❌ Order declined and permanently deleted');
-    };
-
-    window.pickupOrder = async function(orderId) {
-        if (!isDeliveryLoggedIn) {
-            alert('Please login as a delivery girl first');
-            return;
-        }
-        
-        if (!confirm('Mark this order as picked up?')) return;
-        
-        if (useSupabase && supabaseClient) {
-            try {
-                await supabaseClient
-                    .from('orders')
-                    .update({ 
-                        status: 'picked_up',
-                        picked_up_at: new Date().toISOString()
-                    })
-                    .eq('id', orderId);
-            } catch (error) {
-                alert('Failed to update: ' + error.message);
-                return;
-            }
-        }
-        
-        alert('🛵 Order marked as picked up!');
-        renderDeliveryView();
-    };
-
-    window.deliverOrder = async function(orderId) {
-        if (!isDeliveryLoggedIn) {
-            alert('Please login as a delivery girl first');
-            return;
-        }
-        
-        if (!confirm('Confirm delivery of this order?')) return;
-        
-        if (useSupabase && supabaseClient) {
-            try {
-                await supabaseClient
-                    .from('orders')
-                    .update({ 
-                        status: 'delivered',
-                        delivered_at: new Date().toISOString()
-                    })
-                    .eq('id', orderId);
-            } catch (error) {
-                alert('Failed to confirm delivery: ' + error.message);
-                return;
-            }
-        }
-        
-        deliveryOrders = deliveryOrders.filter(o => o.id !== orderId);
-        alert('✅ Order delivered! Thank you!');
-        renderDeliveryView();
-    };
-
-    // ============================================
-    // CUSTOMER FUNCTIONS
-    // ============================================
-    window.addToCart = function(id) {
-        const menu = currentMenu || [];
-        const item = menu.find(i => i.id === id);
-        if (!item) return;
-        const existing = cart.find(i => i.id === id);
-        if (existing) {
-            cart = cart.map(i => i.id === id ? { ...i, qty: i.qty + 1 } : i);
-        } else {
-            cart.push({ ...item, qty: 1 });
-        }
-        renderCustomerView();
-    };
-
-    window.removeFromCart = function(id) {
-        const existing = cart.find(i => i.id === id);
-        if (existing && existing.qty > 1) {
-            cart = cart.map(i => i.id === id ? { ...i, qty: i.qty - 1 } : i);
-        } else {
-            cart = cart.filter(i => i.id !== id);
-        }
-        renderCustomerView();
-    };
-
-    window.shareLocation = function() {
-        const message = `📍 I'm ordering from Laura Girls Food Delivery in Kasama!\n📍 Location: ${customerLocation}\n👤 Name: ${customerName}\n📱 Phone: ${customerPhone}\n🍽️ Order ready for delivery!`;
-        const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-        window.open(url, '_blank');
-    };
-
-    window.placeOrder = async function() {
-        if (cart.length === 0) {
-            alert('Please add items to your order');
-            return;
-        }
-
-        const nameInput = document.getElementById('customerName');
-        const phoneInput = document.getElementById('customerPhone');
-        const addressInput = document.getElementById('customerAddress');
-        
-        const name = nameInput ? nameInput.value.trim() : '';
-        const phone = phoneInput ? phoneInput.value.trim() : '';
-        const address = addressInput ? addressInput.value.trim() : 'Kasama, Northern Province, Zambia';
-
-        if (!name) {
-            alert('⚠️ Please enter your full name');
-            nameInput?.focus();
-            return;
-        }
-
-        if (!phone) {
-            alert('⚠️ Please enter your phone number');
-            phoneInput?.focus();
-            return;
-        }
-
-        const phoneRegex = /^[0-9]{9,12}$/;
-        if (!phoneRegex.test(phone.replace(/[^0-9]/g, ''))) {
-            alert('⚠️ Please enter a valid phone number (e.g., 0977123456)');
-            phoneInput?.focus();
-            return;
-        }
-
-        if (!address) {
-            alert('⚠️ Please enter your delivery address');
-            addressInput?.focus();
-            return;
-        }
-
-        try {
-            const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
-            
-            if (useSupabase && supabaseClient) {
-                const { error } = await supabaseClient
-                    .from('orders')
-                    .insert({
-                        items: cart,
-                        total: totalPrice,
-                        customer_location: address,
-                        customer_name: name,
-                        customer_phone: phone,
-                        status: 'pending',
-                        district: 'Kasama',
-                        province: 'Northern Province'
-                    });
-
-                if (error) throw error;
-            } else {
-                console.log('📝 Order placed (demo):', { cart, totalPrice, name, phone, address });
-            }
-
-            orderPlaced = true;
-            orderStatus = `🛵 Order confirmed, ${name}! A delivery girl from Kasama will arrive in 20-30 minutes. We'll call you at ${phone}.`;
-            cart = [];
-            
-            customerName = name;
-            customerPhone = phone;
-            customerLocation = address;
-            
-            renderCustomerView();
-            
-            setTimeout(() => {
-                orderPlaced = false;
-                orderStatus = '';
-                renderCustomerView();
-            }, 15000);
-            
-            alert(`✅ Order placed successfully, ${name}!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}\n🛵 A delivery girl from Kasama will arrive soon.`);
-        } catch (error) {
-            alert('Failed to place order: ' + error.message);
-        }
-    };
-
-    // ============================================
-    // ADMIN - DELIVERY GIRL MANAGEMENT
-    // ============================================
-    window.addDeliveryGirl = async function() {
-        if (!isAdmin) {
-            alert('⚠️ Admin access required. Please login first.');
-            return;
-        }
-
-        const input = document.getElementById('newGirlInput');
-        const name = input.value.trim();
-        if (!name) {
-            alert('Please enter a delivery girl name');
-            return;
-        }
-
-        if (useSupabase && supabaseClient) {
-            try {
-                const { error } = await supabaseClient
-                    .from('delivery_girls')
-                    .insert({ name: name });
-
-                if (error) throw error;
-            } catch (error) {
-                alert('Failed to add delivery girl: ' + error.message);
-                return;
-            }
-        }
-
-        currentGirls.push(name);
-        input.value = '';
-        renderCustomerView();
-        alert(`✅ ${name} added as a delivery girl in Kasama!`);
-    };
-
-    window.removeGirl = async function(name) {
-        if (!isAdmin) {
-            alert('⚠️ Admin access required. Please login first.');
-            return;
-        }
-
-        if (!confirm(`Remove ${name} from delivery girls in Kasama?`)) return;
-
-        if (useSupabase && supabaseClient) {
-            try {
-                await supabaseClient
-                    .from('delivery_girls')
-                    .delete()
-                    .eq('name', name);
-            } catch (error) {
-                alert('Failed to remove delivery girl: ' + error.message);
-                return;
-            }
-        }
-
-        currentGirls = currentGirls.filter(g => g !== name);
-        renderCustomerView();
-        alert('✅ Delivery girl removed successfully!');
-    };
-
-    // ============================================
-    // LOAD SUPABASE AND RUN APP
-    // ============================================
-    async function loadSupabaseAndRun() {
-        try {
-            updateStatus('📦 Loading Supabase library...');
-            
-            await new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-                script.onload = resolve;
-                script.onerror = reject;
-                document.head.appendChild(script);
-            });
-
-            updateStatus('✅ Supabase loaded!');
-            
-            try {
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-                updateStatus('🔗 Trying to connect to Supabase...');
-                
-                const { data, error } = await supabaseClient
-                    .from('menu')
-                    .select('count')
-                    .limit(1);
-                
-                if (error) {
-                    throw error;
-                }
-                
-                useSupabase = true;
-                updateStatus('✅ Connected to Supabase!');
-                
-                const { data: menuData } = await supabaseClient
-                    .from('menu')
-                    .select('*')
-                    .order('id');
-                
-                if (menuData && menuData.length > 0) {
-                    currentMenu = menuData;
-                    updateStatus(`✅ Menu loaded: ${currentMenu.length} items`);
-                }
-                
-                const { data: girlsData } = await supabaseClient
-                    .from('delivery_girls')
-                    .select('name')
-                    .order('name');
-                
-                if (girlsData && girlsData.length > 0) {
-                    currentGirls = girlsData.map(g => g.name);
-                    updateStatus(`✅ Girls loaded: ${currentGirls.length}`);
-                }
-                
-            } catch (supabaseError) {
-                console.warn('⚠️ Supabase connection failed, using mock data:', supabaseError.message);
-                useSupabase = false;
-                updateStatus('⚠️ Using demo data (Supabase offline)');
-                currentMenu = MOCK_MENU;
-                currentGirls = MOCK_GIRLS;
-            }
-
-            checkAdminSession();
-            renderCustomerView();
-            updateStatus('✅ App ready! Serving Kasama District');
-            loadingDiv.style.display = 'none';
-
-        } catch (error) {
-            console.error('❌ Error:', error);
-            updateStatus(`❌ Using demo data (${error.message})`);
-            
-            useSupabase = false;
-            currentMenu = MOCK_MENU;
-            currentGirls = MOCK_GIRLS;
-            
-            checkAdminSession();
-            renderCustomerView();
-            
-            loadingDiv.innerHTML = `
-                <div style="text-align:center;padding:16px;color:#cc0000;">
-                    <i class="fas fa-exclamation-triangle" style="font-size:24px;"></i>
-                    <p style="margin-top:6px;font-weight:600;font-size:13px;">Using Demo Mode</p>
-                    <p style="font-size:11px;color:#666;margin-top:2px;">Supabase connection failed. Using local data.</p>
-                    <button class="action-btn" onclick="location.reload()" style="font-size:12px;padding:6px;margin-top:6px;">
-                        <i class="fas fa-sync"></i> Retry
-                    </button>
-                </div>
-            `;
-            
-            setTimeout(() => {
-                loadingDiv.style.display = 'none';
-            }, 3000);
-        }
+    
+    const nameInput = document.getElementById('customerNameInput');
+    const phoneInput = document.getElementById('customerPhoneInput');
+    const addressInput = document.getElementById('customerAddressInput');
+    
+    const name = nameInput ? nameInput.value.trim() : '';
+    const phone = phoneInput ? phoneInput.value.trim() : '';
+    const address = addressInput ? addressInput.value.trim() : 'Kasama, Northern Province, Zambia';
+    
+    if (!name) {
+        alert('⚠️ Please enter your full name');
+        nameInput?.focus();
+        return;
     }
+    if (!phone) {
+        alert('⚠️ Please enter your phone number');
+        phoneInput?.focus();
+        return;
+    }
+    if (!address) {
+        alert('⚠️ Please enter your delivery address');
+        addressInput?.focus();
+        return;
+    }
+    
+    const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
+    
+    // Show confirmation
+    document.getElementById('orderStatus').innerHTML = `
+        <div class="order-placed-banner">
+            <i class="fas fa-check-circle"></i> ✅ Order confirmed, ${name}! 
+            <br>🛵 A delivery girl will arrive in 20-30 minutes.
+            <br>📱 We'll call you at ${phone}
+        </div>
+    `;
+    
+    // Log the order (in production, save to database)
+    console.log('📝 ORDER PLACED:', { 
+        customer: name, 
+        phone: phone, 
+        address: address, 
+        items: cart, 
+        total: totalPrice 
+    });
+    
+    // Clear cart
+    cart = [];
+    customerName = name;
+    customerPhone = phone;
+    customerLocation = address;
+    
+    // Re-render after delay
+    setTimeout(() => {
+        document.getElementById('orderStatus').innerHTML = '';
+        renderApp();
+    }, 8000);
+    
+    alert(`✅ Order placed successfully, ${name}!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}\n🛵 A delivery girl from Kasama will arrive soon.`);
+}
 
-    // Start the app
-    loadSupabaseAndRun();
+function shareLocation() {
+    const message = `📍 I'm ordering from Laura Girls Food Delivery in Kasama!\n📍 Location: ${customerLocation}\n👤 Name: ${customerName}\n📱 Phone: ${customerPhone}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+}
+
+function toggleAdmin() {
+    isAdmin = !isAdmin;
+    renderApp();
+}
+
+// ============================================
+// START THE APP
+// ============================================
+renderApp();
+console.log('✅ Laura Girls Food Delivery App Loaded!');
+console.log(`📋 ${MENU.length} menu items loaded`);
+console.log('📍 Serving Kasama District, Zambia');
 </script>
 </body>
 </html>
