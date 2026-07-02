@@ -35,58 +35,93 @@
         }
         .app-header {
             background: linear-gradient(135deg, #cc0000, #990000);
-            padding: 12px 14px 10px;
+            padding: 10px 14px;
             color: white;
             display: flex;
             align-items: center;
+            justify-content: space-between;
             gap: 6px;
-            flex-wrap: wrap;
+            min-height: 50px;
         }
-        .app-header i {
-            font-size: 20px;
-            color: #ffcc00;
-        }
-        .app-header h1 {
-            font-size: 16px;
-            font-weight: 600;
+        .app-header .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             flex: 1;
         }
-        .app-header .badge {
-            background: #ffcc00;
-            color: #990000;
-            font-size: 9px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 40px;
+        .app-header .brand i {
+            font-size: 22px;
+            color: #ffcc00;
         }
-        .app-header .location-badge {
-            background: rgba(255,255,255,0.2);
-            padding: 2px 6px;
-            border-radius: 20px;
-            font-size: 8px;
+        .app-header .brand h1 {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .app-header .brand .subtitle {
+            font-size: 7px;
+            opacity: 0.8;
+            display: block;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+        .app-header .header-actions {
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 4px;
         }
-        .app-header .nav-btn {
-            background: rgba(255,255,255,0.15);
+        .app-header .header-btn {
+            background: rgba(255,255,255,0.12);
             color: white;
             border: none;
-            padding: 3px 8px;
+            padding: 5px 10px;
             border-radius: 20px;
-            font-size: 9px;
+            font-size: 10px;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 4px;
             transition: 0.15s;
+            font-weight: 600;
+            white-space: nowrap;
         }
-        .app-header .nav-btn:hover {
+        .app-header .header-btn:hover {
             background: rgba(255,255,255,0.25);
         }
-        .app-header .nav-btn.active {
+        .app-header .header-btn.active {
             background: #ffcc00;
             color: #990000;
+        }
+        .app-header .header-btn .badge-dot {
+            width: 6px;
+            height: 6px;
+            background: #ff4444;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1s infinite;
+        }
+        .app-header .header-btn .count-badge {
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            padding: 1px 5px;
+            font-size: 8px;
+            font-weight: 700;
+            margin-left: 2px;
+        }
+        .app-header .delivery-name {
+            font-size: 9px;
+            background: rgba(255,255,255,0.15);
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: none;
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .app-header .delivery-name.show {
+            display: inline-block;
         }
         .app-body {
             flex: 1;
@@ -207,14 +242,14 @@
             font-size: 11px;
             text-align: center;
         }
-        .admin-panel, .delivery-panel {
+        .admin-panel {
             background: #fff5f5;
             border-radius: 16px;
             padding: 12px;
             border: 1px solid #ffe0e0;
             display: none;
         }
-        .admin-panel.show, .delivery-panel.show {
+        .admin-panel.show {
             display: block;
         }
         .admin-input-group {
@@ -287,17 +322,14 @@
             font-size: 12px;
             animation: fadeIn 0.5s;
         }
-        .badge-count {
-            background: #cc0000;
-            color: white;
-            border-radius: 50%;
-            padding: 1px 5px;
-            font-size: 9px;
-            margin-left: 3px;
-        }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
         }
         .loading {
             text-align: center;
@@ -384,11 +416,6 @@
             border-radius: 50%;
             animation: pulse 1.5s infinite;
         }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.3; }
-            100% { opacity: 1; }
-        }
         .order-status {
             background: #fff5f5;
             padding: 5px 8px;
@@ -412,22 +439,8 @@
             font-size: 11px;
             margin-top: 4px;
         }
-        .admin-login-btn {
-            background: rgba(255,255,255,0.15);
-            color: white;
-            border: none;
-            padding: 3px 8px;
-            border-radius: 20px;
-            font-size: 9px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            transition: 0.15s;
-        }
-        .admin-login-btn:hover {
-            background: rgba(255,255,255,0.25);
-        }
+
+        /* Admin Login Modal */
         .admin-login-modal {
             display: none;
             position: fixed;
@@ -490,20 +503,8 @@
         .admin-login-box .error.show {
             display: block;
         }
-        .admin-header-badge {
-            background: #ffcc00;
-            color: #990000;
-            padding: 1px 6px;
-            border-radius: 12px;
-            font-size: 7px;
-            font-weight: 700;
-            display: none;
-        }
-        .admin-header-badge.show {
-            display: inline-block;
-        }
 
-        /* Delivery Girl Login Styles */
+        /* Delivery Girl Login Modal */
         .delivery-login-modal {
             display: none;
             position: fixed;
@@ -661,16 +662,6 @@
             text-decoration: underline;
         }
 
-        .notification-badge {
-            background: #ff4444;
-            color: white;
-            border-radius: 50%;
-            padding: 1px 5px;
-            font-size: 8px;
-            font-weight: 700;
-            animation: pulse 1s infinite;
-        }
-
         /* Stats Grid */
         .stats-grid {
             display: grid;
@@ -696,7 +687,6 @@
             margin-top: 1px;
         }
 
-        /* Customer Details */
         .customer-details {
             background: #fff8f8;
             border-radius: 12px;
@@ -743,22 +733,23 @@
 <body>
 <div id="root">
     <div class="app-header">
-        <i class="fas fa-utensils"></i>
-        <h1>Laura Girls Food</h1>
-        <span class="location-badge">
-            <i class="fas fa-map-marker-alt"></i> Kasama
-        </span>
-        <button class="nav-btn" id="customerTabBtn" onclick="switchTab('customer')">
-            <i class="fas fa-user"></i> Order
-        </button>
-        <button class="nav-btn" id="deliveryTabBtn" onclick="openDeliveryLogin()">
-            <i class="fas fa-motorcycle"></i> Delivery
-        </button>
-        <button class="admin-login-btn" id="adminToggleBtn" onclick="toggleAdminLogin()">
-            <i class="fas fa-user-shield"></i>
-        </button>
-        <span class="admin-header-badge" id="adminBadge">👑</span>
-        <span id="deliveryNameDisplay" style="font-size:9px;background:rgba(255,255,255,0.2);padding:2px 6px;border-radius:12px;display:none;"></span>
+        <div class="brand">
+            <i class="fas fa-utensils"></i>
+            <div>
+                <h1>Laura Girls</h1>
+                <span class="subtitle">Kasama · Food Delivery</span>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="header-btn" id="deliveryLoginBtn" onclick="openDeliveryLogin()">
+                <i class="fas fa-motorcycle"></i> 
+                <span id="deliveryBtnText">Delivery</span>
+            </button>
+            <button class="header-btn" id="adminToggleBtn" onclick="toggleAdminLogin()">
+                <i class="fas fa-user-shield"></i>
+            </button>
+            <span class="delivery-name" id="deliveryNameDisplay"></span>
+        </div>
     </div>
     <div id="app-container" class="app-body">
         <div class="loading" id="loadingDiv">
@@ -835,8 +826,6 @@
     let currentTab = 'customer';
     let animationInterval = null;
     let currentPosition = { lat: -10.2129, lng: 31.1809 };
-    let targetPosition = { lat: -10.2129, lng: 31.1809 };
-    let isAnimating = false;
 
     const container = document.getElementById('app-container');
     const loadingDiv = document.getElementById('loadingDiv');
@@ -873,7 +862,6 @@
             return;
         }
 
-        // Check if delivery girl exists in the list
         if (!currentGirls.includes(name)) {
             document.getElementById('deliveryLoginError').textContent = '❌ Name not found. Please contact admin.';
             document.getElementById('deliveryLoginError').classList.add('show');
@@ -884,48 +872,29 @@
         deliveryGirlName = name;
         document.getElementById('deliveryLoginModal').classList.remove('show');
         document.getElementById('deliveryNameDisplay').textContent = '👩 ' + name;
-        document.getElementById('deliveryNameDisplay').style.display = 'inline-block';
-        document.getElementById('deliveryTabBtn').innerHTML = '<i class="fas fa-motorcycle"></i> Delivery';
-        document.getElementById('deliveryTabBtn').classList.add('active');
-        document.getElementById('customerTabBtn').classList.remove('active');
+        document.getElementById('deliveryNameDisplay').classList.add('show');
+        document.getElementById('deliveryBtnText').textContent = 'Logout';
+        document.getElementById('deliveryLoginBtn').onclick = deliveryLogout;
+        document.getElementById('deliveryLoginBtn').classList.add('active');
         
         alert('✅ Welcome ' + name + '! You are now logged in as a delivery girl.');
-        currentTab = 'delivery';
         renderDeliveryView();
     };
 
     window.deliveryLogout = function() {
         isDeliveryLoggedIn = false;
         deliveryGirlName = '';
-        document.getElementById('deliveryNameDisplay').style.display = 'none';
-        document.getElementById('deliveryTabBtn').innerHTML = '<i class="fas fa-motorcycle"></i> Delivery';
-        document.getElementById('deliveryTabBtn').classList.remove('active');
-        document.getElementById('customerTabBtn').classList.add('active');
-        currentTab = 'customer';
-        renderCustomerView();
-        alert('👋 Logged out from delivery');
-    };
-
-    // ============================================
-    // TAB SWITCHING
-    // ============================================
-    window.switchTab = function(tab) {
-        if (tab === 'delivery' && !isDeliveryLoggedIn) {
-            openDeliveryLogin();
-            return;
+        document.getElementById('deliveryNameDisplay').classList.remove('show');
+        document.getElementById('deliveryBtnText').textContent = 'Delivery';
+        document.getElementById('deliveryLoginBtn').onclick = openDeliveryLogin;
+        document.getElementById('deliveryLoginBtn').classList.remove('active');
+        
+        if (animationInterval) {
+            clearInterval(animationInterval);
         }
         
-        currentTab = tab;
-        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-        if (tab === 'customer') {
-            document.getElementById('customerTabBtn').classList.add('active');
-            document.getElementById('deliveryTabBtn').classList.remove('active');
-            renderCustomerView();
-        } else {
-            document.getElementById('deliveryTabBtn').classList.add('active');
-            document.getElementById('customerTabBtn').classList.remove('active');
-            renderDeliveryView();
-        }
+        alert('👋 Logged out from delivery');
+        renderCustomerView();
     };
 
     // ============================================
@@ -959,7 +928,6 @@
                         attribution: '&copy; OpenStreetMap'
                     }).addTo(map);
                     
-                    // Customer marker
                     const markerIcon = L.divIcon({
                         html: '<i class="fas fa-map-marker-alt" style="color:#cc0000;font-size:28px;"></i>',
                         className: 'custom-marker',
@@ -970,7 +938,6 @@
                     mapMarker = L.marker([lat, lng], { icon: markerIcon }).addTo(map);
                     mapMarker.bindPopup(`<strong>📍 ${location}</strong>`).openPopup();
                     
-                    // Delivery girl marker (if logged in)
                     if (isDeliveryLoggedIn) {
                         addDeliveryMarker(lat, lng);
                     }
@@ -1002,7 +969,6 @@
         deliveryMarker = L.marker([lat, lng], { icon: deliveryIcon }).addTo(map);
         deliveryMarker.bindPopup(`<strong>🛵 ${deliveryGirlName}</strong><br>On the way!`).openPopup();
         
-        // Start animation
         startDeliveryAnimation(lat, lng);
     }
 
@@ -1011,24 +977,18 @@
             clearInterval(animationInterval);
         }
         
-        // Generate random movement path
         let step = 0;
         const totalSteps = 20;
         const endLat = startLat + (Math.random() - 0.5) * 0.02;
         const endLng = startLng + (Math.random() - 0.5) * 0.02;
         
-        isAnimating = true;
-        
         animationInterval = setInterval(() => {
             step++;
             if (step > totalSteps) {
-                // Reset animation with new random destination
                 const newStartLat = currentPosition.lat;
                 const newStartLng = currentPosition.lng;
                 const newEndLat = newStartLat + (Math.random() - 0.5) * 0.02;
                 const newEndLng = newStartLng + (Math.random() - 0.5) * 0.02;
-                
-                // Smoothly move to new position
                 animateToPosition(newStartLat, newStartLng, newEndLat, newEndLng);
                 return;
             }
@@ -1041,7 +1001,6 @@
             
             if (deliveryMarker) {
                 deliveryMarker.setLatLng([lat, lng]);
-                // Update popup with current status
                 const status = ['Moving to customer...', 'On the way!', 'Almost there!'][Math.floor(Math.random() * 3)];
                 deliveryMarker.bindPopup(`<strong>🛵 ${deliveryGirlName}</strong><br>${status}`).openPopup();
             }
@@ -1059,18 +1018,15 @@
         animationInterval = setInterval(() => {
             step++;
             if (step > totalSteps) {
-                // Reset animation with new random destination
                 const newStartLat = currentPosition.lat;
                 const newStartLng = currentPosition.lng;
                 const newEndLat = newStartLat + (Math.random() - 0.5) * 0.02;
                 const newEndLng = newStartLng + (Math.random() - 0.5) * 0.02;
-                
                 animateToPosition(newStartLat, newStartLng, newEndLat, newEndLng);
                 return;
             }
             
             const progress = step / totalSteps;
-            // Ease in-out for smooth movement
             const eased = progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
             const lat = fromLat + (toLat - fromLat) * eased;
             const lng = fromLng + (toLng - fromLng) * eased;
@@ -1083,7 +1039,6 @@
                 deliveryMarker.bindPopup(`<strong>🛵 ${deliveryGirlName}</strong><br>${status}`).openPopup();
             }
             
-            // Also update the map view slightly to follow
             if (map) {
                 map.panTo([lat, lng], { animate: true, duration: 0.5 });
             }
@@ -1112,17 +1067,44 @@
             .catch(error => console.error('Geocoding error:', error));
     }
 
+    function showFallbackMap() {
+        const mapContainer = document.getElementById('map');
+        if (!mapContainer) return;
+        
+        if (map) {
+            map.remove();
+        }
+        
+        map = L.map('map').setView([-10.2129, 31.1809], 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+        
+        const markerIcon = L.divIcon({
+            html: '<i class="fas fa-map-marker-alt" style="color:#cc0000;font-size:28px;"></i>',
+            className: 'custom-marker',
+            iconSize: [28, 28],
+            iconAnchor: [14, 28]
+        });
+        
+        mapMarker = L.marker([-10.2129, 31.1809], { icon: markerIcon }).addTo(map);
+        mapMarker.bindPopup('📍 Kasama, Zambia').openPopup();
+        
+        document.getElementById('mapLoading')?.style.setProperty('display', 'none');
+    }
+
     // ============================================
     // ADMIN FUNCTIONS
     // ============================================
     window.toggleAdminLogin = function() {
         if (isAdmin) {
             isAdmin = false;
-            document.getElementById('adminBadge').classList.remove('show');
             document.getElementById('adminToggleBtn').innerHTML = '<i class="fas fa-user-shield"></i>';
             document.querySelector('.admin-panel')?.classList.remove('show');
             localStorage.removeItem('adminLoggedIn');
             alert('👋 Logged out from admin panel');
+            renderCustomerView();
         } else {
             document.getElementById('adminModal').classList.add('show');
             document.getElementById('adminPassword').value = '';
@@ -1137,7 +1119,6 @@
             isAdmin = true;
             localStorage.setItem('adminLoggedIn', 'true');
             document.getElementById('adminModal').classList.remove('show');
-            document.getElementById('adminBadge').classList.add('show');
             document.getElementById('adminToggleBtn').innerHTML = '<i class="fas fa-sign-out-alt"></i>';
             document.querySelector('.admin-panel')?.classList.add('show');
             alert('✅ Welcome Admin!');
@@ -1156,7 +1137,6 @@
     function checkAdminSession() {
         if (localStorage.getItem('adminLoggedIn') === 'true') {
             isAdmin = true;
-            document.getElementById('adminBadge').classList.add('show');
             document.getElementById('adminToggleBtn').innerHTML = '<i class="fas fa-sign-out-alt"></i>';
             document.querySelector('.admin-panel')?.classList.add('show');
         }
@@ -1338,14 +1318,12 @@
             </div>
         `;
 
-        // Initialize map after DOM update
         setTimeout(() => {
             if (document.getElementById('map')) {
                 initMap(customerLocation);
             }
         }, 500);
 
-        // Update input values and listeners
         const nameInput = document.getElementById('customerName');
         const phoneInput = document.getElementById('customerPhone');
         const addressInput = document.getElementById('customerAddress');
@@ -1368,7 +1346,7 @@
     }
 
     // ============================================
-    // DELIVERY VIEW WITH LOGIN AND DELETE
+    // DELIVERY VIEW
     // ============================================
     let deliveryOrders = [];
 
@@ -1396,7 +1374,6 @@
             }
         }
 
-        // Use mock orders if no real data
         if (orders.length === 0) {
             orders = [
                 {
@@ -1423,8 +1400,6 @@
         }
 
         deliveryOrders = orders;
-
-        // Filter orders - show only pending and assigned (not picked up)
         const availableOrders = deliveryOrders.filter(o => o.status === 'pending' || o.status === 'assigned');
 
         let ordersHTML = '';
@@ -1503,7 +1478,6 @@
         }
 
         container.innerHTML = `
-            <!-- Delivery Girl Header -->
             <div style="background:linear-gradient(135deg,#cc0000,#990000);color:white;padding:8px 12px;border-radius:12px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between;">
                 <div>
                     <i class="fas fa-motorcycle"></i> 
@@ -1513,13 +1487,9 @@
                 <div style="text-align:right;">
                     <div style="font-size:16px;font-weight:700;">${availableOrders.length}</div>
                     <div style="font-size:8px;opacity:0.8;">Pending Orders</div>
-                    <button onclick="deliveryLogout()" style="background:rgba(255,255,255,0.2);border:none;color:white;padding:2px 8px;border-radius:12px;font-size:8px;cursor:pointer;margin-top:2px;">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
                 </div>
             </div>
 
-            <!-- Orders -->
             <div style="margin-top:6px;">
                 <div class="section-title" style="font-size:12px;">
                     <i class="fas fa-list"></i> Available Orders
@@ -1528,7 +1498,6 @@
                 ${ordersHTML}
             </div>
 
-            <!-- Quick Stats -->
             <div class="card" style="padding:8px;">
                 <div class="section-title" style="font-size:11px;margin-bottom:4px;">
                     <i class="fas fa-chart-simple"></i> Quick Stats
@@ -1547,12 +1516,8 @@
                         <div class="label">Picked Up</div>
                     </div>
                 </div>
-                <div style="font-size:9px;color:#6d6a7a;text-align:center;margin-top:2px;">
-                    ${useSupabase ? '✅ Connected to Supabase' : '⚠️ Using demo data'}
-                </div>
             </div>
 
-            <!-- Refresh -->
             <button class="action-btn" onclick="renderDeliveryView()" style="font-size:12px;padding:6px;margin-top:3px;">
                 <i class="fas fa-sync"></i> Refresh Orders
             </button>
@@ -1587,11 +1552,7 @@
         }
         
         alert(`✅ Order #${orderId} assigned to ${deliveryGirlName}!`);
-        
-        // Remove the order from the list immediately
         deliveryOrders = deliveryOrders.filter(o => o.id !== orderId);
-        
-        // If using Supabase, the order will be updated in the DB
         renderDeliveryView();
     };
 
@@ -1605,7 +1566,6 @@
         
         if (useSupabase && supabaseClient) {
             try {
-                // Delete the order from the database
                 const { error } = await supabaseClient
                     .from('orders')
                     .delete()
@@ -1618,22 +1578,8 @@
             }
         }
         
-        // Remove the order from the list immediately
         deliveryOrders = deliveryOrders.filter(o => o.id !== orderId);
-        
-        // Remove from UI with animation
-        const orderElement = document.getElementById(`order-${orderId}`);
-        if (orderElement) {
-            orderElement.style.transition = 'all 0.5s';
-            orderElement.style.opacity = '0';
-            orderElement.style.transform = 'scale(0.8)';
-            setTimeout(() => {
-                renderDeliveryView();
-            }, 500);
-        } else {
-            renderDeliveryView();
-        }
-        
+        renderDeliveryView();
         alert('❌ Order declined and permanently deleted');
     };
 
@@ -1687,9 +1633,7 @@
             }
         }
         
-        // Remove the order from the list
         deliveryOrders = deliveryOrders.filter(o => o.id !== orderId);
-        
         alert('✅ Order delivered! Thank you!');
         renderDeliveryView();
     };
@@ -1931,11 +1875,7 @@
             }
 
             checkAdminSession();
-
-            // Start with customer view
-            document.getElementById('customerTabBtn').classList.add('active');
             renderCustomerView();
-
             updateStatus('✅ App ready! Serving Kasama District');
             loadingDiv.style.display = 'none';
 
@@ -1948,7 +1888,6 @@
             currentGirls = MOCK_GIRLS;
             
             checkAdminSession();
-            document.getElementById('customerTabBtn').classList.add('active');
             renderCustomerView();
             
             loadingDiv.innerHTML = `
