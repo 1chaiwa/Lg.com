@@ -47,13 +47,6 @@
             align-items: center;
             gap: 8px;
         }
-        .app-header .brand img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #ffcc00;
-        }
         .app-header .brand i {
             font-size: 22px;
             color: #ffcc00;
@@ -380,13 +373,23 @@
             min-width: 16px;
             text-align: center;
         }
+        .logo-header {
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ffcc00;
+        }
     </style>
 </head>
 <body>
 <div id="root">
     <div class="app-header">
         <div class="brand">
-            <img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/logo.jpg" alt="Laura Girls Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\\'fas fa-utensils\\'></i>'"/>
+            <img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/logo.jpg" 
+                 alt="Laura Girls" 
+                 class="logo-header"
+                 onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\\'fas fa-utensils\\'></i>'"/>
             <div>
                 <h1>Laura Girls</h1>
                 <span class="subtitle">Kasama · Food Delivery</span>
@@ -406,7 +409,7 @@
 
 <script>
 // ============================================
-// MENU WITH YOUR IMAGES - USING IMG TAG FORMAT
+// MENU WITH YOUR IMAGES - REAL ZAMBIAN PRICES
 // ============================================
 const MENU = [
     { 
@@ -414,7 +417,7 @@ const MENU = [
         name: 'Nshima & Chicken', 
         price: 45.00, 
         emoji: '🍗',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/nshima-chiken.jpg" alt="Nshima & Chicken">',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/nshima-chiken.jpg',
         description: 'Traditional Zambian meal with chicken'
     },
     { 
@@ -422,7 +425,7 @@ const MENU = [
         name: 'Beef Burger', 
         price: 35.00, 
         emoji: '🍔',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/beef-burger.jpg" alt="Beef Burger">',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/beef-burger.jpg',
         description: 'With lettuce, cheese & fries'
     },
     { 
@@ -430,7 +433,7 @@ const MENU = [
         name: 'Breakfast Roll', 
         price: 25.00, 
         emoji: '🥐',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/breakfast-roll.jpg" alt="Breakfast Roll">',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/breakfast-roll.jpg',
         description: 'Egg, sausage & cheese roll'
     },
     { 
@@ -438,7 +441,7 @@ const MENU = [
         name: 'Burger', 
         price: 30.00, 
         emoji: '🍔',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/burger.jpg" alt="Burger">',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/burger.jpg',
         description: 'Classic beef burger with chips'
     },
     { 
@@ -446,7 +449,7 @@ const MENU = [
         name: 'ChiWing', 
         price: 40.00, 
         emoji: '🍗',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/chiWing.jpg" alt="ChiWing">',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/chiWing.jpg',
         description: 'Spicy chicken wings (6 pieces)'
     },
     { 
@@ -454,7 +457,7 @@ const MENU = [
         name: 'Chicken & Chips', 
         price: 38.00, 
         emoji: '🍗',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/CHI.jpg" alt="Chicken & Chips">',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/CHI.jpg',
         description: 'Fried chicken with crispy chips'
     },
     { 
@@ -462,7 +465,7 @@ const MENU = [
         name: 'Coca-Cola', 
         price: 8.00, 
         emoji: '🥤',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/coc.jpg" alt="Coca-Cola">',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/coc.jpg',
         description: 'Ice cold Coca-Cola 1.5L'
     },
     { 
@@ -470,7 +473,7 @@ const MENU = [
         name: 'Fanta Orange', 
         price: 8.00, 
         emoji: '🥤',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/FANTA.jpg" alt="Fanta Orange">',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/FANTA.jpg',
         description: 'Fanta Orange 1.5L'
     },
     { 
@@ -478,7 +481,7 @@ const MENU = [
         name: 'Kapenta', 
         price: 25.00, 
         emoji: '🐟',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/kap.jpg" alt="Kapenta">',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/kap.jpg',
         description: 'Dried Kapenta fish with relish'
     },
     { 
@@ -486,7 +489,7 @@ const MENU = [
         name: 'Okra', 
         price: 20.00, 
         emoji: '🥬',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/OKRA.jpg" alt="Okra">',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/OKRA.jpg',
         description: 'Fresh okra vegetable stew'
     },
     { 
@@ -494,7 +497,7 @@ const MENU = [
         name: 'Pizza', 
         price: 55.00, 
         emoji: '🍕',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/pizza.jpg" alt="Pizza">',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/pizza.jpg',
         description: 'Large margherita pizza'
     }
 ];
@@ -531,15 +534,19 @@ function renderApp() {
             </div>
         `).join('');
     
-    // Menu Grid HTML - Using the imgTag format
+    // Menu Grid HTML
     let menuHTML = MENU.map(item => {
         const qty = cart.find(i => i.id === item.id)?.qty || 0;
+        let imageHTML = '';
+        if (item.image) {
+            imageHTML = `<img src="${item.image}" alt="${item.name}" loading="lazy" onerror="this.style.display='none';this.parentElement.innerHTML='<span class=\\'emoji-placeholder\\'>${item.emoji}</span>'" />`;
+        } else {
+            imageHTML = `<span class="emoji-placeholder">${item.emoji}</span>`;
+        }
         
         return `
             <div class="menu-item-card">
-                <div class="image-container">
-                    ${item.imgTag}
-                </div>
+                <div class="image-container">${imageHTML}</div>
                 <div class="item-info">
                     <div class="item-name">${item.emoji} ${item.name}</div>
                     <div style="font-size:9px;color:#888;">${item.description || ''}</div>
