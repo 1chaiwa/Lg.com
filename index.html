@@ -399,74 +399,96 @@
 
 <script>
 // ============================================
-// SIMPLE WORKING VERSION - NO SUPABASE DEPENDENCY
+// MENU WITH YOUR IMAGES
 // ============================================
-
-// Menu data with images from your GitHub
 const MENU = [
     { 
         id: 1, 
-        name: 'Grilled Chicken', 
-        price: 12.99, 
+        name: 'Nshima & Chicken', 
+        price: 25.00, 
         emoji: '🍗',
-        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/nshima-chicken.jpg',
-        description: 'Juicy grilled chicken'
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/nshima-chiken.jpg',
+        description: 'Traditional Zambian meal'
     },
     { 
         id: 2, 
-        name: 'Jollof Rice', 
-        price: 9.49, 
-        emoji: '🍛',
-        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/jollof-rice.jpg',
-        description: 'West African style'
-    },
-    { 
-        id: 3, 
         name: 'Beef Burger', 
-        price: 11.99, 
+        price: 18.50, 
         emoji: '🍔',
         image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/beef-burger.jpg',
         description: 'With lettuce and cheese'
     },
     { 
+        id: 3, 
+        name: 'Breakfast Roll', 
+        price: 12.00, 
+        emoji: '🥐',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/breakfast-roll.jpg',
+        description: 'Perfect morning start'
+    },
+    { 
         id: 4, 
-        name: 'Fruit Salad', 
-        price: 7.25, 
-        emoji: '🥗',
-        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fruit-salad.jpg',
-        description: 'Fresh mixed fruits'
+        name: 'Burger', 
+        price: 16.50, 
+        emoji: '🍔',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/burger.jpg',
+        description: 'Classic beef burger'
     },
     { 
         id: 5, 
-        name: 'Mango Smoothie', 
-        price: 5.50, 
-        emoji: '🥭',
-        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/mango-smoothie.jpg',
-        description: 'Creamy and refreshing'
+        name: 'ChiWing', 
+        price: 22.00, 
+        emoji: '🍗',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/chiWing.jpg',
+        description: 'Spicy chicken wings'
     },
     { 
         id: 6, 
-        name: 'Pizza', 
-        price: 14.99, 
-        emoji: '🍕',
-        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/pizza.jpg',
-        description: 'Classic margherita'
+        name: 'Chicken & Chips', 
+        price: 20.00, 
+        emoji: '🍗',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/CHI.jpg',
+        description: 'Fried chicken with chips'
     },
     { 
         id: 7, 
-        name: 'Chocolate Cake', 
-        price: 6.99, 
-        emoji: '🍰',
-        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/chocolate-cake.jpg',
-        description: 'Rich chocolate cake'
+        name: 'Coconut Rice', 
+        price: 15.00, 
+        emoji: '🍚',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/coc.jpg',
+        description: 'Creamy coconut rice'
     },
     { 
         id: 8, 
-        name: 'Fresh Juice', 
-        price: 4.50, 
-        emoji: '🧃',
-        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fresh-juice.jpg',
-        description: 'Freshly squeezed'
+        name: 'Fanta', 
+        price: 5.00, 
+        emoji: '🥤',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/FANTA.jpg',
+        description: 'Orange fizzy drink'
+    },
+    { 
+        id: 9, 
+        name: 'Kapenta', 
+        price: 14.00, 
+        emoji: '🐟',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/kap.jpg',
+        description: 'Small dried fish'
+    },
+    { 
+        id: 10, 
+        name: 'Okra', 
+        price: 12.00, 
+        emoji: '🥬',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/OKRA.jpg',
+        description: 'Fresh okra vegetable'
+    },
+    { 
+        id: 11, 
+        name: 'Pizza', 
+        price: 28.00, 
+        emoji: '🍕',
+        image: 'https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/pizza.jpg',
+        description: 'Classic margherita'
     }
 ];
 
@@ -657,11 +679,9 @@ function initMap(location) {
         const mapContainer = document.getElementById('map');
         if (!mapContainer) return;
         
-        // Default Kasama coordinates
         let lat = -10.2129;
         let lng = 31.1809;
         
-        // Try to geocode the location
         fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`)
             .then(r => r.json())
             .then(data => {
@@ -755,7 +775,6 @@ function placeOrder() {
     
     const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
     
-    // Show confirmation
     document.getElementById('orderStatus').innerHTML = `
         <div class="order-placed-banner">
             <i class="fas fa-check-circle"></i> ✅ Order confirmed, ${name}! 
@@ -764,7 +783,6 @@ function placeOrder() {
         </div>
     `;
     
-    // Log the order (in production, save to database)
     console.log('📝 ORDER PLACED:', { 
         customer: name, 
         phone: phone, 
@@ -773,13 +791,11 @@ function placeOrder() {
         total: totalPrice 
     });
     
-    // Clear cart
     cart = [];
     customerName = name;
     customerPhone = phone;
     customerLocation = address;
     
-    // Re-render after delay
     setTimeout(() => {
         document.getElementById('orderStatus').innerHTML = '';
         renderApp();
@@ -804,7 +820,7 @@ function toggleAdmin() {
 // ============================================
 renderApp();
 console.log('✅ Laura Girls Food Delivery App Loaded!');
-console.log(`📋 ${MENU.length} menu items loaded`);
+console.log(`📋 ${MENU.length} menu items loaded with images`);
 console.log('📍 Serving Kasama District, Zambia');
 </script>
 </body>
