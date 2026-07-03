@@ -47,13 +47,6 @@
             align-items: center;
             gap: 8px;
         }
-        .app-header .brand img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #ffcc00;
-        }
         .app-header .brand i {
             font-size: 22px;
             color: #ffcc00;
@@ -67,6 +60,11 @@
             opacity: 0.8;
             display: block;
         }
+        .app-header .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
         .header-btn {
             background: rgba(255,255,255,0.12);
             color: white;
@@ -78,6 +76,36 @@
             display: flex;
             align-items: center;
             gap: 4px;
+            transition: 0.15s;
+        }
+        .header-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        .header-btn.active {
+            background: #ffcc00;
+            color: #990000;
+        }
+        .header-btn .badge-dot {
+            width: 6px;
+            height: 6px;
+            background: #ff4444;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1s infinite;
+        }
+        .delivery-name {
+            font-size: 9px;
+            background: rgba(255,255,255,0.15);
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: none;
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .delivery-name.show {
+            display: inline-block;
         }
         .app-body {
             flex: 1;
@@ -380,20 +408,103 @@
             min-width: 16px;
             text-align: center;
         }
+
+        /* Delivery Login Modal */
+        .delivery-login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+        .delivery-login-modal.show {
+            display: flex;
+        }
+        .delivery-login-box {
+            background: white;
+            padding: 20px;
+            border-radius: 24px;
+            max-width: 300px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .delivery-login-box h2 {
+            color: #cc0000;
+            margin-bottom: 14px;
+            text-align: center;
+            font-size: 16px;
+        }
+        .delivery-login-box input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ffcccc;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            font-size: 13px;
+            outline: none;
+        }
+        .delivery-login-box input:focus {
+            border-color: #cc0000;
+        }
+        .delivery-login-box button {
+            width: 100%;
+            padding: 8px;
+            background: #cc0000;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .delivery-login-box .error {
+            color: #cc0000;
+            font-size: 11px;
+            text-align: center;
+            margin-top: 6px;
+            display: none;
+        }
+        .delivery-login-box .error.show {
+            display: block;
+        }
+        .delivery-login-box .close-btn {
+            margin-top: 6px;
+            background: #999;
+            width: 100%;
+            padding: 6px;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
 <div id="root">
     <div class="app-header">
         <div class="brand">
-            <img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/logo.jpg" alt="Laura Girls Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\\'fas fa-utensils\\'></i>'"/>
+            <i class="fas fa-utensils"></i>
             <div>
                 <h1>Laura Girls</h1>
                 <span class="subtitle">Kasama · Food Delivery</span>
             </div>
         </div>
-        <div>
-            <button class="header-btn" onclick="toggleAdmin()"><i class="fas fa-user-shield"></i></button>
+        <div class="header-actions">
+            <button class="header-btn" id="deliveryLoginBtn" onclick="openDeliveryLogin()">
+                <i class="fas fa-motorcycle"></i> 
+                <span id="deliveryBtnText">Delivery</span>
+            </button>
+            <button class="header-btn" onclick="toggleAdmin()">
+                <i class="fas fa-user-shield"></i>
+            </button>
+            <span class="delivery-name" id="deliveryNameDisplay"></span>
         </div>
     </div>
     <div id="app-container" class="app-body">
@@ -401,6 +512,18 @@
     </div>
     <div class="footnote">
         <i class="fas fa-shield-alt"></i> Cash on delivery · Serving Kasama District, Northern Province, Zambia
+    </div>
+</div>
+
+<!-- Delivery Girl Login Modal -->
+<div class="delivery-login-modal" id="deliveryLoginModal">
+    <div class="delivery-login-box">
+        <h2><i class="fas fa-motorcycle"></i> Delivery Login</h2>
+        <p style="font-size:11px;color:#666;text-align:center;margin-bottom:10px;">Enter your name to start delivering</p>
+        <input type="text" id="deliveryLoginName" placeholder="Enter your name" onkeypress="if(event.key==='Enter') deliveryLogin()" />
+        <button onclick="deliveryLogin()">Login</button>
+        <div class="error" id="deliveryLoginError">❌ Please enter your name</div>
+        <button class="close-btn" onclick="closeDeliveryLogin()">Cancel</button>
     </div>
 </div>
 
@@ -503,9 +626,70 @@ const DELIVERY_GIRLS = ['Alice Johnson', 'Brenda Smith', 'Cathy Williams'];
 
 let cart = [];
 let isAdmin = false;
+let isDeliveryLoggedIn = false;
+let deliveryGirlName = '';
 let customerName = '';
 let customerPhone = '';
 let customerLocation = 'Kasama, Northern Province, Zambia';
+
+// ============================================
+// DELIVERY LOGIN FUNCTIONS
+// ============================================
+function openDeliveryLogin() {
+    document.getElementById('deliveryLoginModal').classList.add('show');
+    document.getElementById('deliveryLoginName').value = '';
+    document.getElementById('deliveryLoginError').classList.remove('show');
+    document.getElementById('deliveryLoginName').focus();
+}
+
+function closeDeliveryLogin() {
+    document.getElementById('deliveryLoginModal').classList.remove('show');
+}
+
+function deliveryLogin() {
+    const name = document.getElementById('deliveryLoginName').value.trim();
+    if (!name) {
+        document.getElementById('deliveryLoginError').textContent = '❌ Please enter your name';
+        document.getElementById('deliveryLoginError').classList.add('show');
+        return;
+    }
+
+    if (!DELIVERY_GIRLS.includes(name)) {
+        document.getElementById('deliveryLoginError').textContent = '❌ Name not found. Please contact admin.';
+        document.getElementById('deliveryLoginError').classList.add('show');
+        return;
+    }
+
+    isDeliveryLoggedIn = true;
+    deliveryGirlName = name;
+    document.getElementById('deliveryLoginModal').classList.remove('show');
+    document.getElementById('deliveryNameDisplay').textContent = '👩 ' + name;
+    document.getElementById('deliveryNameDisplay').classList.add('show');
+    document.getElementById('deliveryBtnText').textContent = 'Logout';
+    document.getElementById('deliveryLoginBtn').onclick = deliveryLogout;
+    document.getElementById('deliveryLoginBtn').classList.add('active');
+    
+    alert('✅ Welcome ' + name + '! You are now logged in as a delivery girl.');
+    renderApp();
+}
+
+function deliveryLogout() {
+    isDeliveryLoggedIn = false;
+    deliveryGirlName = '';
+    document.getElementById('deliveryNameDisplay').classList.remove('show');
+    document.getElementById('deliveryBtnText').textContent = 'Delivery';
+    document.getElementById('deliveryLoginBtn').onclick = openDeliveryLogin;
+    document.getElementById('deliveryLoginBtn').classList.remove('active');
+    alert('👋 Logged out from delivery');
+    renderApp();
+}
+
+// Close modal on outside click
+document.getElementById('deliveryLoginModal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeDeliveryLogin();
+    }
+});
 
 // ============================================
 // RENDER APP
@@ -574,6 +758,14 @@ function renderApp() {
                 <span class="dot"></span> Live
             </div>
         </div>
+        
+        <!-- Delivery Status -->
+        ${isDeliveryLoggedIn ? `
+            <div style="background:#e8f5e9;padding:4px 10px;border-radius:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;font-size:11px;border:1px solid #a5d6a7;">
+                <span><i class="fas fa-motorcycle" style="color:#cc0000;"></i> <strong>${deliveryGirlName}</strong> is online</span>
+                <span style="color:#2e7d32;font-size:9px;"><i class="fas fa-circle" style="color:#4caf50;"></i> Available</span>
+            </div>
+        ` : ''}
         
         <!-- Menu -->
         <div class="card">
@@ -781,7 +973,7 @@ function placeOrder() {
     document.getElementById('orderStatus').innerHTML = `
         <div class="order-placed-banner">
             <i class="fas fa-check-circle"></i> ✅ Order confirmed, ${name}! 
-            <br>🛵 A delivery girl will arrive in 20-30 minutes.
+            <br>🛵 ${isDeliveryLoggedIn ? deliveryGirlName : 'A delivery girl'} will arrive in 20-30 minutes.
             <br>📱 We'll call you at ${phone}
             <br>📍 Delivering to: ${address}
         </div>
@@ -792,7 +984,8 @@ function placeOrder() {
         phone: phone, 
         address: address, 
         items: cart, 
-        total: totalPrice 
+        total: totalPrice,
+        delivery_girl: isDeliveryLoggedIn ? deliveryGirlName : 'Not assigned'
     });
     
     cart = [];
@@ -805,7 +998,7 @@ function placeOrder() {
         renderApp();
     }, 8000);
     
-    alert(`✅ Order placed successfully, ${name}!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}\n🛵 A delivery girl from Kasama will arrive soon.`);
+    alert(`✅ Order placed successfully, ${name}!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}\n🛵 ${isDeliveryLoggedIn ? deliveryGirlName : 'A delivery girl'} will arrive soon.`);
 }
 
 function shareLocation() {
