@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Chikorlando Restaurant & Food Delivery</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         * {
             margin: 0;
@@ -64,7 +66,7 @@
             gap: 4px;
         }
         .header-btn {
-            background: rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.12);
             color: white;
             border: none;
             padding: 4px 10px;
@@ -82,6 +84,14 @@
         .header-btn.active {
             background: #ffcc00;
             color: #990000;
+        }
+        .header-btn .badge-dot {
+            width: 6px;
+            height: 6px;
+            background: #ff4444;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1s infinite;
         }
         .delivery-name {
             font-size: 9px;
@@ -139,6 +149,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
         .menu-item-card .image-container img {
             width: 100%;
@@ -211,6 +222,19 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
+        .map-container {
+            height: 150px;
+            background: #e8e0e0;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 4px 0;
+            position: relative;
+        }
+        .map-container #map {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
         .footnote {
             font-size: 9px;
             color: #6d6a7a;
@@ -227,6 +251,45 @@
             font-size: 10px;
             font-weight: 700;
             margin-left: 5px;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            color: #cc0000;
+        }
+        .loading i {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+        .error-message {
+            background: #ffe6e6;
+            color: #cc0000;
+            padding: 12px;
+            border-radius: 12px;
+            margin: 6px 0;
+            text-align: center;
+            font-size: 13px;
+        }
+        .status-box {
+            background: #fff5f5;
+            padding: 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            margin: 8px 0;
+            color: #333;
+            font-family: monospace;
+            border: 1px solid #ffe0e0;
+        }
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 11px;
+            margin-top: 4px;
         }
         .customer-details {
             background: #fff8f8;
@@ -364,6 +427,8 @@
             color: #ccc;
             margin-bottom: 5px;
         }
+
+        /* Delivery Login Modal */
         .delivery-login-modal {
             display: none;
             position: fixed;
@@ -483,28 +548,141 @@
 
 <script>
 // ============================================
-// SIMPLE WORKING VERSION - NO EXTERNAL DEPENDENCIES
+// MENU WITH YOUR IMAGES - 5 EMPTY SLOTS ADDED
 // ============================================
-
-// MENU DATA
 const MENU = [
-    { id: 1, name: 'Fried Fish', price: 60.00, emoji: '🐟', description: 'Crispy fried fish with chips' },
-    { id: 2, name: 'Beef Burger', price: 35.00, emoji: '🍔', description: 'With lettuce, cheese & fries' },
-    { id: 3, name: 'Breakfast Roll', price: 25.00, emoji: '🥐', description: 'Egg, sausage & cheese roll' },
-    { id: 4, name: 'Burger', price: 30.00, emoji: '🍔', description: 'Classic beef burger with chips' },
-    { id: 5, name: 'ChiWing', price: 40.00, emoji: '🍗', description: 'Spicy chicken wings (6 pieces)' },
-    { id: 6, name: 'Chicken & Chips', price: 38.00, emoji: '🍗', description: 'Fried chicken with crispy chips' },
-    { id: 7, name: 'Coca-Cola', price: 8.00, emoji: '🥤', description: 'Ice cold Coca-Cola 1.5L' },
-    { id: 8, name: 'Fanta Orange', price: 8.00, emoji: '🥤', description: 'Fanta Orange 1.5L' },
-    { id: 9, name: 'Kapenta', price: 25.00, emoji: '🐟', description: 'Dried Kapenta fish with relish' },
-    { id: 10, name: 'Okra', price: 20.00, emoji: '🥬', description: 'Fresh okra vegetable stew' },
-    { id: 11, name: 'Pizza', price: 55.00, emoji: '🍕', description: 'Large margherita pizza' },
-    // Empty slots
-    { id: 12, name: 'Add Item 1', price: 0, emoji: '➕', description: 'Coming soon' },
-    { id: 13, name: 'Add Item 2', price: 0, emoji: '➕', description: 'Coming soon' },
-    { id: 14, name: 'Add Item 3', price: 0, emoji: '➕', description: 'Coming soon' },
-    { id: 15, name: 'Add Item 4', price: 0, emoji: '➕', description: 'Coming soon' },
-    { id: 16, name: 'Add Item 5', price: 0, emoji: '➕', description: 'Coming soon' }
+    { 
+        id: 1, 
+        name: 'Fried Fish', 
+        price: 60.00, 
+        emoji: '🐟',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fish.jpg" alt="Fried Fish" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🐟</span>\'">',
+        description: 'Crispy fried fish with chips'
+    },
+    { 
+        id: 2, 
+        name: 'Beef Burger', 
+        price: 35.00, 
+        emoji: '🍔',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/beef-burger.jpg" alt="Beef Burger" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🍔</span>\'">',
+        description: 'With lettuce, cheese & fries'
+    },
+    { 
+        id: 3, 
+        name: 'Breakfast Roll', 
+        price: 25.00, 
+        emoji: '🥐',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/breakfast-roll.jpg" alt="Breakfast Roll" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🥐</span>\'">',
+        description: 'Egg, sausage & cheese roll'
+    },
+    { 
+        id: 4, 
+        name: 'Burger', 
+        price: 30.00, 
+        emoji: '🍔',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/burger.jpg" alt="Burger" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🍔</span>\'">',
+        description: 'Classic beef burger with chips'
+    },
+    { 
+        id: 5, 
+        name: 'ChiWing', 
+        price: 40.00, 
+        emoji: '🍗',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/chiWing.jpg" alt="ChiWing" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🍗</span>\'">',
+        description: 'Spicy chicken wings (6 pieces)'
+    },
+    { 
+        id: 6, 
+        name: 'Chicken & Chips', 
+        price: 38.00, 
+        emoji: '🍗',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/CHI.jpg" alt="Chicken & Chips" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🍗</span>\'">',
+        description: 'Fried chicken with crispy chips'
+    },
+    { 
+        id: 7, 
+        name: 'Coca-Cola', 
+        price: 8.00, 
+        emoji: '🥤',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/coc.jpg" alt="Coca-Cola" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🥤</span>\'">',
+        description: 'Ice cold Coca-Cola 1.5L'
+    },
+    { 
+        id: 8, 
+        name: 'Fanta Orange', 
+        price: 8.00, 
+        emoji: '🥤',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/FANTA.jpg" alt="Fanta Orange" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🥤</span>\'">',
+        description: 'Fanta Orange 1.5L'
+    },
+    { 
+        id: 9, 
+        name: 'Kapenta', 
+        price: 25.00, 
+        emoji: '🐟',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/kap.jpg" alt="Kapenta" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🐟</span>\'">',
+        description: 'Dried Kapenta fish with relish'
+    },
+    { 
+        id: 10, 
+        name: 'Okra', 
+        price: 20.00, 
+        emoji: '🥬',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/OKRA.jpg" alt="Okra" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🥬</span>\'">',
+        description: 'Fresh okra vegetable stew'
+    },
+    { 
+        id: 11, 
+        name: 'Pizza', 
+        price: 55.00, 
+        emoji: '🍕',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/pizza.jpg" alt="Pizza" onerror="this.parentElement.innerHTML=\'<span class=\\'emoji-placeholder\\'>🍕</span>\'">',
+        description: 'Large margherita pizza'
+    },
+
+    // ============================================
+    // 5 EMPTY SLOTS - ADD YOUR FOOD ITEMS HERE
+    // ============================================
+    { 
+        id: 12, 
+        name: 'Add Food Item 1', 
+        price: 0.00, 
+        emoji: '🍽️',
+        imgTag: '<div class="empty-slot"><i class="fas fa-plus-circle"></i>Add Item<br><span style="font-size:9px;">Upload image & edit</span></div>',
+        description: 'Click to edit this item'
+    },
+    { 
+        id: 13, 
+        name: 'Add Food Item 2', 
+        price: 0.00, 
+        emoji: '🍽️',
+        imgTag: '<div class="empty-slot"><i class="fas fa-plus-circle"></i>Add Item<br><span style="font-size:9px;">Upload image & edit</span></div>',
+        description: 'Click to edit this item'
+    },
+    { 
+        id: 14, 
+        name: 'Add Food Item 3', 
+        price: 0.00, 
+        emoji: '🍽️',
+        imgTag: '<div class="empty-slot"><i class="fas fa-plus-circle"></i>Add Item<br><span style="font-size:9px;">Upload image & edit</span></div>',
+        description: 'Click to edit this item'
+    },
+    { 
+        id: 15, 
+        name: 'Add Food Item 4', 
+        price: 0.00, 
+        emoji: '🍽️',
+        imgTag: '<div class="empty-slot"><i class="fas fa-plus-circle"></i>Add Item<br><span style="font-size:9px;">Upload image & edit</span></div>',
+        description: 'Click to edit this item'
+    },
+    { 
+        id: 16, 
+        name: 'Add Food Item 5', 
+        price: 0.00, 
+        emoji: '🍽️',
+        imgTag: '<div class="empty-slot"><i class="fas fa-plus-circle"></i>Add Item<br><span style="font-size:9px;">Upload image & edit</span></div>',
+        description: 'Click to edit this item'
+    }
 ];
 
 const DELIVERY_GIRLS = ['Chaiwa Justine', 'Brenda Mwansa', 'Chola Williams'];
@@ -518,31 +696,33 @@ let customerPhone = '';
 let customerLocation = 'Kasama, Northern Province, Zambia';
 
 // ============================================
-// DELIVERY LOGIN FUNCTIONS
+// DELIVERY GIRL FUNCTIONS
 // ============================================
-function openDeliveryLogin() {
+window.openDeliveryLogin = function() {
     document.getElementById('deliveryLoginModal').classList.add('show');
     document.getElementById('deliveryLoginName').value = '';
     document.getElementById('deliveryLoginError').classList.remove('show');
     document.getElementById('deliveryLoginName').focus();
-}
+};
 
-function closeDeliveryLogin() {
+window.closeDeliveryLogin = function() {
     document.getElementById('deliveryLoginModal').classList.remove('show');
-}
+};
 
-function deliveryLogin() {
+window.deliveryLogin = function() {
     const name = document.getElementById('deliveryLoginName').value.trim();
     if (!name) {
         document.getElementById('deliveryLoginError').textContent = '❌ Please enter your name';
         document.getElementById('deliveryLoginError').classList.add('show');
         return;
     }
+
     if (!DELIVERY_GIRLS.includes(name)) {
-        document.getElementById('deliveryLoginError').textContent = '❌ Name not found. Contact admin.';
+        document.getElementById('deliveryLoginError').textContent = '❌ Name not found. Please contact admin.';
         document.getElementById('deliveryLoginError').classList.add('show');
         return;
     }
+
     isDeliveryLoggedIn = true;
     deliveryGirlName = name;
     document.getElementById('deliveryLoginModal').classList.remove('show');
@@ -551,11 +731,12 @@ function deliveryLogin() {
     document.getElementById('deliveryBtnText').textContent = 'Logout';
     document.getElementById('deliveryLoginBtn').onclick = deliveryLogout;
     document.getElementById('deliveryLoginBtn').classList.add('active');
-    alert('✅ Welcome ' + name + '! You are now logged in.');
+    
+    alert('✅ Welcome ' + name + '! You are now logged in as a delivery girl.');
     renderApp();
-}
+};
 
-function deliveryLogout() {
+window.deliveryLogout = function() {
     isDeliveryLoggedIn = false;
     deliveryGirlName = '';
     document.getElementById('deliveryNameDisplay').classList.remove('show');
@@ -564,11 +745,13 @@ function deliveryLogout() {
     document.getElementById('deliveryLoginBtn').classList.remove('active');
     alert('👋 Logged out from delivery');
     renderApp();
-}
+};
 
 // Close modal on outside click
 document.getElementById('deliveryLoginModal')?.addEventListener('click', function(e) {
-    if (e.target === this) closeDeliveryLogin();
+    if (e.target === this) {
+        closeDeliveryLogin();
+    }
 });
 
 // ============================================
@@ -586,7 +769,8 @@ function renderApp() {
         cart.map(item => `
             <div class="order-row">
                 <span>${item.emoji} ${item.name} × ${item.qty}</span>
-                <span>ZMW ${(item.price * item.qty).toFixed(2)}
+                <span>
+                    ZMW ${(item.price * item.qty).toFixed(2)}
                     <button onclick="removeFromCart(${item.id})" style="background:none;border:none;color:#cc0000;margin-left:4px;cursor:pointer;font-size:11px;">
                         <i class="fas fa-minus-circle"></i>
                     </button>
@@ -598,28 +782,27 @@ function renderApp() {
     let menuHTML = MENU.map(item => {
         const qty = cart.find(i => i.id === item.id)?.qty || 0;
         const isSlot = item.id >= 12;
-        const isAvailable = item.price > 0;
         
         return `
-            <div class="menu-item-card" style="${isSlot ? 'opacity:0.6;' : ''}">
+            <div class="menu-item-card" style="${isSlot ? 'opacity:0.7;' : ''}">
                 <div class="image-container">
-                    <span class="emoji-placeholder">${item.emoji}</span>
+                    ${item.imgTag}
                 </div>
                 <div class="item-info">
                     <div class="item-name">${item.emoji} ${item.name}</div>
                     <div style="font-size:9px;color:#888;">${item.description || ''}</div>
-                    <div class="item-price">${isAvailable ? 'ZMW ' + item.price.toFixed(2) : 'Coming Soon'}</div>
+                    <div class="item-price">${item.price > 0 ? 'ZMW ' + item.price.toFixed(2) : 'Price TBD'}</div>
                     <div style="margin-top:4px;">
-                        ${qty > 0 ? `
+                        ${qty === 0 && item.price > 0 ? `
+                            <button class="add-btn-grid" onclick="addToCart(${item.id})">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        ` : qty > 0 ? `
                             <div class="qty-control">
                                 <button class="qty-btn-minus" onclick="removeFromCart(${item.id})">−</button>
                                 <span class="qty-number">${qty}</span>
                                 <button class="qty-btn-plus" onclick="addToCart(${item.id})">+</button>
                             </div>
-                        ` : isAvailable ? `
-                            <button class="add-btn-grid" onclick="addToCart(${item.id})">
-                                <i class="fas fa-plus"></i> Add
-                            </button>
                         ` : `
                             <div style="font-size:9px;color:#999;">Coming Soon</div>
                         `}
@@ -642,6 +825,7 @@ function renderApp() {
             </div>
         </div>
         
+        <!-- Delivery Status -->
         ${isDeliveryLoggedIn ? `
             <div style="background:#e8f5e9;padding:4px 10px;border-radius:12px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;font-size:11px;border:1px solid #a5d6a7;">
                 <span><i class="fas fa-motorcycle" style="color:#cc0000;"></i> <strong>${deliveryGirlName}</strong> is online</span>
@@ -653,11 +837,11 @@ function renderApp() {
         <div class="card">
             <div class="section-title">
                 <i class="fas fa-th-large"></i> Today's Menu
-                <span class="kasama-badge" style="margin-left:auto;">${MENU.filter(m => m.price > 0).length} items</span>
+                <span class="kasama-badge" style="margin-left:auto;">${MENU.length} items</span>
             </div>
             <div class="menu-grid">${menuHTML}</div>
             <div style="font-size:9px;color:#999;margin-top:8px;text-align:center;border-top:1px solid #f0f0f0;padding-top:6px;">
-                <i class="fas fa-info-circle"></i> ${MENU.filter(m => m.price === 0).length} empty slots - Add your own items!
+                <i class="fas fa-info-circle"></i> 5 empty slots available - Add your own food items!
             </div>
         </div>
         
@@ -673,6 +857,7 @@ function renderApp() {
                 <span>ZMW ${totalPrice.toFixed(2)}</span>
             </div>
             
+            <!-- Customer Details -->
             <div class="customer-details">
                 <div style="font-size:11px;font-weight:600;color:#cc0000;margin-bottom:4px;">
                     <i class="fas fa-user"></i> Delivery Details
@@ -695,6 +880,23 @@ function renderApp() {
                 <i class="fas fa-motorcycle"></i> Place Order · Cash
             </button>
             <div id="orderStatus"></div>
+        </div>
+        
+        <!-- Map -->
+        <div class="card">
+            <div class="section-title">
+                <i class="fas fa-map-marked-alt"></i> Location
+            </div>
+            <div class="map-container">
+                <div id="map"></div>
+            </div>
+            <div style="font-size:11px;margin-top:3px;">
+                <i class="fas fa-location-dot" style="color:#cc0000;"></i> 
+                <strong>Customer:</strong> ${customerLocation}
+            </div>
+            <button class="whatsapp-btn" onclick="shareLocation()">
+                <i class="fab fa-whatsapp"></i> Share Location
+            </button>
         </div>
         
         <!-- Admin Panel -->
@@ -723,7 +925,61 @@ function renderApp() {
     });
     document.getElementById('customerAddressInput')?.addEventListener('input', function() {
         customerLocation = this.value || 'Kasama, Northern Province, Zambia';
+        initMap(customerLocation);
     });
+    
+    // Initialize map
+    setTimeout(() => initMap(customerLocation), 300);
+}
+
+// ============================================
+// MAP FUNCTIONS
+// ============================================
+let map = null;
+let mapMarker = null;
+
+function initMap(location) {
+    try {
+        const mapContainer = document.getElementById('map');
+        if (!mapContainer) return;
+        
+        let lat = -10.2129;
+        let lng = 31.1809;
+        
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`)
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    lat = parseFloat(data[0].lat);
+                    lng = parseFloat(data[0].lon);
+                }
+                createMap(lat, lng, location);
+            })
+            .catch(() => createMap(lat, lng, location));
+    } catch (e) {
+        console.error('Map error:', e);
+    }
+}
+
+function createMap(lat, lng, location) {
+    if (map) {
+        map.remove();
+    }
+    
+    map = L.map('map').setView([lat, lng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+    
+    const markerIcon = L.divIcon({
+        html: '<i class="fas fa-map-marker-alt" style="color:#cc0000;font-size:28px;"></i>',
+        className: 'custom-marker',
+        iconSize: [28, 28],
+        iconAnchor: [14, 28]
+    });
+    
+    mapMarker = L.marker([lat, lng], { icon: markerIcon }).addTo(map);
+    mapMarker.bindPopup(`<strong>📍 ${location}</strong>`).openPopup();
 }
 
 // ============================================
@@ -768,9 +1024,21 @@ function placeOrder() {
     const phone = phoneInput ? phoneInput.value.trim() : '';
     const address = addressInput ? addressInput.value.trim() : 'Kasama, Northern Province, Zambia';
     
-    if (!name) { alert('⚠️ Please enter your full name'); nameInput?.focus(); return; }
-    if (!phone) { alert('⚠️ Please enter your phone number'); phoneInput?.focus(); return; }
-    if (!address) { alert('⚠️ Please enter your delivery address'); addressInput?.focus(); return; }
+    if (!name) {
+        alert('⚠️ Please enter your full name');
+        nameInput?.focus();
+        return;
+    }
+    if (!phone) {
+        alert('⚠️ Please enter your phone number');
+        phoneInput?.focus();
+        return;
+    }
+    if (!address) {
+        alert('⚠️ Please enter your delivery address');
+        addressInput?.focus();
+        return;
+    }
     
     const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
     
@@ -779,10 +1047,18 @@ function placeOrder() {
             <i class="fas fa-check-circle"></i> ✅ Order confirmed, ${name}! 
             <br>🛵 ${isDeliveryLoggedIn ? deliveryGirlName : 'A delivery girl'} will arrive in 20-30 minutes.
             <br>📱 We'll call you at ${phone}
+            <br>📍 Delivering to: ${address}
         </div>
     `;
     
-    console.log('📝 ORDER PLACED:', { customer: name, phone, address, items: cart, total: totalPrice });
+    console.log('📝 ORDER PLACED:', { 
+        customer: name, 
+        phone: phone, 
+        address: address, 
+        items: cart, 
+        total: totalPrice,
+        delivery_girl: isDeliveryLoggedIn ? deliveryGirlName : 'Not assigned'
+    });
     
     cart = [];
     customerName = name;
@@ -797,6 +1073,12 @@ function placeOrder() {
     alert(`✅ Order placed successfully, ${name}!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}\n🛵 ${isDeliveryLoggedIn ? deliveryGirlName : 'A delivery girl'} will arrive soon.`);
 }
 
+function shareLocation() {
+    const message = `📍 I'm ordering from Chikorlando Restaurant in Kasama!\n📍 Location: ${customerLocation}\n👤 Name: ${customerName}\n📱 Phone: ${customerPhone}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+}
+
 function toggleAdmin() {
     isAdmin = !isAdmin;
     renderApp();
@@ -807,6 +1089,7 @@ function toggleAdmin() {
 // ============================================
 renderApp();
 console.log('✅ Chikorlando Restaurant App Loaded!');
+console.log(`📋 ${MENU.length} menu items (${MENU.length - 5} active, 5 slots available)`);
 console.log('📍 Serving Kasama District, Zambia');
 </script>
 </body>
