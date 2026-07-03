@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- EmailJS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <style>  
         * {
             margin: 0;
@@ -680,7 +682,7 @@
         <button onclick="adminLogin()">Login</button>
         <div class="error" id="adminLoginError">❌ Incorrect password</div>
         <div style="margin-top:4px;text-align:center;font-size:9px;color:#999;">
-            <i class="fas fa-info-circle"></i> Default: <strong>......</strong>
+            <i class="fas fa-info-circle"></i> Default: <strong>admin2426</strong>
         </div>
         <button class="close-btn" onclick="closeAdminLogin()">Cancel</button>
     </div>
@@ -704,7 +706,7 @@ const MENU = [
         name: 'Nshima with Full Fish', 
         price: 120.00, 
         emoji: '🍔',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/beef-burger.jpg" alt="Beef Burger">',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fish.jpg" alt="Full Fish">',
         description: 'Well fried fish'
     },
     { 
@@ -712,15 +714,15 @@ const MENU = [
         name: 'Nshima with Beef Sausage', 
         price: 50.00, 
         emoji: '🥐',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/bsausage1.jpg" alt="Breakfast Roll">',
-        description: ' Wellcooked Sausages'
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/bsausage1.jpg" alt="Beef Sausage">',
+        description: 'Well cooked Sausages'
     },
     { 
         id: 4, 
         name: 'Nshima with Pork', 
         price: 80.00, 
         emoji: '🍔',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/pork1.jpg" alt="Burger">',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/pork1.jpg" alt="Pork">',
         description: 'Yummy Pork'
     },
     { 
@@ -728,18 +730,18 @@ const MENU = [
         name: 'Nshima with Liver', 
         price: 60.00, 
         emoji: '🍗',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/liver.jpg" alt="ChiWing">',
-        description: 'Spicy liver & Onions (6 pcs)'
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/liver.jpg" alt="Liver">',
+        description: 'Spicy liver & Onions'
     },
     { 
         id: 6, 
         name: 'Nshima with Boiled Fish', 
         price: 60.00, 
         emoji: '🍗',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/boiledfish.jpg" alt="Spycy Boiled fish">',
-        description: 'Yummy fish '
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/boiledfish.jpg" alt="Boiled Fish">',
+        description: 'Yummy fish'
     },
-     {
+    {
         id: 7, 
         name: 'Kapenta', 
         price: 50.00, 
@@ -757,13 +759,12 @@ const MENU = [
     },
     { 
         id: 9, 
-        name: 'Nshima with Trooters', 
+        name: 'Nshima with Trotters', 
         price: 60.00, 
         emoji: '🍕',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/trot.jpg" alt="Pizza">',
-        description: 'Flied Chicken trooters'
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/trot.jpg" alt="Trotters">',
+        description: 'Fried chicken trotters'
     },
-
     { 
         id: 10, 
         name: 'Disposable Coke', 
@@ -777,8 +778,8 @@ const MENU = [
         name: 'Disposable Fanta', 
         price: 15.00, 
         emoji: '🥤',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fnta.jpg" alt="Coca-Cola">',
-        description: 'Ice cold Coca-Cola 500 ml'
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fnta.jpg" alt="Fanta">',
+        description: 'Ice cold Fanta 500 ml'
     },
     { 
         id: 12, 
@@ -786,20 +787,86 @@ const MENU = [
         price: 10.00, 
         emoji: '🥤',
         imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fnt.jpg" alt="Fanta Orange">',
-        description: 'Fanta Orange .300 ml'
+        description: 'Fanta Orange 300 ml'
     },
     {
         id: 13, 
         name: 'Bottled Coke', 
         price: 10.00, 
         emoji: '🥤',
-        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/small coke.jpg" alt="Fanta Orange">',
-        description: 'Chiiled coke .300 ml'
-    },
-   
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/small coke.jpg" alt="Bottled Coke">',
+        description: 'Chilled Coke 300 ml'
+    }
 ];
+
 const DELIVERY_GIRLS = ['Chaiwa Justine', 'Brenda Mwansa', 'Chola Williams'];
 const ADMIN_PASSWORD = 'admin2426';
+
+// ============================================
+// EMAILJS CONFIGURATION
+// ============================================
+// 🔑 GET YOUR FREE CREDENTIALS FROM: https://www.emailjs.com/
+const EMAIL_CONFIG = {
+    // Step 1: Sign up at EmailJS (free)
+    // Step 2: Create a service (e.g., Gmail)
+    // Step 3: Create an email template
+    // Step 4: Get your credentials below
+    serviceId: 'service_xxxxxxxx',  // Replace with your Service ID
+    templateId: 'template_xxxxxxxx', // Replace with your Template ID
+    userId: 'user_xxxxxxxx',        // Replace with your User ID
+    adminEmail: 'admin@chikorlando.com' // Admin email to receive notifications
+};
+
+// Initialize EmailJS
+(function initEmailJS() {
+    try {
+        emailjs.init(EMAIL_CONFIG.userId);
+        console.log('✅ EmailJS initialized');
+    } catch (error) {
+        console.warn('⚠️ EmailJS not configured. Email notifications will be disabled.');
+    }
+})();
+
+// ============================================
+// EMAIL NOTIFICATION FUNCTION
+// ============================================
+function sendOrderEmail(orderDetails) {
+    // Check if EmailJS is configured
+    if (!EMAIL_CONFIG.serviceId || EMAIL_CONFIG.serviceId === 'service_xxxxxxxx') {
+        console.warn('⚠️ EmailJS not configured. Please set up your credentials.');
+        return Promise.reject('EmailJS not configured');
+    }
+
+    // Build the email template parameters
+    const templateParams = {
+        to_email: EMAIL_CONFIG.adminEmail,
+        to_name: 'Chikorlando Admin',
+        customer_name: orderDetails.name,
+        customer_phone: orderDetails.phone,
+        customer_address: orderDetails.address,
+        order_total: orderDetails.total.toFixed(2),
+        order_items: orderDetails.items.map(i => `${i.qty}x ${i.name} - ZMW ${(i.price * i.qty).toFixed(2)}`).join('\n'),
+        order_time: new Date().toLocaleString(),
+        order_status: 'Pending',
+        delivery_girl: orderDetails.deliveryGirl || 'Not assigned yet',
+        restaurant_name: 'Chikorlando Restaurant',
+        restaurant_phone: '+260 97 712 3456',
+        restaurant_address: 'Kasama District, Northern Province, Zambia'
+    };
+
+    console.log('📧 Sending email notification...', templateParams);
+
+    // Send the email using EmailJS
+    return emailjs.send(EMAIL_CONFIG.serviceId, EMAIL_CONFIG.templateId, templateParams)
+        .then(function(response) {
+            console.log('✅ Email sent successfully!', response);
+            return { success: true, message: 'Email sent' };
+        })
+        .catch(function(error) {
+            console.error('❌ Email failed:', error);
+            return { success: false, error: error.text };
+        });
+}
 
 // ============================================
 // STATE
@@ -821,8 +888,8 @@ const sampleOrders = [
         customer_name: 'John Banda',
         customer_phone: '0977123456',
         customer_location: 'Lubwa, Kasama',
-        items: [{ name: 'Nshima & Chicken', qty: 2, price: 45.00 }, { name: 'Coca-Cola', qty: 1, price: 8.00 }],
-        total: 98.00,
+        items: [{ name: 'Nshima & Chicken', qty: 2, price: 45.00 }, { name: 'Coca-Cola', qty: 1, price: 15.00 }],
+        total: 105.00,
         status: 'pending',
         delivery_girl: '',
         created_at: new Date(Date.now() - 3600000).toISOString()
@@ -832,8 +899,8 @@ const sampleOrders = [
         customer_name: 'Mary Mwansa',
         customer_phone: '0966234567',
         customer_location: 'Chambeshi, Kasama',
-        items: [{ name: 'Beef Burger', qty: 1, price: 35.00 }, { name: 'Fanta Orange', qty: 1, price: 8.00 }],
-        total: 43.00,
+        items: [{ name: 'Nshima with Beef Sausage', qty: 2, price: 50.00 }, { name: 'Bottled Fanta Orange', qty: 1, price: 10.00 }],
+        total: 110.00,
         status: 'assigned',
         delivery_girl: 'Chaiwa Justine',
         created_at: new Date(Date.now() - 7200000).toISOString()
@@ -1338,11 +1405,40 @@ function placeOrder() {
     };
     allOrders.push(newOrder);
     
+    // ============================================
+    // SEND EMAIL NOTIFICATION
+    // ============================================
+    const orderDetails = {
+        name: name,
+        phone: phone,
+        address: address,
+        total: totalPrice,
+        items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
+        deliveryGirl: isDeliveryLoggedIn ? deliveryGirlName : 'Not assigned yet'
+    };
+    
+    // Send email notification
+    sendOrderEmail(orderDetails)
+        .then(result => {
+            if (result.success) {
+                console.log('📧 Email sent to admin!');
+                // Show email sent indicator in the status
+                document.getElementById('emailStatus').innerHTML = '📧 Email notification sent!';
+            }
+        })
+        .catch(error => {
+            console.warn('⚠️ Email not sent:', error);
+        });
+    
+    // ============================================
+    // ORDER CONFIRMATION
+    // ============================================
     document.getElementById('orderStatus').innerHTML = `
         <div class="order-placed-banner">
             <i class="fas fa-check-circle"></i> ✅ Order confirmed, ${name}! 
             <br>🛵 A delivery girl will arrive soon.
             <br>📱 We'll call you at ${phone}
+            <br><span id="emailStatus" style="font-size:9px;color:#ffcc00;">📧 Sending email notification...</span>
         </div>
     `;
     
@@ -1354,9 +1450,9 @@ function placeOrder() {
     setTimeout(() => {
         document.getElementById('orderStatus').innerHTML = '';
         renderApp();
-    }, 8000);
+    }, 10000);
     
-    alert(`✅ Order placed successfully, ${name}!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}`);
+    alert(`✅ Order placed successfully, ${name}!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}\n📧 Email notification sent to admin!`);
 }
 
 function shareLocation() {
@@ -1447,6 +1543,7 @@ console.log('✅ Chikorlando Restaurant App Loaded!');
 console.log(`📋 ${MENU.length} menu items loaded`);
 console.log('📍 Serving Kasama District, Zambia');
 console.log('👩 Delivery Girls:', DELIVERY_GIRLS.join(', '));
+console.log('📧 Email notifications: ' + (EMAIL_CONFIG.serviceId !== 'service_xxxxxxxx' ? '✅ Configured' : '⚠️ Not configured - add your EmailJS credentials'));
 </script>
 </body>
 </html>
