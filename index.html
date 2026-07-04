@@ -37,37 +37,56 @@
         }
         .app-header {
             background: linear-gradient(135deg, #cc0000, #990000);
-            padding: 12px 14px;
+            padding: 14px 16px;
             color: white;
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 6px;
+            flex-wrap: wrap;
         }
         .app-header .brand {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         .app-header .brand img {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid #ffcc00;
         }
         .app-header .brand i {
-            font-size: 20px;
+            font-size: 24px;
             color: #ffcc00;
         }
+        .app-header .brand-info {
+            display: flex;
+            flex-direction: column;
+        }
         .app-header .brand h1 {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 700;
+            line-height: 1.2;
         }
         .app-header .brand .subtitle {
-            font-size: 6px;
+            font-size: 7px;
             opacity: 0.8;
             display: block;
+        }
+        .app-header .brand .contact-info {
+            font-size: 10px;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 1px;
+            font-weight: 500;
+        }
+        .app-header .brand .contact-info i {
+            font-size: 10px;
+            color: #ffcc00;
         }
         .app-header .header-actions {
             display: flex;
@@ -78,7 +97,7 @@
             background: rgba(255,255,255,0.15);
             color: white;
             border: none;
-            padding: 3px 8px;
+            padding: 4px 10px;
             border-radius: 20px;
             font-size: 9px;
             cursor: pointer;
@@ -131,9 +150,9 @@
         }
         .section-title {
             font-weight: 600;
-            font-size: 12px;
+            font-size: 13px;
             color: #1a1a2e;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
         }
         .section-title i {
             color: #cc0000;
@@ -142,22 +161,24 @@
         .menu-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 10px;
         }
         .menu-item-card {
             background: white;
-            border-radius: 10px;
+            border-radius: 12px;
             border: 1px solid #f0eff2;
             overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
         }
         .menu-item-card .image-container {
             width: 100%;
-            height: 85px;
+            height: 150px;
             background: #f5f0f5;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
         .menu-item-card .image-container img {
             width: 100%;
@@ -165,30 +186,41 @@
             object-fit: cover;
         }
         .menu-item-card .image-container .emoji-placeholder {
-            font-size: 35px;
+            font-size: 50px;
         }
         .menu-item-card .item-info {
-            padding: 4px 6px;
+            padding: 8px 10px;
         }
         .menu-item-card .item-name {
             font-weight: 600;
-            font-size: 11px;
+            font-size: 13px;
+            color: #1a1a2e;
         }
         .menu-item-card .item-price {
             color: #cc0000;
             font-weight: 700;
-            font-size: 12px;
+            font-size: 14px;
+            margin-top: 2px;
+        }
+        .menu-item-card .item-description {
+            font-size: 10px;
+            color: #888;
+            margin-top: 2px;
         }
         .menu-item-card .add-btn-grid {
             background: #cc0000;
             color: white;
             border: none;
             border-radius: 30px;
-            padding: 2px 10px;
+            padding: 4px 14px;
             font-weight: 600;
-            font-size: 9px;
+            font-size: 11px;
             cursor: pointer;
-            margin-top: 3px;
+            margin-top: 4px;
+            transition: 0.15s;
+        }
+        .menu-item-card .add-btn-grid:active {
+            transform: scale(0.95);
         }
         .order-summary {
             background: white;
@@ -200,16 +232,16 @@
         .order-row {
             display: flex;
             justify-content: space-between;
-            padding: 2px 0;
-            font-size: 11px;
+            padding: 3px 0;
+            font-size: 12px;
             border-bottom: 1px dashed #e3dfe9;
         }
         .order-total {
             font-weight: 700;
-            font-size: 13px;
-            padding-top: 3px;
+            font-size: 14px;
+            padding-top: 4px;
             border-top: 2px solid #cc0000;
-            margin-top: 2px;
+            margin-top: 3px;
         }
         .order-total span {
             color: #cc0000;
@@ -219,12 +251,16 @@
             color: white;
             border: none;
             border-radius: 40px;
-            padding: 7px;
+            padding: 8px;
             font-weight: 700;
-            font-size: 12px;
+            font-size: 13px;
             width: 100%;
             margin-top: 6px;
             cursor: pointer;
+            transition: 0.15s;
+        }
+        .action-btn:active {
+            transform: scale(0.97);
         }
         .action-btn:disabled {
             opacity: 0.5;
@@ -244,7 +280,7 @@
             background: #990000;
         }
         .map-container {
-            height: 120px;
+            height: 150px;
             background: #e8e0e0;
             border-radius: 10px;
             overflow: hidden;
@@ -268,8 +304,8 @@
             background: #cc0000;
             color: white;
             border-radius: 50%;
-            padding: 0 5px;
-            font-size: 9px;
+            padding: 0 6px;
+            font-size: 10px;
             font-weight: 700;
             margin-left: 4px;
         }
@@ -292,10 +328,10 @@
         }
         .customer-details input {
             width: 100%;
-            padding: 4px 6px;
+            padding: 5px 8px;
             border: 1px solid #ffcccc;
             border-radius: 6px;
-            font-size: 11px;
+            font-size: 12px;
             outline: none;
         }
         .customer-details .required {
@@ -332,11 +368,11 @@
         .order-placed-banner {
             background: #cc0000;
             color: white;
-            padding: 5px;
+            padding: 6px;
             border-radius: 10px;
             text-align: center;
             margin-top: 4px;
-            font-size: 11px;
+            font-size: 12px;
             animation: fadeIn 0.5s;
         }
         @keyframes fadeIn {
@@ -375,16 +411,20 @@
         .qty-control {
             display: flex;
             align-items: center;
-            gap: 3px;
+            gap: 4px;
         }
         .qty-control button {
-            width: 18px;
-            height: 18px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             border: none;
             font-weight: 700;
             cursor: pointer;
-            font-size: 10px;
+            font-size: 12px;
+            transition: 0.15s;
+        }
+        .qty-control button:active {
+            transform: scale(0.9);
         }
         .qty-btn-minus {
             background: #f0f0f0;
@@ -396,8 +436,8 @@
         }
         .qty-number {
             font-weight: 700;
-            font-size: 12px;
-            min-width: 14px;
+            font-size: 14px;
+            min-width: 16px;
             text-align: center;
         }
         .whatsapp-btn {
@@ -405,10 +445,10 @@
             color: white;
             border: none;
             border-radius: 40px;
-            padding: 3px 10px;
+            padding: 4px 12px;
             font-weight: 600;
             cursor: pointer;
-            font-size: 10px;
+            font-size: 11px;
             margin-top: 3px;
         }
 
@@ -638,9 +678,15 @@
     <div class="app-header">
         <div class="brand">
             <img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/logo1.png" alt="Chikorlando Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\\'fas fa-utensils\\'></i>'"/>
-            <div>
+            <div class="brand-info">
                 <h1>Chikorlando</h1>
                 <span class="subtitle">Restaurant & Food Delivery</span>
+                <div class="contact-info">
+                    <i class="fas fa-phone"></i> 
+                    <span>0977 123 456</span>
+                    <i class="fas fa-whatsapp" style="margin-left:4px;"></i>
+                    <span>0977 654 321</span>
+                </div>
             </div>
         </div>
         <div class="header-actions">
@@ -690,40 +736,40 @@
 
 <script>
 // ============================================
-// MENU DATA
+// MENU DATA - WITH FULL IMAGES
 // ============================================
 const MENU = [
     { 
         id: 1, 
-        name: 'Nshima Wth Village Chicken', 
+        name: 'Nshima with Village Chicken', 
         price: 90.00, 
         emoji: '🍗',
         imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/vchik.jpg" alt="Nshima & Chicken">',
-        description: 'Traditional Zambian meal'
+        description: 'Traditional Zambian meal with village chicken'
     },
     { 
         id: 2, 
         name: 'Nshima with Full Fish', 
         price: 120.00, 
-        emoji: '🍔',
+        emoji: '🐟',
         imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fish.jpg" alt="Full Fish">',
-        description: 'Well fried fish'
+        description: 'Well fried whole fish'
     },
     { 
         id: 3, 
         name: 'Nshima with Beef Sausage', 
         price: 50.00, 
-        emoji: '🥐',
+        emoji: '🌭',
         imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/bsausage1.jpg" alt="Beef Sausage">',
-        description: 'Well cooked Sausages'
+        description: 'Well cooked beef sausages'
     },
     { 
         id: 4, 
         name: 'Nshima with Pork', 
         price: 80.00, 
-        emoji: '🍔',
+        emoji: '🥩',
         imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/pork1.jpg" alt="Pork">',
-        description: 'Yummy Pork'
+        description: 'Tender and yummy pork'
     },
     { 
         id: 5, 
@@ -731,15 +777,15 @@ const MENU = [
         price: 60.00, 
         emoji: '🍗',
         imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/liver.jpg" alt="Liver">',
-        description: 'Spicy liver & Onions'
+        description: 'Spicy liver with onions'
     },
     { 
         id: 6, 
         name: 'Nshima with Boiled Fish', 
         price: 60.00, 
-        emoji: '🍗',
+        emoji: '🐟',
         imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/boiledfish.jpg" alt="Boiled Fish">',
-        description: 'Yummy fish'
+        description: 'Delicious boiled fish'
     },
     {
         id: 7, 
@@ -751,7 +797,7 @@ const MENU = [
     },
     { 
         id: 8, 
-        name: 'Okra', 
+        name: 'Okra Stew', 
         price: 50.00, 
         emoji: '🥬',
         imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/OKRA.jpg" alt="Okra">',
@@ -761,7 +807,7 @@ const MENU = [
         id: 9, 
         name: 'Nshima with Trotters', 
         price: 60.00, 
-        emoji: '🍕',
+        emoji: '🍗',
         imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/trot.jpg" alt="Trotters">',
         description: 'Fried chicken trotters'
     },
@@ -771,7 +817,7 @@ const MENU = [
         price: 15.00, 
         emoji: '🥤',
         imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/coco.jpg" alt="Coca-Cola">',
-        description: 'Ice cold Coca-Cola 500 ml'
+        description: 'Ice cold Coca-Cola 500ml'
     },
     { 
         id: 11, 
@@ -779,7 +825,7 @@ const MENU = [
         price: 15.00, 
         emoji: '🥤',
         imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fnta.jpg" alt="Fanta">',
-        description: 'Ice cold Fanta 500 ml'
+        description: 'Ice cold Fanta 500ml'
     },
     { 
         id: 12, 
@@ -787,7 +833,7 @@ const MENU = [
         price: 10.00, 
         emoji: '🥤',
         imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fnt.jpg" alt="Fanta Orange">',
-        description: 'Fanta Orange 300 ml'
+        description: 'Fanta Orange 300ml'
     },
     {
         id: 13, 
@@ -795,7 +841,7 @@ const MENU = [
         price: 10.00, 
         emoji: '🥤',
         imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/small coke.jpg" alt="Bottled Coke">',
-        description: 'Chilled Coke 300 ml'
+        description: 'Chilled Coke 300ml'
     }
 ];
 
@@ -803,18 +849,13 @@ const DELIVERY_GIRLS = ['Chaiwa Justine', 'Brenda Mwansa', 'Chola Williams'];
 const ADMIN_PASSWORD = 'admin2426';
 
 // ============================================
-// EMAILJS CONFIGURATION
+// EMAILJS CONFIGURATION - GET FREE CREDENTIALS FROM https://www.emailjs.com/
 // ============================================
-// 🔑 GET YOUR FREE CREDENTIALS FROM: https://www.emailjs.com/
 const EMAIL_CONFIG = {
-    // Step 1: Sign up at EmailJS (free)
-    // Step 2: Create a service (e.g., Gmail)
-    // Step 3: Create an email template
-    // Step 4: Get your credentials below
     serviceId: 'service_xxxxxxxx',  // Replace with your Service ID
     templateId: 'template_xxxxxxxx', // Replace with your Template ID
     userId: 'user_xxxxxxxx',        // Replace with your User ID
-    adminEmail: 'admin@chikorlando.com' // Admin email to receive notifications
+    adminEmail: 'admin@chikorlando.com'
 };
 
 // Initialize EmailJS
@@ -823,7 +864,7 @@ const EMAIL_CONFIG = {
         emailjs.init(EMAIL_CONFIG.userId);
         console.log('✅ EmailJS initialized');
     } catch (error) {
-        console.warn('⚠️ EmailJS not configured. Email notifications will be disabled.');
+        console.warn('⚠️ EmailJS not configured.');
     }
 })();
 
@@ -831,13 +872,11 @@ const EMAIL_CONFIG = {
 // EMAIL NOTIFICATION FUNCTION
 // ============================================
 function sendOrderEmail(orderDetails) {
-    // Check if EmailJS is configured
     if (!EMAIL_CONFIG.serviceId || EMAIL_CONFIG.serviceId === 'service_xxxxxxxx') {
-        console.warn('⚠️ EmailJS not configured. Please set up your credentials.');
+        console.warn('⚠️ EmailJS not configured.');
         return Promise.reject('EmailJS not configured');
     }
 
-    // Build the email template parameters
     const templateParams = {
         to_email: EMAIL_CONFIG.adminEmail,
         to_name: 'Chikorlando Admin',
@@ -854,13 +893,10 @@ function sendOrderEmail(orderDetails) {
         restaurant_address: 'Kasama District, Northern Province, Zambia'
     };
 
-    console.log('📧 Sending email notification...', templateParams);
-
-    // Send the email using EmailJS
     return emailjs.send(EMAIL_CONFIG.serviceId, EMAIL_CONFIG.templateId, templateParams)
         .then(function(response) {
-            console.log('✅ Email sent successfully!', response);
-            return { success: true, message: 'Email sent' };
+            console.log('✅ Email sent!', response);
+            return { success: true };
         })
         .catch(function(error) {
             console.error('❌ Email failed:', error);
@@ -888,8 +924,8 @@ const sampleOrders = [
         customer_name: 'John Banda',
         customer_phone: '0977123456',
         customer_location: 'Lubwa, Kasama',
-        items: [{ name: 'Nshima & Chicken', qty: 2, price: 45.00 }, { name: 'Coca-Cola', qty: 1, price: 15.00 }],
-        total: 105.00,
+        items: [{ name: 'Nshima with Village Chicken', qty: 2, price: 90.00 }, { name: 'Coca-Cola', qty: 1, price: 15.00 }],
+        total: 195.00,
         status: 'pending',
         delivery_girl: '',
         created_at: new Date(Date.now() - 3600000).toISOString()
@@ -899,7 +935,7 @@ const sampleOrders = [
         customer_name: 'Mary Mwansa',
         customer_phone: '0966234567',
         customer_location: 'Chambeshi, Kasama',
-        items: [{ name: 'Nshima with Beef Sausage', qty: 2, price: 50.00 }, { name: 'Bottled Fanta Orange', qty: 1, price: 10.00 }],
+        items: [{ name: 'Nshima with Beef Sausage', qty: 2, price: 50.00 }, { name: 'Fanta Orange', qty: 1, price: 10.00 }],
         total: 110.00,
         status: 'assigned',
         delivery_girl: 'Chaiwa Justine',
@@ -946,7 +982,7 @@ function deliveryLogin() {
     document.getElementById('deliveryNameDisplay').classList.add('show');
     document.getElementById('deliveryBtnText').textContent = 'Logout';
     document.getElementById('deliveryLoginBtn').classList.add('active');
-    alert('✅ Welcome ' + name + '! You are now logged in.');
+    alert('✅ Welcome ' + name + '!');
     renderApp();
 }
 
@@ -1021,20 +1057,20 @@ function renderApp() {
     
     // Cart HTML
     let cartHTML = cart.length === 0 ? 
-        '<div style="color:#7a6e86;padding:3px 0;font-size:11px;"><i class="fas fa-shopping-cart"></i> Cart is empty</div>' :
+        '<div style="color:#7a6e86;padding:4px 0;font-size:12px;"><i class="fas fa-shopping-cart"></i> Cart is empty</div>' :
         cart.map(item => `
             <div class="order-row">
                 <span>${item.emoji} ${item.name} × ${item.qty}</span>
                 <span>
                     ZMW ${(item.price * item.qty).toFixed(2)}
-                    <button onclick="removeFromCart(${item.id})" style="background:none;border:none;color:#cc0000;margin-left:3px;cursor:pointer;font-size:10px;">
+                    <button onclick="removeFromCart(${item.id})" style="background:none;border:none;color:#cc0000;margin-left:4px;cursor:pointer;font-size:11px;">
                         <i class="fas fa-minus-circle"></i>
                     </button>
                 </span>
             </div>
         `).join('');
     
-    // Menu Grid HTML
+    // Menu Grid HTML - Full size images
     let menuHTML = MENU.map(item => {
         const qty = cart.find(i => i.id === item.id)?.qty || 0;
         return `
@@ -1042,9 +1078,9 @@ function renderApp() {
                 <div class="image-container">${item.imgTag}</div>
                 <div class="item-info">
                     <div class="item-name">${item.emoji} ${item.name}</div>
-                    <div style="font-size:8px;color:#888;">${item.description || ''}</div>
+                    <div class="item-description">${item.description || ''}</div>
                     <div class="item-price">ZMW ${item.price.toFixed(2)}</div>
-                    <div style="margin-top:2px;">
+                    <div style="margin-top:4px;">
                         ${qty === 0 ? `
                             <button class="add-btn-grid" onclick="addToCart(${item.id})">
                                 <i class="fas fa-plus"></i> Add
@@ -1405,9 +1441,7 @@ function placeOrder() {
     };
     allOrders.push(newOrder);
     
-    // ============================================
-    // SEND EMAIL NOTIFICATION
-    // ============================================
+    // Send email notification
     const orderDetails = {
         name: name,
         phone: phone,
@@ -1417,12 +1451,9 @@ function placeOrder() {
         deliveryGirl: isDeliveryLoggedIn ? deliveryGirlName : 'Not assigned yet'
     };
     
-    // Send email notification
     sendOrderEmail(orderDetails)
         .then(result => {
             if (result.success) {
-                console.log('📧 Email sent to admin!');
-                // Show email sent indicator in the status
                 document.getElementById('emailStatus').innerHTML = '📧 Email notification sent!';
             }
         })
@@ -1430,9 +1461,7 @@ function placeOrder() {
             console.warn('⚠️ Email not sent:', error);
         });
     
-    // ============================================
-    // ORDER CONFIRMATION
-    // ============================================
+    // Order confirmation
     document.getElementById('orderStatus').innerHTML = `
         <div class="order-placed-banner">
             <i class="fas fa-check-circle"></i> ✅ Order confirmed, ${name}! 
@@ -1452,7 +1481,7 @@ function placeOrder() {
         renderApp();
     }, 10000);
     
-    alert(`✅ Order placed successfully, ${name}!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}\n📧 Email notification sent to admin!`);
+    alert(`✅ Order placed successfully, ${name}!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}`);
 }
 
 function shareLocation() {
@@ -1543,7 +1572,7 @@ console.log('✅ Chikorlando Restaurant App Loaded!');
 console.log(`📋 ${MENU.length} menu items loaded`);
 console.log('📍 Serving Kasama District, Zambia');
 console.log('👩 Delivery Girls:', DELIVERY_GIRLS.join(', '));
-console.log('📧 Email notifications: ' + (EMAIL_CONFIG.serviceId !== 'service_xxxxxxxx' ? '✅ Configured' : '⚠️ Not configured - add your EmailJS credentials'));
+console.log('📧 Email notifications: ' + (EMAIL_CONFIG.serviceId !== 'service_xxxxxxxx' ? '✅ Configured' : '⚠️ Not configured'));
 </script>
 </body>
 </html>
