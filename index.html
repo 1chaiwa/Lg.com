@@ -7,8 +7,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- EmailJS Library -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <style>
+    <style>  
         * {
             margin: 0;
             padding: 0;
@@ -55,6 +56,10 @@
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid #ffcc00;
+        }
+        .app-header .brand i {
+            font-size: 24px;
+            color: #ffcc00;
         }
         .app-header .brand-info {
             display: flex;
@@ -107,6 +112,14 @@
         .header-btn.active {
             background: #ffcc00;
             color: #990000;
+        }
+        .header-btn .badge-dot {
+            width: 5px;
+            height: 5px;
+            background: #ff4444;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1s infinite;
         }
         .delivery-name {
             font-size: 8px;
@@ -170,9 +183,7 @@
         .menu-item-card .image-container img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
-            background: #f5f0f5;
-            padding: 4px;
+            object-fit: cover;
         }
         .menu-item-card .image-container .emoji-placeholder {
             font-size: 50px;
@@ -207,6 +218,9 @@
             cursor: pointer;
             margin-top: 4px;
             transition: 0.15s;
+        }
+        .menu-item-card .add-btn-grid:active {
+            transform: scale(0.95);
         }
         .order-summary {
             background: white;
@@ -244,6 +258,9 @@
             margin-top: 6px;
             cursor: pointer;
             transition: 0.15s;
+        }
+        .action-btn:active {
+            transform: scale(0.97);
         }
         .action-btn:disabled {
             opacity: 0.5;
@@ -316,6 +333,9 @@
             border-radius: 6px;
             font-size: 12px;
             outline: none;
+        }
+        .customer-details .required {
+            color: #cc0000;
         }
         .kasama-badge {
             background: #ffcc00;
@@ -403,6 +423,9 @@
             font-size: 12px;
             transition: 0.15s;
         }
+        .qty-control button:active {
+            transform: scale(0.9);
+        }
         .qty-btn-minus {
             background: #f0f0f0;
             color: #333;
@@ -428,6 +451,8 @@
             font-size: 11px;
             margin-top: 3px;
         }
+
+        /* Modals */
         .delivery-login-modal, .admin-login-modal {
             display: none;
             position: fixed;
@@ -466,6 +491,9 @@
             font-size: 12px;
             outline: none;
         }
+        .delivery-login-box input:focus, .admin-login-box input:focus {
+            border-color: #cc0000;
+        }
         .delivery-login-box button, .admin-login-box button {
             width: 100%;
             padding: 7px;
@@ -499,6 +527,8 @@
             cursor: pointer;
             font-size: 11px;
         }
+
+        /* Order Cards */
         .order-card {
             background: white;
             border-radius: 10px;
@@ -557,6 +587,9 @@
             cursor: pointer;
             transition: 0.15s;
         }
+        .order-card .action-btns button:active {
+            transform: scale(0.95);
+        }
         .btn-accept {
             background: #4caf50;
             color: white;
@@ -573,35 +606,26 @@
             background: #f44336;
             color: white;
         }
-        .btn-decline:hover {
-            background: #d32f2f;
+        .btn-complete {
+            background: #4caf50;
+            color: white;
+        }
+        .order-card .status-badge {
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 7px;
+            font-weight: 600;
         }
         .status-badge.pending { background: #ffe0b2; color: #e65100; }
         .status-badge.delivered { background: #c8e6c9; color: #2e7d32; }
         .status-badge.assigned { background: #b3e5fc; color: #01579b; }
         .status-badge.picked_up { background: #fff9c4; color: #f57f17; }
-        .status-badge.declined { background: #ffcdd2; color: #c62828; }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+        .status-badge.completed { background: #c8e6c9; color: #2e7d32; }
+
+        .tab-bar {
+            display: flex;
             gap: 4px;
-            margin: 4px 0;
-        }
-        .stat-card {
-            background: linear-gradient(135deg, #fff5f5, #ffffff);
-            padding: 6px;
-            border-radius: 8px;
-            border: 1px solid #ffe0e0;
-            text-align: center;
-        }
-        .stat-card .number {
-            font-size: 14px;
-            font-weight: 700;
-            color: #cc0000;
-        }
-        .stat-card .label {
-            font-size: 7px;
-            color: #6d6a7a;
+            margin: 6px 0;
         }
         .tab-btn {
             flex: 1;
@@ -624,10 +648,28 @@
         .tab-content.active {
             display: block;
         }
-        .tab-bar {
-            display: flex;
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 4px;
-            margin: 6px 0;
+            margin: 4px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #fff5f5, #ffffff);
+            padding: 6px;
+            border-radius: 8px;
+            border: 1px solid #ffe0e0;
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 14px;
+            font-weight: 700;
+            color: #cc0000;
+        }
+        .stat-card .label {
+            font-size: 7px;
+            color: #6d6a7a;
         }
     </style>
 </head>
@@ -694,34 +736,125 @@
 
 <script>
 // ============================================
-// SUPABASE CONFIGURATION
+// MENU DATA - WITH FULL IMAGES
 // ============================================
-const SUPABASE_URL = 'https://ndwoqlxtaczwxsescemu.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kd29xbHh0YWN6d3hzZXNjZW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5Mjk2MTQsImV4cCI6MjA5ODUwNTYxNH0.43PgLQSdEESXboLGrdtZCHq-f8TwzItXaGuxmI4NEe8';
+const MENU = [
+    { 
+        id: 1, 
+        name: 'Nshima with Village Chicken', 
+        price: 90.00, 
+        emoji: '🍗',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/vchik.jpg" alt="Nshima & Chicken">',
+        description: 'Traditional Zambian meal with village chicken'
+    },
+    { 
+        id: 2, 
+        name: 'Nshima with Full Fish', 
+        price: 120.00, 
+        emoji: '🐟',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fish.jpg" alt="Full Fish">',
+        description: 'Well fried whole fish'
+    },
+    { 
+        id: 3, 
+        name: 'Nshima with Beef Sausage', 
+        price: 50.00, 
+        emoji: '🌭',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/bsausage1.jpg" alt="Beef Sausage">',
+        description: 'Well cooked beef sausages'
+    },
+    { 
+        id: 4, 
+        name: 'Nshima with Pork', 
+        price: 80.00, 
+        emoji: '🥩',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/pork1.jpg" alt="Pork">',
+        description: 'Tender and yummy pork'
+    },
+    { 
+        id: 5, 
+        name: 'Nshima with Liver', 
+        price: 60.00, 
+        emoji: '🍗',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/liver.jpg" alt="Liver">',
+        description: 'Spicy liver with onions'
+    },
+    { 
+        id: 6, 
+        name: 'Nshima with Boiled Fish', 
+        price: 60.00, 
+        emoji: '🐟',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/boiledfish.jpg" alt="Boiled Fish">',
+        description: 'Delicious boiled fish'
+    },
+    {
+        id: 7, 
+        name: 'Kapenta', 
+        price: 50.00, 
+        emoji: '🐟',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/kap.jpg" alt="Kapenta">',
+        description: 'Dried Kapenta fish'
+    },
+    { 
+        id: 8, 
+        name: 'Okra Stew', 
+        price: 50.00, 
+        emoji: '🥬',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/OKRA.jpg" alt="Okra">',
+        description: 'Fresh okra vegetable stew'
+    },
+    { 
+        id: 9, 
+        name: 'Nshima with Trotters', 
+        price: 60.00, 
+        emoji: '🍗',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/trot.jpg" alt="Trotters">',
+        description: 'Fried chicken trotters'
+    },
+    { 
+        id: 10, 
+        name: 'Disposable Coke', 
+        price: 15.00, 
+        emoji: '🥤',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/coco.jpg" alt="Coca-Cola">',
+        description: 'Ice cold Coca-Cola 500ml'
+    },
+    { 
+        id: 11, 
+        name: 'Disposable Fanta', 
+        price: 15.00, 
+        emoji: '🥤',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fnta.jpg" alt="Fanta">',
+        description: 'Ice cold Fanta 500ml'
+    },
+    { 
+        id: 12, 
+        name: 'Bottled Fanta Orange', 
+        price: 10.00, 
+        emoji: '🥤',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fnt.jpg" alt="Fanta Orange">',
+        description: 'Fanta Orange 300ml'
+    },
+    {
+        id: 13, 
+        name: 'Bottled Coke', 
+        price: 10.00, 
+        emoji: '🥤',
+        imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/small coke.jpg" alt="Bottled Coke">',
+        description: 'Chilled Coke 300ml'
+    }
+];
+
+const DELIVERY_GIRLS = ['Chaiwa Justine', 'Brenda Mwansa', 'Chola Williams'];
+const ADMIN_PASSWORD = 'admin2426';
 
 // ============================================
-// STATE
-// ============================================
-let supabase = null;
-let menuItems = [];
-let deliveryGirlsList = [];
-let cart = [];
-let isAdmin = false;
-let isDeliveryLoggedIn = false;
-let deliveryGirlName = '';
-let customerName = '';
-let customerPhone = '';
-let customerLocation = 'Kasama, Northern Province, Zambia';
-let allOrders = [];
-let orderIdCounter = 1;
-
-// ============================================
-// EMAILJS CONFIGURATION
+// EMAILJS CONFIGURATION - GET FREE CREDENTIALS FROM https://www.emailjs.com/
 // ============================================
 const EMAIL_CONFIG = {
-    serviceId: 'service_xxxxxxxx',
-    templateId: 'template_xxxxxxxx',
-    userId: 'user_xxxxxxxx',
+    serviceId: 'service_xxxxxxxx',  // Replace with your Service ID
+    templateId: 'template_xxxxxxxx', // Replace with your Template ID
+    userId: 'user_xxxxxxxx',        // Replace with your User ID
     adminEmail: 'admin@chikorlando.com'
 };
 
@@ -772,172 +905,45 @@ function sendOrderEmail(orderDetails) {
 }
 
 // ============================================
-// SUPABASE FUNCTIONS
+// STATE
 // ============================================
-async function initSupabase() {
-    try {
-        await new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-            script.onload = resolve;
-            script.onerror = reject;
-            document.head.appendChild(script);
-        });
+let cart = [];
+let isAdmin = false;
+let isDeliveryLoggedIn = false;
+let deliveryGirlName = '';
+let customerName = '';
+let customerPhone = '';
+let customerLocation = 'Kasama, Northern Province, Zambia';
+let allOrders = [];
+let orderIdCounter = 1;
 
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log('✅ Supabase initialized');
-
-        await loadMenuItems();
-        await loadDeliveryGirls();
-        await loadOrders();
-        
-        return true;
-    } catch (error) {
-        console.error('❌ Supabase initialization failed:', error);
-        return false;
+// Sample orders for demo
+const sampleOrders = [
+    {
+        id: 1,
+        customer_name: 'John Banda',
+        customer_phone: '0977123456',
+        customer_location: 'Lubwa, Kasama',
+        items: [{ name: 'Nshima with Village Chicken', qty: 2, price: 90.00 }, { name: 'Coca-Cola', qty: 1, price: 15.00 }],
+        total: 195.00,
+        status: 'pending',
+        delivery_girl: '',
+        created_at: new Date(Date.now() - 3600000).toISOString()
+    },
+    {
+        id: 2,
+        customer_name: 'Mary Mwansa',
+        customer_phone: '0966234567',
+        customer_location: 'Chambeshi, Kasama',
+        items: [{ name: 'Nshima with Beef Sausage', qty: 2, price: 50.00 }, { name: 'Fanta Orange', qty: 1, price: 10.00 }],
+        total: 110.00,
+        status: 'assigned',
+        delivery_girl: 'Chaiwa Justine',
+        created_at: new Date(Date.now() - 7200000).toISOString()
     }
-}
+];
 
-async function loadMenuItems() {
-    try {
-        const { data, error } = await supabase
-            .from('menu')
-            .select('*')
-            .order('id');
-        
-        if (error) throw error;
-        
-        if (data && data.length > 0) {
-            menuItems = data;
-        } else {
-            menuItems = [
-                { id: 1, name: 'Nshima with Village Chicken', price: 90.00, emoji: '🍗', description: 'Traditional Zambian meal' },
-                { id: 2, name: 'Nshima with Full Fish', price: 120.00, emoji: '🐟', description: 'Well fried whole fish' },
-                { id: 3, name: 'Nshima with Beef Sausage', price: 50.00, emoji: '🌭', description: 'Well cooked beef sausages' },
-                { id: 4, name: 'Nshima with Pork', price: 80.00, emoji: '🥩', description: 'Tender and yummy pork' },
-                { id: 5, name: 'Nshima with Liver', price: 60.00, emoji: '🍗', description: 'Spicy liver with onions' },
-                { id: 6, name: 'Nshima with Boiled Fish', price: 60.00, emoji: '🐟', description: 'Delicious boiled fish' },
-                { id: 7, name: 'Kapenta', price: 50.00, emoji: '🐟', description: 'Dried Kapenta fish' },
-                { id: 8, name: 'Okra Stew', price: 50.00, emoji: '🥬', description: 'Fresh okra vegetable stew' },
-                { id: 9, name: 'Nshima with Trotters', price: 60.00, emoji: '🍗', description: 'Fried chicken trotters' },
-                { id: 10, name: 'Disposable Coke', price: 15.00, emoji: '🥤', description: 'Ice cold Coca-Cola 500ml' },
-                { id: 11, name: 'Disposable Fanta', price: 15.00, emoji: '🥤', description: 'Ice cold Fanta 500ml' },
-                { id: 12, name: 'Bottled Fanta Orange', price: 10.00, emoji: '🥤', description: 'Fanta Orange 300ml' },
-                { id: 13, name: 'Bottled Coke', price: 10.00, emoji: '🥤', description: 'Chilled Coke 300ml' }
-            ];
-        }
-        
-        console.log(`📋 Menu loaded: ${menuItems.length} items`);
-    } catch (error) {
-        console.error('Error loading menu:', error);
-    }
-}
-
-async function loadDeliveryGirls() {
-    try {
-        const { data, error } = await supabase
-            .from('delivery_girls')
-            .select('name')
-            .order('name');
-        
-        if (error) throw error;
-        
-        if (data && data.length > 0) {
-            deliveryGirlsList = data.map(g => g.name);
-        } else {
-            deliveryGirlsList = ['Chaiwa Justine', 'Brenda Mwansa', 'Chola Williams'];
-        }
-        
-        console.log(`👩 Delivery girls loaded: ${deliveryGirlsList.length}`);
-    } catch (error) {
-        console.error('Error loading delivery girls:', error);
-        deliveryGirlsList = ['Chaiwa Justine', 'Brenda Mwansa', 'Chola Williams'];
-    }
-}
-
-async function loadOrders() {
-    try {
-        const { data, error } = await supabase
-            .from('orders')
-            .select('*')
-            .order('created_at', { ascending: false });
-        
-        if (error) throw error;
-        
-        allOrders = data || [];
-        console.log(`📦 Orders loaded: ${allOrders.length}`);
-    } catch (error) {
-        console.error('Error loading orders:', error);
-        allOrders = [];
-    }
-}
-
-async function saveOrderToSupabase(orderData) {
-    try {
-        const { data, error } = await supabase
-            .from('orders')
-            .insert([{
-                customer_name: orderData.customer_name,
-                customer_phone: orderData.customer_phone,
-                customer_location: orderData.customer_location,
-                items: orderData.items,
-                total: orderData.total,
-                status: orderData.status || 'pending',
-                delivery_girl: orderData.delivery_girl || '',
-                district: orderData.district || 'Kasama',
-                province: orderData.province || 'Northern Province'
-            }])
-            .select();
-        
-        if (error) throw error;
-        
-        console.log('✅ Order saved to Supabase:', data);
-        return data ? data[0] : null;
-    } catch (error) {
-        console.error('❌ Failed to save order:', error);
-        throw error;
-    }
-}
-
-async function updateOrderStatus(orderId, status, deliveryGirl = null) {
-    try {
-        const updateData = { status };
-        if (deliveryGirl !== null) {
-            updateData.delivery_girl = deliveryGirl;
-        }
-        
-        const { data, error } = await supabase
-            .from('orders')
-            .update(updateData)
-            .eq('id', orderId)
-            .select();
-        
-        if (error) throw error;
-        
-        console.log(`✅ Order ${orderId} updated to ${status}`);
-        return data ? data[0] : null;
-    } catch (error) {
-        console.error('❌ Failed to update order:', error);
-        throw error;
-    }
-}
-
-async function deleteOrder(orderId) {
-    try {
-        const { error } = await supabase
-            .from('orders')
-            .delete()
-            .eq('id', orderId);
-        
-        if (error) throw error;
-        
-        console.log(`✅ Order ${orderId} deleted`);
-        return true;
-    } catch (error) {
-        console.error('❌ Failed to delete order:', error);
-        throw error;
-    }
-}
+allOrders = [...sampleOrders];
 
 // ============================================
 // DELIVERY LOGIN FUNCTIONS
@@ -964,7 +970,7 @@ function deliveryLogin() {
         document.getElementById('deliveryLoginError').classList.add('show');
         return;
     }
-    if (!deliveryGirlsList.includes(name)) {
+    if (!DELIVERY_GIRLS.includes(name)) {
         document.getElementById('deliveryLoginError').textContent = '❌ Name not found. Contact admin.';
         document.getElementById('deliveryLoginError').classList.add('show');
         return;
@@ -993,8 +999,6 @@ function deliveryLogout() {
 // ============================================
 // ADMIN LOGIN FUNCTIONS
 // ============================================
-const ADMIN_PASSWORD = 'admin2426';
-
 function openAdminLogin() {
     if (isAdmin) {
         adminLogout();
@@ -1066,16 +1070,12 @@ function renderApp() {
             </div>
         `).join('');
     
-    // Menu Grid HTML
-    let menuHTML = menuItems.map(item => {
+    // Menu Grid HTML - Full size images
+    let menuHTML = MENU.map(item => {
         const qty = cart.find(i => i.id === item.id)?.qty || 0;
-        const imgTag = `<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/${item.name.toLowerCase().replace(/ /g, '')}.jpg" alt="${item.name}" onerror="this.parentElement.innerHTML='<span class=\\'emoji-placeholder\\'>${item.emoji}</span>'">`;
-        
         return `
             <div class="menu-item-card">
-                <div class="image-container">
-                    ${item.image_url ? `<img src="${item.image_url}" alt="${item.name}">` : `<span class="emoji-placeholder">${item.emoji}</span>`}
-                </div>
+                <div class="image-container">${item.imgTag}</div>
                 <div class="item-info">
                     <div class="item-name">${item.emoji} ${item.name}</div>
                     <div class="item-description">${item.description || ''}</div>
@@ -1102,13 +1102,13 @@ function renderApp() {
     let adminHTML = '';
     if (isAdmin) {
         const totalOrders = allOrders.length;
-        const pendingOrders = allOrders.filter(o => o.status === 'pending').length;
-        const completedOrders = allOrders.filter(o => o.status === 'delivered').length;
-        const totalRevenue = allOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+        const pendingOrders = allOrders.filter(o => o.status === 'pending' || o.status === 'assigned').length;
+        const completedOrders = allOrders.filter(o => o.status === 'delivered' || o.status === 'completed').length;
+        const totalRevenue = allOrders.reduce((sum, o) => sum + o.total, 0);
         
         let ordersListHTML = allOrders.map(order => {
             const statusClass = order.status || 'pending';
-            const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name}`).join(', ') : 'No items';
+            const itemsText = order.items.map(i => `${i.qty}x ${i.name}`).join(', ');
             const date = new Date(order.created_at).toLocaleDateString();
             const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             return `
@@ -1121,18 +1121,18 @@ function renderApp() {
                     <div class="customer-info"><i class="fas fa-map-marker-alt"></i> ${order.customer_location}</div>
                     <div class="order-items">${itemsText}</div>
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
-                        <span class="order-total">ZMW ${(order.total || 0).toFixed(2)}</span>
+                        <span class="order-total">ZMW ${order.total.toFixed(2)}</span>
                         <span class="status-badge ${statusClass}">${statusClass.toUpperCase()}</span>
                     </div>
                     ${order.delivery_girl ? `<div style="font-size:9px;color:#666;margin-top:2px;"><i class="fas fa-motorcycle"></i> ${order.delivery_girl}</div>` : ''}
                     ${order.status === 'pending' ? `
                         <div style="margin-top:4px;">
-                            <button class="action-btn-small" onclick="assignOrder(${order.id}, '${deliveryGirlsList[0] || 'Chaiwa Justine'}')">Assign to ${deliveryGirlsList[0] || 'Chaiwa Justine'}</button>
+                            <button class="action-btn-small" onclick="assignOrder(${order.id}, '${DELIVERY_GIRLS[0]}')">Assign to ${DELIVERY_GIRLS[0]}</button>
                         </div>
                     ` : ''}
-                    ${order.status !== 'delivered' && order.status !== 'declined' ? `
+                    ${order.status !== 'completed' && order.status !== 'delivered' ? `
                         <div style="margin-top:4px;">
-                            <button class="action-btn-small" onclick="markDelivered(${order.id})" style="background:#4caf50;">Mark Delivered</button>
+                            <button class="action-btn-small" onclick="completeOrder(${order.id})" style="background:#4caf50;">Mark Complete</button>
                         </div>
                     ` : ''}
                 </div>
@@ -1145,7 +1145,7 @@ function renderApp() {
                 <div class="stats-grid">
                     <div class="stat-card"><div class="number">${totalOrders}</div><div class="label">Total Orders</div></div>
                     <div class="stat-card"><div class="number">${pendingOrders}</div><div class="label">Pending</div></div>
-                    <div class="stat-card"><div class="number">${completedOrders}</div><div class="label">Delivered</div></div>
+                    <div class="stat-card"><div class="number">${completedOrders}</div><div class="label">Completed</div></div>
                 </div>
                 <div style="font-size:11px;font-weight:700;color:#cc0000;text-align:center;margin-bottom:4px;">Total Revenue: ZMW ${totalRevenue.toFixed(2)}</div>
                 
@@ -1153,7 +1153,7 @@ function renderApp() {
                 <div style="max-height:300px;overflow-y:auto;">${ordersListHTML}</div>
                 
                 <div class="section-title" style="margin-top:6px;"><i class="fas fa-female"></i> Delivery Girls</div>
-                <div>${deliveryGirlsList.map(g => `<span class="delivery-girl-tag"><i class="fas fa-female"></i> ${g}</span>`).join('')}</div>
+                <div>${DELIVERY_GIRLS.map(g => `<span class="delivery-girl-tag"><i class="fas fa-female"></i> ${g}</span>`).join('')}</div>
                 
                 <div style="margin-top:6px;">
                     <div style="display:flex;gap:4px;">
@@ -1172,13 +1172,13 @@ function renderApp() {
         
         let ordersListHTML = myOrders.map(order => {
             const statusClass = order.status || 'pending';
-            const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name}`).join(', ') : 'No items';
+            const itemsText = order.items.map(i => `${i.qty}x ${i.name}`).join(', ');
             const date = new Date(order.created_at).toLocaleDateString();
             const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const isMine = order.delivery_girl === deliveryGirlName;
             
             let actionsHTML = '';
-            if (order.status === 'pending') {
+            if (order.status === 'pending' && !order.delivery_girl) {
                 actionsHTML = `
                     <div class="action-btns">
                         <button class="btn-accept" onclick="acceptOrder(${order.id})"><i class="fas fa-check"></i> Accept</button>
@@ -1209,7 +1209,7 @@ function renderApp() {
                     <div class="customer-info"><i class="fas fa-map-marker-alt"></i> ${order.customer_location}</div>
                     <div class="order-items">${itemsText}</div>
                     <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
-                        <span class="order-total">ZMW ${(order.total || 0).toFixed(2)}</span>
+                        <span class="order-total">ZMW ${order.total.toFixed(2)}</span>
                         <span class="status-badge ${statusClass}">${statusClass.toUpperCase()}</span>
                     </div>
                     ${actionsHTML}
@@ -1256,7 +1256,7 @@ function renderApp() {
             <div class="card">
                 <div class="section-title">
                     <i class="fas fa-th-large"></i> Today's Menu
-                    <span class="kasama-badge" style="margin-left:auto;">${menuItems.length} items</span>
+                    <span class="kasama-badge" style="margin-left:auto;">${MENU.length} items</span>
                 </div>
                 <div class="menu-grid">${menuHTML}</div>
             </div>
@@ -1386,7 +1386,7 @@ function createMap(lat, lng, location) {
 // CUSTOMER FUNCTIONS
 // ============================================
 function addToCart(id) {
-    const item = menuItems.find(i => i.id === id);
+    const item = MENU.find(i => i.id === id);
     if (!item) return;
     const existing = cart.find(i => i.id === id);
     if (existing) {
@@ -1407,7 +1407,7 @@ function removeFromCart(id) {
     renderApp();
 }
 
-async function placeOrder() {
+function placeOrder() {
     if (cart.length === 0) {
         alert('Please add items to your order');
         return;
@@ -1427,8 +1427,9 @@ async function placeOrder() {
     
     const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
     
-    // Prepare order data
-    const orderData = {
+    // Create order
+    const newOrder = {
+        id: orderIdCounter++,
         customer_name: name,
         customer_phone: phone,
         customer_location: address,
@@ -1436,64 +1437,51 @@ async function placeOrder() {
         total: totalPrice,
         status: 'pending',
         delivery_girl: '',
-        district: 'Kasama',
-        province: 'Northern Province'
+        created_at: new Date().toISOString()
+    };
+    allOrders.push(newOrder);
+    
+    // Send email notification
+    const orderDetails = {
+        name: name,
+        phone: phone,
+        address: address,
+        total: totalPrice,
+        items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
+        deliveryGirl: isDeliveryLoggedIn ? deliveryGirlName : 'Not assigned yet'
     };
     
-    try {
-        // Save to Supabase
-        const savedOrder = await saveOrderToSupabase(orderData);
-        
-        if (savedOrder) {
-            // Add to local orders
-            allOrders.unshift(savedOrder);
-            
-            // Send email notification
-            const orderDetails = {
-                name: name,
-                phone: phone,
-                address: address,
-                total: totalPrice,
-                items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
-                deliveryGirl: isDeliveryLoggedIn ? deliveryGirlName : 'Not assigned yet'
-            };
-            
-            sendOrderEmail(orderDetails)
-                .then(result => {
-                    if (result.success) {
-                        document.getElementById('emailStatus').innerHTML = '📧 Email notification sent!';
-                    }
-                })
-                .catch(error => {
-                    console.warn('⚠️ Email not sent:', error);
-                });
-            
-            // Order confirmation
-            document.getElementById('orderStatus').innerHTML = `
-                <div class="order-placed-banner">
-                    <i class="fas fa-check-circle"></i> ✅ Order confirmed, ${name}! 
-                    <br>🛵 A delivery girl will arrive soon.
-                    <br>📱 We'll call you at ${phone}
-                    <br><span id="emailStatus" style="font-size:9px;color:#ffcc00;">📧 Sending email notification...</span>
-                </div>
-            `;
-            
-            cart = [];
-            customerName = name;
-            customerPhone = phone;
-            customerLocation = address;
-            
-            setTimeout(() => {
-                document.getElementById('orderStatus').innerHTML = '';
-                renderApp();
-            }, 10000);
-            
-            alert(`✅ Order placed successfully, ${name}!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}\n📦 Order #${savedOrder.id} saved to database!`);
-        }
-    } catch (error) {
-        alert('❌ Failed to place order: ' + error.message);
-        console.error('Order error:', error);
-    }
+    sendOrderEmail(orderDetails)
+        .then(result => {
+            if (result.success) {
+                document.getElementById('emailStatus').innerHTML = '📧 Email notification sent!';
+            }
+        })
+        .catch(error => {
+            console.warn('⚠️ Email not sent:', error);
+        });
+    
+    // Order confirmation
+    document.getElementById('orderStatus').innerHTML = `
+        <div class="order-placed-banner">
+            <i class="fas fa-check-circle"></i> ✅ Order confirmed, ${name}! 
+            <br>🛵 A delivery girl will arrive soon.
+            <br>📱 We'll call you at ${phone}
+            <br><span id="emailStatus" style="font-size:9px;color:#ffcc00;">📧 Sending email notification...</span>
+        </div>
+    `;
+    
+    cart = [];
+    customerName = name;
+    customerPhone = phone;
+    customerLocation = address;
+    
+    setTimeout(() => {
+        document.getElementById('orderStatus').innerHTML = '';
+        renderApp();
+    }, 10000);
+    
+    alert(`✅ Order placed successfully, ${name}!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}`);
 }
 
 function shareLocation() {
@@ -1505,159 +1493,86 @@ function shareLocation() {
 // ============================================
 // ADMIN FUNCTIONS
 // ============================================
-async function addDeliveryGirl() {
+function addDeliveryGirl() {
     const input = document.getElementById('newGirlInput');
     const name = input.value.trim();
     if (!name) { alert('Please enter a name'); return; }
-    
-    try {
-        const { data, error } = await supabase
-            .from('delivery_girls')
-            .insert([{ name: name }])
-            .select();
-        
-        if (error) throw error;
-        
-        deliveryGirlsList.push(name);
-        input.value = '';
+    DELIVERY_GIRLS.push(name);
+    input.value = '';
+    renderApp();
+    alert('✅ ' + name + ' added as delivery girl!');
+}
+
+function assignOrder(orderId, girlName) {
+    const order = allOrders.find(o => o.id === orderId);
+    if (order) {
+        order.status = 'assigned';
+        order.delivery_girl = girlName;
         renderApp();
-        alert('✅ ' + name + ' added as delivery girl!');
-    } catch (error) {
-        alert('❌ Failed to add delivery girl: ' + error.message);
+        alert('✅ Order #' + orderId + ' assigned to ' + girlName);
     }
 }
 
-async function assignOrder(orderId, girlName) {
-    try {
-        const updatedOrder = await updateOrderStatus(orderId, 'assigned', girlName);
-        if (updatedOrder) {
-            const index = allOrders.findIndex(o => o.id === orderId);
-            if (index !== -1) {
-                allOrders[index] = updatedOrder;
-            }
-            renderApp();
-            alert('✅ Order #' + orderId + ' assigned to ' + girlName);
-        }
-    } catch (error) {
-        alert('❌ Failed to assign order: ' + error.message);
-    }
-}
-
-async function markDelivered(orderId) {
-    try {
-        const updatedOrder = await updateOrderStatus(orderId, 'delivered');
-        if (updatedOrder) {
-            const index = allOrders.findIndex(o => o.id === orderId);
-            if (index !== -1) {
-                allOrders[index] = updatedOrder;
-            }
-            renderApp();
-            alert('✅ Order #' + orderId + ' marked as delivered!');
-        }
-    } catch (error) {
-        alert('❌ Failed to update order: ' + error.message);
+function completeOrder(orderId) {
+    const order = allOrders.find(o => o.id === orderId);
+    if (order) {
+        order.status = 'completed';
+        renderApp();
+        alert('✅ Order #' + orderId + ' marked as completed!');
     }
 }
 
 // ============================================
-// DELIVERY GIRL FUNCTIONS - WITH WORKING DECLINE
+// DELIVERY GIRL FUNCTIONS
 // ============================================
-async function acceptOrder(orderId) {
-    try {
-        const updatedOrder = await updateOrderStatus(orderId, 'assigned', deliveryGirlName);
-        if (updatedOrder) {
-            const index = allOrders.findIndex(o => o.id === orderId);
-            if (index !== -1) {
-                allOrders[index] = updatedOrder;
-            }
-            renderApp();
-            alert('✅ Order #' + orderId + ' accepted by ' + deliveryGirlName + '!');
-        }
-    } catch (error) {
-        alert('❌ Failed to accept order: ' + error.message);
+function acceptOrder(orderId) {
+    const order = allOrders.find(o => o.id === orderId);
+    if (order) {
+        order.status = 'assigned';
+        order.delivery_girl = deliveryGirlName;
+        renderApp();
+        alert('✅ Order #' + orderId + ' accepted!');
     }
 }
 
-async function declineOrder(orderId) {
-    // Show confirmation before deleting
-    if (!confirm('⚠️ Are you sure you want to DECLINE and permanently DELETE this order?')) {
-        return;
-    }
-    
-    try {
-        // Delete from Supabase
-        const deleted = await deleteOrder(orderId);
-        
-        if (deleted) {
-            // Remove from local list
-            allOrders = allOrders.filter(o => o.id !== orderId);
-            renderApp();
-            alert('❌ Order #' + orderId + ' has been declined and permanently deleted!');
-        }
-    } catch (error) {
-        alert('❌ Failed to decline order: ' + error.message);
-        console.error('Decline error:', error);
+function declineOrder(orderId) {
+    if (!confirm('Are you sure you want to decline this order?')) return;
+    const order = allOrders.find(o => o.id === orderId);
+    if (order) {
+        order.status = 'pending';
+        order.delivery_girl = '';
+        renderApp();
+        alert('❌ Order #' + orderId + ' declined');
     }
 }
 
-async function pickupOrder(orderId) {
-    try {
-        const updatedOrder = await updateOrderStatus(orderId, 'picked_up');
-        if (updatedOrder) {
-            const index = allOrders.findIndex(o => o.id === orderId);
-            if (index !== -1) {
-                allOrders[index] = updatedOrder;
-            }
-            renderApp();
-            alert('🛵 Order #' + orderId + ' picked up!');
-        }
-    } catch (error) {
-        alert('❌ Failed to update order: ' + error.message);
+function pickupOrder(orderId) {
+    const order = allOrders.find(o => o.id === orderId);
+    if (order) {
+        order.status = 'picked_up';
+        renderApp();
+        alert('🛵 Order #' + orderId + ' picked up!');
     }
 }
 
-async function deliverOrder(orderId) {
-    try {
-        const updatedOrder = await updateOrderStatus(orderId, 'delivered');
-        if (updatedOrder) {
-            const index = allOrders.findIndex(o => o.id === orderId);
-            if (index !== -1) {
-                allOrders[index] = updatedOrder;
-            }
-            renderApp();
-            alert('✅ Order #' + orderId + ' delivered! Thank you!');
-        }
-    } catch (error) {
-        alert('❌ Failed to update order: ' + error.message);
+function deliverOrder(orderId) {
+    const order = allOrders.find(o => o.id === orderId);
+    if (order) {
+        order.status = 'delivered';
+        renderApp();
+        alert('✅ Order #' + orderId + ' delivered! Thank you!');
     }
 }
 
 // ============================================
 // START THE APP
 // ============================================
-async function startApp() {
-    const loadingDiv = document.getElementById('loadingDiv');
-    if (loadingDiv) loadingDiv.style.display = 'block';
-    
-    // Initialize Supabase
-    const connected = await initSupabase();
-    
-    if (loadingDiv) loadingDiv.style.display = 'none';
-    
-    if (connected) {
-        console.log('✅ App connected to Supabase');
-        console.log('📦 Orders in database:', allOrders.length);
-    } else {
-        console.log('⚠️ App running in offline mode');
-    }
-    
-    renderApp();
-}
-
-// Start the app
-startApp();
+renderApp();
 console.log('✅ Chikorlando Restaurant App Loaded!');
+console.log(`📋 ${MENU.length} menu items loaded`);
 console.log('📍 Serving Kasama District, Zambia');
+console.log('👩 Delivery Girls:', DELIVERY_GIRLS.join(', '));
+console.log('📧 Email notifications: ' + (EMAIL_CONFIG.serviceId !== 'service_xxxxxxxx' ? '✅ Configured' : '⚠️ Not configured'));
 </script>
 </body>
 </html>
