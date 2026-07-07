@@ -8,7 +8,1669 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- EmailJS Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Chikorlando Restaurant & Food Delivery</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 12px;
+        }
+        #root {
+            width: 100%;
+            max-width: 430px;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            overflow: hidden;
+            min-height: 780px;
+            display: flex;
+            flex-direction: column;
+        }
+        .app-header {
+            background: linear-gradient(135deg, #cc0000, #990000);
+            padding: 14px 16px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .app-header .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .app-header .brand img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ffcc00;
+        }
+        .app-header .brand-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .app-header .brand h1 {
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        .app-header .brand .subtitle {
+            font-size: 7px;
+            opacity: 0.8;
+            display: block;
+        }
+        .app-header .brand .contact-info {
+            font-size: 10px;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 1px;
+            font-weight: 500;
+        }
+        .app-header .brand .contact-info i {
+            font-size: 10px;
+            color: #ffcc00;
+        }
+        .app-header .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .header-btn {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 9px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            transition: 0.15s;
+        }
+        .header-btn:hover {
+            background: rgba(255,255,255,0.25);
+        }
+        .header-btn.active {
+            background: #ffcc00;
+            color: #990000;
+        }
+        .delivery-name {
+            font-size: 8px;
+            background: rgba(255,255,255,0.15);
+            padding: 2px 6px;
+            border-radius: 12px;
+            display: none;
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .delivery-name.show {
+            display: inline-block;
+        }
+        .app-body {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            background: #fafafc;
+        }
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 10px;
+            margin-bottom: 8px;
+            border: 1px solid #f0eff2;
+        }
+        .section-title {
+            font-weight: 600;
+            font-size: 13px;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+        }
+        .section-title i {
+            color: #cc0000;
+            margin-right: 4px;
+        }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .menu-item-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #f0eff2;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+        }
+        .menu-item-card .image-container {
+            width: 100%;
+            height: 150px;
+            background: #f5f0f5;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .menu-item-card .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #f5f0f5;
+            padding: 4px;
+        }
+        .menu-item-card .image-container .emoji-placeholder {
+            font-size: 50px;
+        }
+        .menu-item-card .item-info {
+            padding: 8px 10px;
+        }
+        .menu-item-card .item-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: #1a1a2e;
+        }
+        .menu-item-card .item-price {
+            color: #cc0000;
+            font-weight: 700;
+            font-size: 14px;
+            margin-top: 2px;
+        }
+        .menu-item-card .item-description {
+            font-size: 10px;
+            color: #888;
+            margin-top: 2px;
+        }
+        .menu-item-card .add-btn-grid {
+            background: #cc0000;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 4px 14px;
+            font-weight: 600;
+            font-size: 11px;
+            cursor: pointer;
+            margin-top: 4px;
+            transition: 0.15s;
+        }
+        .order-summary {
+            background: white;
+            border-radius: 14px;
+            padding: 10px;
+            border: 1px solid #e9e6ed;
+            margin-bottom: 8px;
+        }
+        .order-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+            font-size: 12px;
+            border-bottom: 1px dashed #e3dfe9;
+        }
+        .order-total {
+            font-weight: 700;
+            font-size: 14px;
+            padding-top: 4px;
+            border-top: 2px solid #cc0000;
+            margin-top: 3px;
+        }
+        .order-total span {
+            color: #cc0000;
+        }
+        .action-btn {
+            background: #cc0000;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            width: 100%;
+            margin-top: 6px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .action-btn-small {
+            background: #cc0000;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 4px 12px;
+            font-weight: 600;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        .action-btn-small:hover {
+            background: #990000;
+        }
+        .map-container {
+            height: 150px;
+            background: #e8e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 3px 0;
+            position: relative;
+        }
+        .map-container #map {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .footnote {
+            font-size: 8px;
+            color: #6d6a7a;
+            text-align: center;
+            padding: 6px;
+            border-top: 1px solid #ece9f0;
+            background: #fff5f5;
+        }
+        .cart-count {
+            background: #cc0000;
+            color: white;
+            border-radius: 50%;
+            padding: 0 6px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 4px;
+        }
+        .customer-details {
+            background: #fff8f8;
+            border-radius: 10px;
+            padding: 6px;
+            margin-top: 3px;
+            border: 1px solid #ffe0e0;
+        }
+        .customer-details .form-group {
+            margin-bottom: 4px;
+        }
+        .customer-details label {
+            display: block;
+            font-size: 9px;
+            font-weight: 600;
+            color: #6d6a7a;
+            margin-bottom: 1px;
+        }
+        .customer-details input {
+            width: 100%;
+            padding: 5px 8px;
+            border: 1px solid #ffcccc;
+            border-radius: 6px;
+            font-size: 12px;
+            outline: none;
+        }
+        .kasama-badge {
+            background: #ffcc00;
+            color: #990000;
+            padding: 1px 5px;
+            border-radius: 10px;
+            font-size: 6px;
+            font-weight: 700;
+        }
+        .real-time-indicator .dot {
+            width: 4px;
+            height: 4px;
+            background: #00cc44;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+        .real-time-indicator {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            font-size: 8px;
+            color: #cc0000;
+        }
+        .order-placed-banner {
+            background: #cc0000;
+            color: white;
+            padding: 6px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 4px;
+            font-size: 12px;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .admin-panel {
+            background: #fff5f5;
+            border-radius: 14px;
+            padding: 10px;
+            border: 1px solid #ffe0e0;
+            display: none;
+        }
+        .admin-panel.show {
+            display: block;
+        }
+        .delivery-panel {
+            background: #f0f8ff;
+            border-radius: 14px;
+            padding: 10px;
+            border: 1px solid #b3d9ff;
+            display: none;
+        }
+        .delivery-panel.show {
+            display: block;
+        }
+        .delivery-girl-tag {
+            background: white;
+            border-radius: 40px;
+            padding: 2px 8px;
+            display: inline-block;
+            border: 1px solid #ffcccc;
+            font-size: 10px;
+            margin: 2px;
+        }
+        .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .qty-control button {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 12px;
+            transition: 0.15s;
+        }
+        .qty-btn-minus {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .qty-btn-plus {
+            background: #cc0000;
+            color: white;
+        }
+        .qty-number {
+            font-weight: 700;
+            font-size: 14px;
+            min-width: 16px;
+            text-align: center;
+        }
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 11px;
+            margin-top: 3px;
+        }
+        .delivery-login-modal, .admin-login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+        .delivery-login-modal.show, .admin-login-modal.show {
+            display: flex;
+        }
+        .delivery-login-box, .admin-login-box {
+            background: white;
+            padding: 20px;
+            border-radius: 24px;
+            max-width: 300px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .delivery-login-box h2, .admin-login-box h2 {
+            color: #cc0000;
+            margin-bottom: 12px;
+            text-align: center;
+            font-size: 15px;
+        }
+        .delivery-login-box input, .admin-login-box input {
+            width: 100%;
+            padding: 7px;
+            border: 1px solid #ffcccc;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            font-size: 12px;
+            outline: none;
+        }
+        .delivery-login-box button, .admin-login-box button {
+            width: 100%;
+            padding: 7px;
+            background: #cc0000;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .delivery-login-box .error, .admin-login-box .error {
+            color: #cc0000;
+            font-size: 10px;
+            text-align: center;
+            margin-top: 4px;
+            display: none;
+        }
+        .delivery-login-box .error.show, .admin-login-box .error.show {
+            display: block;
+        }
+        .close-btn {
+            margin-top: 4px;
+            background: #999;
+            width: 100%;
+            padding: 5px;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .order-card {
+            background: white;
+            border-radius: 10px;
+            padding: 8px;
+            margin-bottom: 6px;
+            border: 1px solid #e9e6ed;
+        }
+        .order-card .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3px;
+        }
+        .order-card .order-id {
+            font-weight: 600;
+            font-size: 10px;
+            color: #1a1a2e;
+        }
+        .order-card .order-time {
+            font-size: 8px;
+            color: #999;
+        }
+        .order-card .customer-info {
+            font-size: 10px;
+            color: #333;
+            margin: 2px 0;
+        }
+        .order-card .customer-info i {
+            color: #cc0000;
+            width: 12px;
+        }
+        .order-card .order-items {
+            font-size: 9px;
+            color: #666;
+            margin: 2px 0;
+            padding: 2px 0;
+            border-top: 1px dashed #f0edf3;
+        }
+        .order-card .order-total {
+            font-weight: 700;
+            color: #cc0000;
+            font-size: 12px;
+        }
+        .order-card .action-btns {
+            display: flex;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        .order-card .action-btns button {
+            flex: 1;
+            padding: 4px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 9px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .btn-accept {
+            background: #4caf50;
+            color: white;
+        }
+        .btn-pickup {
+            background: #ff9800;
+            color: white;
+        }
+        .btn-deliver {
+            background: #2196f3;
+            color: white;
+        }
+        .btn-decline {
+            background: #f44336;
+            color: white;
+        }
+        .btn-decline:hover {
+            background: #d32f2f;
+        }
+        .status-badge.pending { background: #ffe0b2; color: #e65100; }
+        .status-badge.delivered { background: #c8e6c9; color: #2e7d32; }
+        .status-badge.assigned { background: #b3e5fc; color: #01579b; }
+        .status-badge.picked_up { background: #fff9c4; color: #f57f17; }
+        .status-badge.declined { background: #ffcdd2; color: #c62828; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 4px;
+            margin: 4px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #fff5f5, #ffffff);
+            padding: 6px;
+            border-radius: 8px;
+            border: 1px solid #ffe0e0;
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 14px;
+            font-weight: 700;
+            color: #cc0000;
+        }
+        .stat-card .label {
+            font-size: 7px;
+            color: #6d6a7a;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 4px;
+            border: none;
+            border-radius: 8px;
+            background: #f0f0f0;
+            font-weight: 600;
+            font-size: 9px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .tab-btn.active {
+            background: #cc0000;
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .tab-bar {
+            display: flex;
+            gap: 4px;
+            margin: 6px 0;
+        }
+    </style>
+</head>
+<body>
+<div id="root">
+    <div class="app-header">
+        <div class="brand">
+            <img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/logo1.png" alt="Chikorlando Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\\'fas fa-utensils\\'></i>'"/>
+            <div class="brand-info">
+                <h1>Chikorlando</h1>
+                <span class="subtitle">Restaurant & Food Delivery</span>
+                <div class="contact-info">
+                    <i class="fas fa-phone"></i> 
+                    <span>0977 123 456</span>
+                    <i class="fas fa-whatsapp" style="margin-left:4px;"></i>
+                    <span>0977 654 321</span>
+                </div>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="header-btn" id="deliveryLoginBtn" onclick="openDeliveryLogin()">
+                <i class="fas fa-motorcycle"></i> 
+                <span id="deliveryBtnText">Delivery</span>
+            </button>
+            <button class="header-btn" id="adminLoginBtn" onclick="openAdminLogin()">
+                <i class="fas fa-user-shield"></i>
+            </button>
+            <span class="delivery-name" id="deliveryNameDisplay"></span>
+        </div>
+    </div>
+    <div id="app-container" class="app-body">
+        <!-- Content will be rendered here -->
+    </div>
+    <div class="footnote">
+        <i class="fas fa-shield-alt"></i> Cash on delivery · Serving Kasama District, Northern Province, Zambia
+    </div>
+</div>
+
+<!-- Delivery Girl Login Modal -->
+<div class="delivery-login-modal" id="deliveryLoginModal">
+    <div class="delivery-login-box">
+        <h2><i class="fas fa-motorcycle"></i> Delivery Login</h2>
+        <p style="font-size:10px;color:#666;text-align:center;margin-bottom:6px;">Enter your name to start delivering</p>
+        <input type="text" id="deliveryLoginName" placeholder="Enter your name" onkeypress="if(event.key==='Enter') deliveryLogin()" />
+        <button onclick="deliveryLogin()">Login</button>
+        <div class="error" id="deliveryLoginError">❌ Please enter your name</div>
+        <button class="close-btn" onclick="closeDeliveryLogin()">Cancel</button>
+    </div>
+</div>
+
+<!-- Admin Login Modal -->
+<div class="admin-login-modal" id="adminLoginModal">
+    <div class="admin-login-box">
+        <h2><i class="fas fa-user-shield"></i> Admin Login</h2>
+        <input type="password" id="adminPassword" placeholder="Enter admin password" onkeypress="if(event.key==='Enter') adminLogin()" />
+        <button onclick="adminLogin()">Login</button>
+        <div class="error" id="adminLoginError">❌ Incorrect password</div>
+        <div style="margin-top:4px;text-align:center;font-size:9px;color:#999;">
+            <i class="fas fa-info-circle"></i> Default: <strong>admin2426</strong>
+        </div>
+        <button class="close-btn" onclick="closeAdminLogin()">Cancel</button>
+    </div>
+</div>
+
+<script>
+// ============================================
+// SUPABASE CONFIGURATION
+// ============================================
+const SUPABASE_URL = 'https://ndwoqlxtaczwxsescemu.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kd29xbHh0YWN6d3hzZXNjZW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5Mjk2MTQsImV4cCI6MjA5ODUwNTYxNH0.43PgLQSdEESXboLGrdtZCHq-f8TwzItXaGuxmI4NEe8';
+
+// ============================================
+// STATE
+// ============================================
+let supabase = null;
+let menuItems = [];
+let deliveryGirlsList = [];
+let cart = [];
+let isAdmin = false;
+let isDeliveryLoggedIn = false;
+let deliveryGirlName = '';
+let customerName = '';
+let customerPhone = '';
+let customerLocation = 'Kasama, Northern Province, Zambia';
+let allOrders = [];
+let orderIdCounter = 1;
+
+// ============================================
+// EMAILJS CONFIGURATION
+// ============================================
+const EMAIL_CONFIG = {
+    serviceId: 'service_xxxxxxxx',
+    templateId: 'template_xxxxxxxx',
+    userId: 'user_xxxxxxxx',
+    adminEmail: 'admin@chikorlando.com'
+};
+
+// Initialize EmailJS
+(function initEmailJS() {
+    try {
+        emailjs.init(EMAIL_CONFIG.userId);
+        console.log('✅ EmailJS initialized');
+    } catch (error) {
+        console.warn('⚠️ EmailJS not configured.');
+    }
+})();
+
+// ============================================
+// EMAIL NOTIFICATION FUNCTION
+// ============================================
+function sendOrderEmail(orderDetails) {
+    if (!EMAIL_CONFIG.serviceId || EMAIL_CONFIG.serviceId === 'service_xxxxxxxx') {
+        console.warn('⚠️ EmailJS not configured.');
+        return Promise.reject('EmailJS not configured');
+    }
+
+    const templateParams = {
+        to_email: EMAIL_CONFIG.adminEmail,
+        to_name: 'Chikorlando Admin',
+        customer_name: orderDetails.name,
+        customer_phone: orderDetails.phone,
+        customer_address: orderDetails.address,
+        order_total: orderDetails.total.toFixed(2),
+        order_items: orderDetails.items.map(i => `${i.qty}x ${i.name} - ZMW ${(i.price * i.qty).toFixed(2)}`).join('\n'),
+        order_time: new Date().toLocaleString(),
+        order_status: 'Pending',
+        delivery_girl: orderDetails.deliveryGirl || 'Not assigned yet',
+        restaurant_name: 'Chikorlando Restaurant',
+        restaurant_phone: '+260 97 712 3456',
+        restaurant_address: 'Kasama District, Northern Province, Zambia'
+    };
+
+    return emailjs.send(EMAIL_CONFIG.serviceId, EMAIL_CONFIG.templateId, templateParams)
+        .then(function(response) {
+            console.log('✅ Email sent!', response);
+            return { success: true };
+        })
+        .catch(function(error) {
+            console.error('❌ Email failed:', error);
+            return { success: false, error: error.text };
+        });
+}
+
+// ============================================
+// SUPABASE FUNCTIONS
+// ============================================
+async function initSupabase() {
+    try {
+        await new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+        });
+
+        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Supabase initialized');
+
+        await loadMenuItems();
+        await loadDeliveryGirls();
+        await loadOrders();
+        
+        return true;
+    } catch (error) {
+        console.error('❌ Supabase initialization failed:', error);
+        return false;
+    }
+}
+
+async function loadMenuItems() {
+    try {
+        const { data, error } = await supabase
+            .from('menu')
+            .select('*')
+            .order('id');
+        
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+            menuItems = data;
+        } else {
+            menuItems = [
+                { id: 1, name: 'Nshima with Village Chicken', price: 90.00, emoji: '🍗', description: 'Traditional Zambian meal' },
+                { id: 2, name: 'Nshima with Full Fish', price: 120.00, emoji: '🐟', description: 'Well fried whole fish' },
+                { id: 3, name: 'Nshima with Beef Sausage', price: 50.00, emoji: '🌭', description: 'Well cooked beef sausages' },
+                { id: 4, name: 'Nshima with Pork', price: 80.00, emoji: '🥩', description: 'Tender and yummy pork' },
+                { id: 5, name: 'Nshima with Liver', price: 60.00, emoji: '🍗', description: 'Spicy liver with onions' },
+                { id: 6, name: 'Nshima with Boiled Fish', price: 60.00, emoji: '🐟', description: 'Delicious boiled fish' },
+                { id: 7, name: 'Kapenta', price: 50.00, emoji: '🐟', description: 'Dried Kapenta fish' },
+                { id: 8, name: 'Okra Stew', price: 50.00, emoji: '🥬', description: 'Fresh okra vegetable stew' },
+                { id: 9, name: 'Nshima with Trotters', price: 60.00, emoji: '🍗', description: 'Fried chicken trotters' },
+                { id: 10, name: 'Disposable Coke', price: 15.00, emoji: '🥤', description: 'Ice cold Coca-Cola 500ml' },
+                { id: 11, name: 'Disposable Fanta', price: 15.00, emoji: '🥤', description: 'Ice cold Fanta 500ml' },
+                { id: 12, name: 'Bottled Fanta Orange', price: 10.00, emoji: '🥤', description: 'Fanta Orange 300ml' },
+                { id: 13, name: 'Bottled Coke', price: 10.00, emoji: '🥤', description: 'Chilled Coke 300ml' }
+            ];
+        }
+        
+        console.log(`📋 Menu loaded: ${menuItems.length} items`);
+    } catch (error) {
+        console.error('Error loading menu:', error);
+    }
+}
+
+async function loadDeliveryGirls() {
+    try {
+        const { data, error } = await supabase
+            .from('delivery_girls')
+            .select('name')
+            .order('name');
+        
+        if (error) throw error;
+        
+        if (data && data.length > 0) {
+            deliveryGirlsList = data.map(g => g.name);
+        } else {
+            deliveryGirlsList = ['Chaiwa Justine', 'Brenda Mwansa', 'Chola Williams'];
+        }
+        
+        console.log(`👩 Delivery girls loaded: ${deliveryGirlsList.length}`);
+    } catch (error) {
+        console.error('Error loading delivery girls:', error);
+        deliveryGirlsList = ['Chaiwa Justine', 'Brenda Mwansa', 'Chola Williams'];
+    }
+}
+
+async function loadOrders() {
+    try {
+        const { data, error } = await supabase
+            .from('orders')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        allOrders = data || [];
+        console.log(`📦 Orders loaded: ${allOrders.length}`);
+    } catch (error) {
+        console.error('Error loading orders:', error);
+        allOrders = [];
+    }
+}
+
+async function saveOrderToSupabase(orderData) {
+    try {
+        const { data, error } = await supabase
+            .from('orders')
+            .insert([{
+                customer_name: orderData.customer_name,
+                customer_phone: orderData.customer_phone,
+                customer_location: orderData.customer_location,
+                items: orderData.items,
+                total: orderData.total,
+                status: orderData.status || 'pending',
+                delivery_girl: orderData.delivery_girl || '',
+                district: orderData.district || 'Kasama',
+                province: orderData.province || 'Northern Province'
+            }])
+            .select();
+        
+        if (error) throw error;
+        
+        console.log('✅ Order saved to Supabase:', data);
+        return data ? data[0] : null;
+    } catch (error) {
+        console.error('❌ Failed to save order:', error);
+        throw error;
+    }
+}
+
+async function updateOrderStatus(orderId, status, deliveryGirl = null) {
+    try {
+        const updateData = { status };
+        if (deliveryGirl !== null) {
+            updateData.delivery_girl = deliveryGirl;
+        }
+        
+        const { data, error } = await supabase
+            .from('orders')
+            .update(updateData)
+            .eq('id', orderId)
+            .select();
+        
+        if (error) throw error;
+        
+        console.log(`✅ Order ${orderId} updated to ${status}`);
+        return data ? data[0] : null;
+    } catch (error) {
+        console.error('❌ Failed to update order:', error);
+        throw error;
+    }
+}
+
+async function deleteOrder(orderId) {
+    try {
+        const { error } = await supabase
+            .from('orders')
+            .delete()
+            .eq('id', orderId);
+        
+        if (error) throw error;
+        
+        console.log(`✅ Order ${orderId} deleted`);
+        return true;
+    } catch (error) {
+        console.error('❌ Failed to delete order:', error);
+        throw error;
+    }
+}
+
+// ============================================
+// DELIVERY LOGIN FUNCTIONS
+// ============================================
+function openDeliveryLogin() {
+    if (isDeliveryLoggedIn) {
+        deliveryLogout();
+        return;
+    }
+    document.getElementById('deliveryLoginModal').classList.add('show');
+    document.getElementById('deliveryLoginName').value = '';
+    document.getElementById('deliveryLoginError').classList.remove('show');
+    document.getElementById('deliveryLoginName').focus();
+}
+
+function closeDeliveryLogin() {
+    document.getElementById('deliveryLoginModal').classList.remove('show');
+}
+
+function deliveryLogin() {
+    const name = document.getElementById('deliveryLoginName').value.trim();
+    if (!name) {
+        document.getElementById('deliveryLoginError').textContent = '❌ Please enter your name';
+        document.getElementById('deliveryLoginError').classList.add('show');
+        return;
+    }
+    if (!deliveryGirlsList.includes(name)) {
+        document.getElementById('deliveryLoginError').textContent = '❌ Name not found. Contact admin.';
+        document.getElementById('deliveryLoginError').classList.add('show');
+        return;
+    }
+    isDeliveryLoggedIn = true;
+    deliveryGirlName = name;
+    document.getElementById('deliveryLoginModal').classList.remove('show');
+    document.getElementById('deliveryNameDisplay').textContent = '👩 ' + name;
+    document.getElementById('deliveryNameDisplay').classList.add('show');
+    document.getElementById('deliveryBtnText').textContent = 'Logout';
+    document.getElementById('deliveryLoginBtn').classList.add('active');
+    alert('✅ Welcome ' + name + '!');
+    renderApp();
+}
+
+function deliveryLogout() {
+    isDeliveryLoggedIn = false;
+    deliveryGirlName = '';
+    document.getElementById('deliveryNameDisplay').classList.remove('show');
+    document.getElementById('deliveryBtnText').textContent = 'Delivery';
+    document.getElementById('deliveryLoginBtn').classList.remove('active');
+    alert('👋 Logged out from delivery');
+    renderApp();
+}
+
+// ============================================
+// ADMIN LOGIN FUNCTIONS
+// ============================================
+const ADMIN_PASSWORD = 'admin2426';
+
+function openAdminLogin() {
+    if (isAdmin) {
+        adminLogout();
+        return;
+    }
+    document.getElementById('adminLoginModal').classList.add('show');
+    document.getElementById('adminPassword').value = '';
+    document.getElementById('adminLoginError').classList.remove('show');
+    document.getElementById('adminPassword').focus();
+}
+
+function closeAdminLogin() {
+    document.getElementById('adminLoginModal').classList.remove('show');
+}
+
+function adminLogin() {
+    const password = document.getElementById('adminPassword').value;
+    if (password === ADMIN_PASSWORD) {
+        isAdmin = true;
+        document.getElementById('adminLoginModal').classList.remove('show');
+        document.getElementById('adminLoginBtn').classList.add('active');
+        document.getElementById('adminLoginBtn').innerHTML = '<i class="fas fa-sign-out-alt"></i>';
+        alert('✅ Welcome Admin!');
+        renderApp();
+    } else {
+        document.getElementById('adminLoginError').classList.add('show');
+        document.getElementById('adminPassword').value = '';
+        document.getElementById('adminPassword').focus();
+    }
+}
+
+function adminLogout() {
+    isAdmin = false;
+    document.getElementById('adminLoginBtn').classList.remove('active');
+    document.getElementById('adminLoginBtn').innerHTML = '<i class="fas fa-user-shield"></i>';
+    alert('👋 Logged out from admin');
+    renderApp();
+}
+
+// Close modals on outside click
+document.getElementById('deliveryLoginModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeDeliveryLogin();
+});
+document.getElementById('adminLoginModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeAdminLogin();
+});
+
+// ============================================
+// RENDER APP
+// ============================================
+function renderApp() {
+    const container = document.getElementById('app-container');
+    
+    const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
+    const cartCount = cart.reduce((acc, i) => acc + i.qty, 0);
+    
+    // Cart HTML
+    let cartHTML = cart.length === 0 ? 
+        '<div style="color:#7a6e86;padding:4px 0;font-size:12px;"><i class="fas fa-shopping-cart"></i> Cart is empty</div>' :
+        cart.map(item => `
+            <div class="order-row">
+                <span>${item.emoji} ${item.name} × ${item.qty}</span>
+                <span>
+                    ZMW ${(item.price * item.qty).toFixed(2)}
+                    <button onclick="removeFromCart(${item.id})" style="background:none;border:none;color:#cc0000;margin-left:4px;cursor:pointer;font-size:11px;">
+                        <i class="fas fa-minus-circle"></i>
+                    </button>
+                </span>
+            </div>
+        `).join('');
+    
+    // Menu Grid HTML
+    let menuHTML = menuItems.map(item => {
+        const qty = cart.find(i => i.id === item.id)?.qty || 0;
+        const imgTag = `<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/${item.name.toLowerCase().replace(/ /g, '')}.jpg" alt="${item.name}" onerror="this.parentElement.innerHTML='<span class=\\'emoji-placeholder\\'>${item.emoji}</span>'">`;
+        
+        return `
+            <div class="menu-item-card">
+                <div class="image-container">
+                    ${item.image_url ? `<img src="${item.image_url}" alt="${item.name}">` : `<span class="emoji-placeholder">${item.emoji}</span>`}
+                </div>
+                <div class="item-info">
+                    <div class="item-name">${item.emoji} ${item.name}</div>
+                    <div class="item-description">${item.description || ''}</div>
+                    <div class="item-price">ZMW ${item.price.toFixed(2)}</div>
+                    <div style="margin-top:4px;">
+                        ${qty === 0 ? `
+                            <button class="add-btn-grid" onclick="addToCart(${item.id})">
+                                <i class="fas fa-plus"></i> Add
+                            </button>
+                        ` : `
+                            <div class="qty-control">
+                                <button class="qty-btn-minus" onclick="removeFromCart(${item.id})">−</button>
+                                <span class="qty-number">${qty}</span>
+                                <button class="qty-btn-plus" onclick="addToCart(${item.id})">+</button>
+                            </div>
+                        `}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Admin Dashboard
+    let adminHTML = '';
+    if (isAdmin) {
+        const totalOrders = allOrders.length;
+        const pendingOrders = allOrders.filter(o => o.status === 'pending').length;
+        const completedOrders = allOrders.filter(o => o.status === 'delivered').length;
+        const totalRevenue = allOrders.reduce((sum, o) => sum + (o.total || 0), 0);
+        
+        let ordersListHTML = allOrders.map(order => {
+            const statusClass = order.status || 'pending';
+            const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name}`).join(', ') : 'No items';
+            const date = new Date(order.created_at).toLocaleDateString();
+            const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return `
+                <div class="order-card">
+                    <div class="header">
+                        <span class="order-id">#${order.id} - ${order.customer_name}</span>
+                        <span class="order-time">${date} ${time}</span>
+                    </div>
+                    <div class="customer-info"><i class="fas fa-phone"></i> ${order.customer_phone}</div>
+                    <div class="customer-info"><i class="fas fa-map-marker-alt"></i> ${order.customer_location}</div>
+                    <div class="order-items">${itemsText}</div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
+                        <span class="order-total">ZMW ${(order.total || 0).toFixed(2)}</span>
+                        <span class="status-badge ${statusClass}">${statusClass.toUpperCase()}</span>
+                    </div>
+                    ${order.delivery_girl ? `<div style="font-size:9px;color:#666;margin-top:2px;"><i class="fas fa-motorcycle"></i> ${order.delivery_girl}</div>` : ''}
+                    ${order.status === 'pending' ? `
+                        <div style="margin-top:4px;">
+                            <button class="action-btn-small" onclick="assignOrder(${order.id}, '${deliveryGirlsList[0] || 'Chaiwa Justine'}')">Assign to ${deliveryGirlsList[0] || 'Chaiwa Justine'}</button>
+                        </div>
+                    ` : ''}
+                    ${order.status !== 'delivered' && order.status !== 'declined' ? `
+                        <div style="margin-top:4px;">
+                            <button class="action-btn-small" onclick="markDelivered(${order.id})" style="background:#4caf50;">Mark Delivered</button>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }).join('');
+        
+        adminHTML = `
+            <div class="admin-panel show">
+                <div class="section-title"><i class="fas fa-chart-line"></i> Admin Dashboard</div>
+                <div class="stats-grid">
+                    <div class="stat-card"><div class="number">${totalOrders}</div><div class="label">Total Orders</div></div>
+                    <div class="stat-card"><div class="number">${pendingOrders}</div><div class="label">Pending</div></div>
+                    <div class="stat-card"><div class="number">${completedOrders}</div><div class="label">Delivered</div></div>
+                </div>
+                <div style="font-size:11px;font-weight:700;color:#cc0000;text-align:center;margin-bottom:4px;">Total Revenue: ZMW ${totalRevenue.toFixed(2)}</div>
+                
+                <div class="section-title" style="margin-top:6px;"><i class="fas fa-list"></i> All Orders</div>
+                <div style="max-height:300px;overflow-y:auto;">${ordersListHTML}</div>
+                
+                <div class="section-title" style="margin-top:6px;"><i class="fas fa-female"></i> Delivery Girls</div>
+                <div>${deliveryGirlsList.map(g => `<span class="delivery-girl-tag"><i class="fas fa-female"></i> ${g}</span>`).join('')}</div>
+                
+                <div style="margin-top:6px;">
+                    <div style="display:flex;gap:4px;">
+                        <input id="newGirlInput" placeholder="Add delivery girl" style="flex:1;padding:4px 6px;border:1px solid #ffcccc;border-radius:20px;font-size:10px;outline:none;">
+                        <button class="action-btn-small" onclick="addDeliveryGirl()"><i class="fas fa-plus"></i> Add</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Delivery Panel
+    let deliveryHTML = '';
+    if (isDeliveryLoggedIn) {
+        const myOrders = allOrders.filter(o => o.delivery_girl === deliveryGirlName || o.status === 'pending');
+        
+        let ordersListHTML = myOrders.map(order => {
+            const statusClass = order.status || 'pending';
+            const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name}`).join(', ') : 'No items';
+            const date = new Date(order.created_at).toLocaleDateString();
+            const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const isMine = order.delivery_girl === deliveryGirlName;
+            
+            let actionsHTML = '';
+            if (order.status === 'pending') {
+                actionsHTML = `
+                    <div class="action-btns">
+                        <button class="btn-accept" onclick="acceptOrder(${order.id})"><i class="fas fa-check"></i> Accept</button>
+                        <button class="btn-decline" onclick="declineOrder(${order.id})"><i class="fas fa-times"></i> Decline</button>
+                    </div>
+                `;
+            } else if (order.status === 'assigned' && isMine) {
+                actionsHTML = `
+                    <div class="action-btns">
+                        <button class="btn-pickup" onclick="pickupOrder(${order.id})"><i class="fas fa-box"></i> Picked Up</button>
+                    </div>
+                `;
+            } else if (order.status === 'picked_up' && isMine) {
+                actionsHTML = `
+                    <div class="action-btns">
+                        <button class="btn-deliver" onclick="deliverOrder(${order.id})"><i class="fas fa-check-circle"></i> Delivered</button>
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="order-card">
+                    <div class="header">
+                        <span class="order-id">#${order.id} - ${order.customer_name}</span>
+                        <span class="order-time">${date} ${time}</span>
+                    </div>
+                    <div class="customer-info"><i class="fas fa-phone"></i> ${order.customer_phone}</div>
+                    <div class="customer-info"><i class="fas fa-map-marker-alt"></i> ${order.customer_location}</div>
+                    <div class="order-items">${itemsText}</div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
+                        <span class="order-total">ZMW ${(order.total || 0).toFixed(2)}</span>
+                        <span class="status-badge ${statusClass}">${statusClass.toUpperCase()}</span>
+                    </div>
+                    ${actionsHTML}
+                </div>
+            `;
+        }).join('');
+        
+        deliveryHTML = `
+            <div class="delivery-panel show">
+                <div class="section-title"><i class="fas fa-motorcycle"></i> My Deliveries</div>
+                <div style="font-size:10px;color:#666;margin-bottom:4px;">Logged in as: <strong>${deliveryGirlName}</strong></div>
+                ${ordersListHTML || '<div style="color:#7a6e86;padding:10px;text-align:center;font-size:11px;">No orders available</div>'}
+            </div>
+        `;
+    }
+    
+    // Main view
+    container.innerHTML = `
+        <!-- Banner -->
+        <div style="background:linear-gradient(135deg,#cc0000,#990000);color:white;padding:5px 10px;border-radius:10px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
+            <div>
+                <i class="fas fa-map-marker-alt"></i> 
+                <strong>Kasama District</strong>
+                <span style="font-size:8px;opacity:0.8;display:block;">Northern Province, Zambia</span>
+            </div>
+            <div class="real-time-indicator" style="color:white;">
+                <span class="dot"></span> Live
+            </div>
+        </div>
+        
+        ${isDeliveryLoggedIn ? `
+            <div style="background:#e8f5e9;padding:3px 8px;border-radius:10px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;font-size:10px;border:1px solid #a5d6a7;">
+                <span><i class="fas fa-motorcycle" style="color:#cc0000;"></i> <strong>${deliveryGirlName}</strong> is online</span>
+                <span style="color:#2e7d32;font-size:8px;"><i class="fas fa-circle" style="color:#4caf50;"></i> Available</span>
+            </div>
+        ` : ''}
+        
+        ${isAdmin ? adminHTML : ''}
+        
+        ${isDeliveryLoggedIn ? deliveryHTML : ''}
+        
+        ${!isAdmin && !isDeliveryLoggedIn ? `
+            <!-- Menu -->
+            <div class="card">
+                <div class="section-title">
+                    <i class="fas fa-th-large"></i> Today's Menu
+                    <span class="kasama-badge" style="margin-left:auto;">${menuItems.length} items</span>
+                </div>
+                <div class="menu-grid">${menuHTML}</div>
+            </div>
+            
+            <!-- Order Summary -->
+            <div class="order-summary">
+                <div class="section-title">
+                    <i class="fas fa-shopping-bag"></i> Your Order
+                    ${cartCount > 0 ? `<span class="cart-count">${cartCount}</span>` : ''}
+                </div>
+                ${cartHTML}
+                <div class="order-row order-total">
+                    <span>Total</span>
+                    <span>ZMW ${totalPrice.toFixed(2)}</span>
+                </div>
+                
+                <div class="customer-details">
+                    <div style="font-size:10px;font-weight:600;color:#cc0000;margin-bottom:3px;">
+                        <i class="fas fa-user"></i> Delivery Details
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name <span class="required">*</span></label>
+                        <input type="text" id="customerNameInput" placeholder="Enter your full name" value="${customerName}" />
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number <span class="required">*</span></label>
+                        <input type="tel" id="customerPhoneInput" placeholder="Enter phone number" value="${customerPhone}" />
+                    </div>
+                    <div class="form-group">
+                        <label>Delivery Address <span class="required">*</span></label>
+                        <input type="text" id="customerAddressInput" placeholder="Enter your delivery address" value="${customerLocation}" />
+                    </div>
+                </div>
+                
+                <button class="action-btn" onclick="placeOrder()" ${cart.length === 0 ? 'disabled' : ''}>
+                    <i class="fas fa-motorcycle"></i> Place Order · Cash
+                </button>
+                <div id="orderStatus"></div>
+            </div>
+            
+            <!-- Map -->
+            <div class="card">
+                <div class="section-title">
+                    <i class="fas fa-map-marked-alt"></i> Location
+                </div>
+                <div class="map-container">
+                    <div id="map"></div>
+                </div>
+                <div style="font-size:10px;margin-top:2px;">
+                    <i class="fas fa-location-dot" style="color:#cc0000;"></i> 
+                    <strong>Customer:</strong> ${customerLocation}
+                </div>
+                <button class="whatsapp-btn" onclick="shareLocation()">
+                    <i class="fab fa-whatsapp"></i> Share Location
+                </button>
+            </div>
+        ` : ''}
+    `;
+    
+    // Update input listeners
+    document.getElementById('customerNameInput')?.addEventListener('input', function() {
+        customerName = this.value;
+    });
+    document.getElementById('customerPhoneInput')?.addEventListener('input', function() {
+        customerPhone = this.value;
+    });
+    document.getElementById('customerAddressInput')?.addEventListener('input', function() {
+        customerLocation = this.value || 'Kasama, Northern Province, Zambia';
+        initMap(customerLocation);
+    });
+    
+    // Initialize map
+    setTimeout(() => initMap(customerLocation), 300);
+}
+
+// ============================================
+// MAP FUNCTIONS
+// ============================================
+let map = null;
+let mapMarker = null;
+
+function initMap(location) {
+    try {
+        const mapContainer = document.getElementById('map');
+        if (!mapContainer) return;
+        
+        let lat = -10.2129;
+        let lng = 31.1809;
+        
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`)
+            .then(r => r.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    lat = parseFloat(data[0].lat);
+                    lng = parseFloat(data[0].lon);
+                }
+                createMap(lat, lng, location);
+            })
+            .catch(() => createMap(lat, lng, location));
+    } catch (e) {
+        console.error('Map error:', e);
+    }
+}
+
+function createMap(lat, lng, location) {
+    if (map) {
+        map.remove();
+    }
+    
+    map = L.map('map').setView([lat, lng], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+    
+    const markerIcon = L.divIcon({
+        html: '<i class="fas fa-map-marker-alt" style="color:#cc0000;font-size:24px;"></i>',
+        className: 'custom-marker',
+        iconSize: [24, 24],
+        iconAnchor: [12, 24]
+    });
+    
+    mapMarker = L.marker([lat, lng], { icon: markerIcon }).addTo(map);
+    mapMarker.bindPopup(`<strong>📍 ${location}</strong>`).openPopup();
+}
+
+// ============================================
+// CUSTOMER FUNCTIONS
+// ============================================
+function addToCart(id) {
+    const item = menuItems.find(i => i.id === id);
+    if (!item) return;
+    const existing = cart.find(i => i.id === id);
+    if (existing) {
+        cart = cart.map(i => i.id === id ? { ...i, qty: i.qty + 1 } : i);
+    } else {
+        cart.push({ ...item, qty: 1 });
+    }
+    renderApp();
+}
+
+function removeFromCart(id) {
+    const existing = cart.find(i => i.id === id);
+    if (existing && existing.qty > 1) {
+        cart = cart.map(i => i.id === id ? { ...i, qty: i.qty - 1 } : i);
+    } else {
+        cart = cart.filter(i => i.id !== id);
+    }
+    renderApp();
+}
+
+async function placeOrder() {
+    if (cart.length === 0) {
+        alert('Please add items to your order');
+        return;
+    }
+    
+    const nameInput = document.getElementById('customerNameInput');
+    const phoneInput = document.getElementById('customerPhoneInput');
+    const addressInput = document.getElementById('customerAddressInput');
+    
+    const name = nameInput ? nameInput.value.trim() : '';
+    const phone = phoneInput ? phoneInput.value.trim() : '';
+    const address = addressInput ? addressInput.value.trim() : 'Kasama, Northern Province, Zambia';
+    
+    if (!name) { alert('⚠️ Please enter your full name'); nameInput?.focus(); return; }
+    if (!phone) { alert('⚠️ Please enter your phone number'); phoneInput?.focus(); return; }
+    if (!address) { alert('⚠️ Please enter your delivery address'); addressInput?.focus(); return; }
+    
+    const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
+    
+    // Prepare order data
+    const orderData = {
+        customer_name: name,
+        customer_phone: phone,
+        customer_location: address,
+        items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
+        total: totalPrice,
+        status: 'pending',
+        delivery_girl: '',
+        district: 'Kasama',
+        province: 'Northern Province'
+    };
+    
+    try {
+        // Save to Supabase
+        const savedOrder = await saveOrderToSupabase(orderData);
+        
+        if (savedOrder) {
+            // Add to local orders
+            allOrders.unshift(savedOrder);
+            
+            // Send email notification
+            const orderDetails = {
+                name: name,
+                phone: phone,
+                address: address,
+                total: totalPrice,
+                items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
+                deliveryGirl: isDeliveryLoggedIn ? deliveryGirlName : 'Not assigned yet'
+            };
+            
+            sendOrderEmail(orderDetails)
+                .then(result => {
+                    if (result.success) {
+                        document.getElementById('emailStatus').innerHTML = '📧 Email notification sent!';
+                    }
+                })
+                .catch(error => {
+                    console.warn('⚠️ Email not sent:', error);
+                });
+            
+            // Order confirmation
+            document.getElementById('orderStatus').innerHTML = `
+                <div class="order-placed-banner">
+                    <i class="fas fa-check-circle"></i> ✅ Order confirmed, ${name}! 
+                    <br>🛵 A delivery girl will arrive soon.
+                    <br>📱 We'll call you at ${phone}
+                    <br><span id="emailStatus" style="font-size:9px;color:#ffcc00;">📧 Sending email notification...</span>
+                </div>
+            `;
+            
+            cart = [];
+            customerName = name;
+            customerPhone = phone;
+            customerLocation = address;
+            
+            setTimeout(() => {
+                document.getElementById('orderStatus').innerHTML = '';
+                renderApp();
+            }, 10000);
+            
+            alert(`✅ Order placed successfully, ${name}!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}\n📦 Order #${savedOrder.id} saved to database!`);
+        }
+    } catch (error) {
+        alert('❌ Failed to place order: ' + error.message);
+        console.error('Order error:', error);
+    }
+}
+
+function shareLocation() {
+    const message = `📍 I'm ordering from Chikorlando Restaurant in Kasama!\n📍 Location: ${customerLocation}\n👤 Name: ${customerName}\n📱 Phone: ${customerPhone}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+}
+
+// ============================================
+// ADMIN FUNCTIONS
+// ============================================
+async function addDeliveryGirl() {
+    const input = document.getElementById('newGirlInput');
+    const name = input.value.trim();
+    if (!name) { alert('Please enter a name'); return; }
+    
+    try {
+        const { data, error } = await supabase
+            .from('delivery_girls')
+            .insert([{ name: name }])
+            .select();
+        
+        if (error) throw error;
+        
+        deliveryGirlsList.push(name);
+        input.value = '';
+        renderApp();
+        alert('✅ ' + name + ' added as delivery girl!');
+    } catch (error) {
+        alert('❌ Failed to add delivery girl: ' + error.message);
+    }
+}
+
+async function assignOrder(orderId, girlName) {
+    try {
+        const updatedOrder = await updateOrderStatus(orderId, 'assigned', girlName);
+        if (updatedOrder) {
+            const index = allOrders.findIndex(o => o.id === orderId);
+            if (index !== -1) {
+                allOrders[index] = updatedOrder;
+            }
+            renderApp();
+            alert('✅ Order #' + orderId + ' assigned to ' + girlName);
+        }
+    } catch (error) {
+        alert('❌ Failed to assign order: ' + error.message);
+    }
+}
+
+async function markDelivered(orderId) {
+    try {
+        const updatedOrder = await updateOrderStatus(orderId, 'delivered');
+        if (updatedOrder) {
+            const index = allOrders.findIndex(o => o.id === orderId);
+            if (index !== -1) {
+                allOrders[index] = updatedOrder;
+            }
+            renderApp();
+            alert('✅ Order #' + orderId + ' marked as delivered!');
+        }
+    } catch (error) {
+        alert('❌ Failed to update order: ' + error.message);
+    }
+}
+
+// ============================================
+// DELIVERY GIRL FUNCTIONS - WITH WORKING DECLINE
+// ============================================
+async function acceptOrder(orderId) {
+    try {
+        const updatedOrder = await updateOrderStatus(orderId, 'assigned', deliveryGirlName);
+        if (updatedOrder) {
+            const index = allOrders.findIndex(o => o.id === orderId);
+            if (index !== -1) {
+                allOrders[index] = updatedOrder;
+            }
+            renderApp();
+            alert('✅ Order #' + orderId + ' accepted by ' + deliveryGirlName + '!');
+        }
+    } catch (error) {
+        alert('❌ Failed to accept order: ' + error.message);
+    }
+}
+
+async function declineOrder(orderId) {
+    // Show confirmation before deleting
+    if (!confirm('⚠️ Are you sure you want to DECLINE and permanently DELETE this order?')) {
+        return;
+    }
+    
+    try {
+        // Delete from Supabase
+        const deleted = await deleteOrder(orderId);
+        
+        if (deleted) {
+            // Remove from local list
+            allOrders = allOrders.filter(o => o.id !== orderId);
+            renderApp();
+            alert('❌ Order #' + orderId + ' has been declined and permanently deleted!');
+        }
+    } catch (error) {
+        alert('❌ Failed to decline order: ' + error.message);
+        console.error('Decline error:', error);
+    }
+}
+
+async function pickupOrder(orderId) {
+    try {
+        const updatedOrder = await updateOrderStatus(orderId, 'picked_up');
+        if (updatedOrder) {
+            const index = allOrders.findIndex(o => o.id === orderId);
+            if (index !== -1) {
+                allOrders[index] = updatedOrder;
+            }
+            renderApp();
+            alert('🛵 Order #' + orderId + ' picked up!');
+        }
+    } catch (error) {
+        alert('❌ Failed to update order: ' + error.message);
+    }
+}
+
+async function deliverOrder(orderId) {
+    try {
+        const updatedOrder = await updateOrderStatus(orderId, 'delivered');
+        if (updatedOrder) {
+            const index = allOrders.findIndex(o => o.id === orderId);
+            if (index !== -1) {
+                allOrders[index] = updatedOrder;
+            }
+            renderApp();
+            alert('✅ Order #' + orderId + ' delivered! Thank you!');
+        }
+    } catch (error) {
+        alert('❌ Failed to update order: ' + error.message);
+    }
+}
+
+// ============================================
+// START THE APP
+// ============================================
+async function startApp() {
+    const loadingDiv = document.getElementById('loadingDiv');
+    if (loadingDiv) loadingDiv.style.display = 'block';
+    
+    // Initialize Supabase
+    const connected = await initSupabase();
+    
+    if (loadingDiv) loadingDiv.style.display = 'none';
+    
+    if (connected) {
+        console.log('✅ App connected to Supabase');
+        console.log('📦 Orders in database:', allOrders.length);
+    } else {
+        console.log('⚠️ App running in offline mode');
+    }
+    
+    renderApp();
+}
+
+// Start the app
+startApp();
+console.log('✅ Chikorlando Restaurant App Loaded!');
+console.log('📍 Serving Kasama District, Zambia');
+</script>
+</body>
+</html>email.min.js"></script>
     <style>  
         * {
             margin: 0;
