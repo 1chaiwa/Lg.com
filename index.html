@@ -1525,7 +1525,7 @@ function addDeliveryGirl() {
 }
 
 function assignOrder(orderId, girlName) {
-    const order = allOrders.find(o => o.id === orderId);
+    const order = allOrders.find(o => o.id === orderId); 
     if (order) {
         order.status = 'assigned';
         order.delivery_girl = girlName;
