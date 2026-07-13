@@ -2,13 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" /> 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Chikorlando Restaurant & Food Delivery</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- EmailJS Library -->
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script> 
     <style>  
         * {
             margin: 0;
@@ -56,10 +54,6 @@
             border-radius: 50%;
             object-fit: cover;
             border: 2px solid #ffcc00;
-        }
-        .app-header .brand i {
-            font-size: 24px;
-            color: #ffcc00;
         }
         .app-header .brand-info {
             display: flex;
@@ -112,14 +106,6 @@
         .header-btn.active {
             background: #ffcc00;
             color: #990000;
-        }
-        .header-btn .badge-dot {
-            width: 5px;
-            height: 5px;
-            background: #ff4444;
-            border-radius: 50%;
-            display: inline-block;
-            animation: pulse 1s infinite;
         }
         .delivery-name {
             font-size: 8px;
@@ -671,6 +657,33 @@
             font-size: 7px;
             color: #6d6a7a;
         }
+        /* WhatsApp notification badge */
+        .whatsapp-notification {
+            background: #25D366;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 9px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        .whatsapp-notification i {
+            font-size: 12px;
+        }
+        .order-status-wa {
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            color: #2e7d32;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
     </style>
 </head>
 <body>
@@ -683,9 +696,9 @@
                 <span class="subtitle">Restaurant & Food Delivery</span>
                 <div class="contact-info">
                     <i class="fas fa-phone"></i> 
-                    <span>0971157284</span>
-                    <i class="fas fa-email" style="margin-left:4px;"></i>
-                    <span>evanschilando0@gmail.com</span>
+                    <span>0977 123 456</span>
+                    <i class="fas fa-whatsapp" style="margin-left:4px;"></i>
+                    <span>0977 654 321</span>
                 </div>
             </div>
         </div>
@@ -736,7 +749,23 @@
 
 <script>
 // ============================================
-// MENU DATA - WITH FULL IMAGES
+// SUPABASE CONFIGURATION
+// ============================================
+const SUPABASE_URL = 'https://ndwoqlxtaczwxsescemu.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kd29xbHh0YWN6d3hzZXNjZW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5Mjk2MTQsImV4cCI6MjA5ODUwNTYxNH0.43PgLQSdEESXboLGrdtZCHq-f8TwzItXaGuxmI4NEe8';
+
+// ============================================
+// WHATSAPP CONFIGURATION
+// ============================================
+const WHATSAPP_CONFIG = {
+    // Admin WhatsApp number (with country code, no +)
+    adminNumber: '260977123456',  // Replace with actual admin number
+    // Restaurant name for messages
+    restaurantName: 'Chikorlando Restaurant'
+};
+
+// ============================================
+// MENU DATA
 // ============================================
 const MENU = [
     { 
@@ -857,64 +886,6 @@ const DELIVERY_GIRLS = ['Chaiwa Justine', 'Brenda Mwansa', 'Chola Williams'];
 const ADMIN_PASSWORD = 'admin2426';
 
 // ============================================
-// 🔑 EMAILJS CONFIGURATION - YOUR CREDENTIALS
-// ============================================
-const EMAIL_CONFIG = {
-    serviceId: 'service_9t0yto7',           // ✅ Your Service ID
-    templateId: 'template_p84bmo8',         // ⚠️ Replace with your Template ID from EmailJS
-    userId: 'gMPYzHMPUGXi1g9TU',              // ✅ Your User ID (Public Key)
-    adminEmail: 'evanschilando0@gmail.com'      // ✅ Your admin email
-};
-
-// Initialize EmailJS
-(function initEmailJS() {
-    try {
-        emailjs.init(EMAIL_CONFIG.userId);
-        console.log('✅ EmailJS initialized with User ID:', EMAIL_CONFIG.userId);
-    } catch (error) {
-        console.warn('⚠️ EmailJS not configured:', error);
-    }
-})();
-
-// ============================================
-// 📧 EMAIL NOTIFICATION FUNCTION
-// ============================================
-function sendOrderEmail(orderDetails) {
-    if (!EMAIL_CONFIG.serviceId || EMAIL_CONFIG.serviceId === 'service_9t0yto7') {
-        console.warn('⚠️ EmailJS not configured.');
-        return Promise.reject('EmailJS not configured');
-    }
-
-    const templateParams = {
-        to_email: EMAIL_CONFIG.adminEmail,
-        to_name: 'Chikorlando Admin',
-        customer_name: orderDetails.name,
-        customer_phone: orderDetails.phone,
-        customer_address: orderDetails.address,
-        order_total: orderDetails.total.toFixed(2),
-        order_items: orderDetails.items.map(i => `${i.qty}x ${i.name} - ZMW ${(i.price * i.qty).toFixed(2)}`).join('\n'),
-        order_time: new Date().toLocaleString(),
-        order_status: 'Pending',
-        delivery_girl: orderDetails.deliveryGirl || 'Not assigned yet',
-        restaurant_name: 'Chikorlando Restaurant',
-        restaurant_phone: '+260971157284',
-        restaurant_address: 'Kasama District, Northern Province, Zambia'
-    };
-
-    console.log('📧 Sending email with params:', templateParams);
-
-    return emailjs.send(EMAIL_CONFIG.serviceId, EMAIL_CONFIG.templateId, templateParams)
-        .then(function(response) {
-            console.log('✅ Email sent successfully!', response);
-            return { success: true, message: 'Email sent' };
-        })
-        .catch(function(error) {
-            console.error('❌ Email failed:', error);
-            return { success: false, error: error.text };
-        });
-}
-
-// ============================================
 // STATE
 // ============================================
 let cart = [];
@@ -923,37 +894,122 @@ let isDeliveryLoggedIn = false;
 let deliveryGirlName = '';
 let customerName = '';
 let customerPhone = '';
-let customerLocation = '';
+let customerLocation = 'Kasama, Northern Province, Zambia';
 let allOrders = [];
 let orderIdCounter = 1;
+let supabaseClient = null;
 
-// Sample orders for demo
-//const sampleOrders = [
-   //* {
-    //    id: 1,
-    //    customer_name: 'John Banda',
-     //   customer_phone: '0977123456',
-     //   customer_location: 'Lubwa, Kasama',
-     //   items: [{ name: 'Nshima with Village Chicken', qty: 2, price: 90.00 }, { name: 'Coca-Cola', qty: 1, price: 15.00 }],
-     //   total: 195.00,
-    //    status: 'pending',
-     //   delivery_girl: '',
-      //  created_at: new Date(Date.now() - 3600000).toISOString()
-  //  },
- //   {
-       // id: 2,
-      //  customer_name: 'Mary Mwansa',
-      //  customer_phone: '0966234567',
-       // customer_location: 'Chambeshi, Kasama',
-      //  items: [{ name: 'Nshima with Beef Sausage', qty: 2, price: 50.00 }, { name: 'Fanta Orange', qty: 1, price: 10.00 }],
-      //  total: 110.00,
-      //  status: 'assigned',
-      //  delivery_girl: 'Chaiwa Justine',
-      //  created_at: new Date(Date.now() - 7200000).toISOString()
-   // }
-//];
+// ============================================
+// SUPABASE FUNCTIONS
+// ============================================
+async function initSupabase() {
+    try {
+        // Load Supabase library dynamically
+        if (typeof window.supabase === 'undefined') {
+            await new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+                script.onload = resolve;
+                script.onerror = reject;
+                document.head.appendChild(script);
+            });
+        }
+        
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        console.log('✅ Supabase initialized');
+        
+        // Load existing orders
+        await loadOrders();
+        return true;
+    } catch (error) {
+        console.error('❌ Supabase initialization failed:', error);
+        return false;
+    }
+}
 
-//allOrders = [...sampleOrders];
+async function saveOrderToSupabase(orderData) {
+    try {
+        console.log('📤 Saving order to Supabase:', orderData);
+        
+        const { data, error } = await supabaseClient
+            .from('orders')
+            .insert([{
+                customer_name: orderData.customer_name,
+                customer_phone: orderData.customer_phone,
+                customer_location: orderData.customer_location,
+                items: orderData.items,
+                total: orderData.total,
+                status: orderData.status || 'pending',
+                delivery_girl: orderData.delivery_girl || '',
+                district: orderData.district || 'Kasama',
+                province: orderData.province || 'Northern Province'
+            }])
+            .select();
+        
+        if (error) {
+            console.error('❌ Supabase insert error:', error);
+            throw error;
+        }
+        
+        console.log('✅ Order saved to Supabase:', data);
+        return data ? data[0] : null;
+    } catch (error) {
+        console.error('❌ Failed to save order:', error);
+        throw error;
+    }
+}
+
+async function loadOrders() {
+    try {
+        const { data, error } = await supabaseClient
+            .from('orders')
+            .select('*')
+            .order('created_at', { ascending: false });
+        
+        if (error) throw error;
+        
+        allOrders = data || [];
+        console.log(`📦 Orders loaded: ${allOrders.length}`);
+        return allOrders;
+    } catch (error) {
+        console.error('Error loading orders:', error);
+        allOrders = [];
+        return [];
+    }
+}
+
+// ============================================
+// WHATSAPP NOTIFICATION FUNCTION
+// ============================================
+function sendWhatsAppNotification(orderDetails) {
+    // Build the WhatsApp message
+    const message = `🆕 *NEW ORDER!* 🛵
+
+👤 *Customer:* ${orderDetails.name}
+📱 *Phone:* ${orderDetails.phone}
+📍 *Address:* ${orderDetails.address}
+💰 *Total:* ZMW ${orderDetails.total.toFixed(2)}
+
+🛒 *Items:*
+${orderDetails.items.map(item => `  • ${item.qty}x ${item.name} - ZMW ${(item.price * item.qty).toFixed(2)}`).join('\n')}
+
+⏰ *Order Time:* ${new Date().toLocaleString()}
+📍 *Location:* Kasama, Zambia
+
+📋 *Please prepare this order ASAP!* 🙏`;
+
+    // Encode the message for WhatsApp URL
+    const encodedMessage = encodeURIComponent(message);
+    
+    // Create WhatsApp URL
+    const whatsappUrl = `https://wa.me/${WHATSAPP_CONFIG.adminNumber}?text=${encodedMessage}`;
+    
+    // Open WhatsApp in new window
+    window.open(whatsappUrl, '_blank');
+    
+    console.log('📱 WhatsApp notification sent to:', WHATSAPP_CONFIG.adminNumber);
+    return true;
+}
 
 // ============================================
 // DELIVERY LOGIN FUNCTIONS
@@ -1080,7 +1136,7 @@ function renderApp() {
             </div>
         `).join('');
     
-    // Menu Grid HTML - Full size images
+    // Menu Grid HTML
     let menuHTML = MENU.map(item => {
         const qty = cart.find(i => i.id === item.id)?.qty || 0;
         return `
@@ -1118,7 +1174,7 @@ function renderApp() {
         
         let ordersListHTML = allOrders.map(order => {
             const statusClass = order.status || 'pending';
-            const itemsText = order.items.map(i => `${i.qty}x ${i.name}`).join(', ');
+            const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name}`).join(', ') : 'No items';
             const date = new Date(order.created_at).toLocaleDateString();
             const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             return `
@@ -1155,7 +1211,7 @@ function renderApp() {
                 <div class="stats-grid">
                     <div class="stat-card"><div class="number">${totalOrders}</div><div class="label">Total Orders</div></div>
                     <div class="stat-card"><div class="number">${pendingOrders}</div><div class="label">Pending</div></div>
-                    <div class="stat-card"><div class="number">${completedOrders}</div><div class="label">Completed</div></div>
+                    <div class="stat-card"><div class="number">${completedOrders}</div><div class="label">Delivered</div></div>
                 </div>
                 <div style="font-size:11px;font-weight:700;color:#cc0000;text-align:center;margin-bottom:4px;">Total Revenue: ZMW ${totalRevenue.toFixed(2)}</div>
                 
@@ -1182,7 +1238,7 @@ function renderApp() {
         
         let ordersListHTML = myOrders.map(order => {
             const statusClass = order.status || 'pending';
-            const itemsText = order.items.map(i => `${i.qty}x ${i.name}`).join(', ');
+            const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name}`).join(', ') : 'No items';
             const date = new Date(order.created_at).toLocaleDateString();
             const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const isMine = order.delivery_girl === deliveryGirlName;
@@ -1417,7 +1473,7 @@ function removeFromCart(id) {
     renderApp();
 }
 
-function placeOrder() {
+async function placeOrder() {
     if (cart.length === 0) {
         alert('Please add items to your order');
         return;
@@ -1437,72 +1493,72 @@ function placeOrder() {
     
     const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
     
-    // Create order
-    const newOrder = {
-        id: orderIdCounter++,
+    // Prepare order data
+    const orderData = {
         customer_name: name,
         customer_phone: phone,
         customer_location: address,
         items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
         total: totalPrice,
         status: 'pending',
-        delivery_girl: '',
-        created_at: new Date().toISOString()
-    };
-    allOrders.push(newOrder);
-    
-    // ============================================
-    // 📧 SEND EMAIL NOTIFICATION
-    // ============================================
-    const orderDetails = {
-        name: name,
-        phone: phone,
-        address: address,
-        total: totalPrice,
-        items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
-        deliveryGirl: isDeliveryLoggedIn ? deliveryGirlName : 'Not assigned yet'
+        delivery_girl: isDeliveryLoggedIn ? deliveryGirlName : '',
+        district: 'Kasama',
+        province: 'Northern Province'
     };
     
-    // Send email notification (async, don't wait for it)
-    sendOrderEmail(orderDetails)
-        .then(result => {
-            if (result.success) {
-                console.log('📧 Email sent successfully!');
-                document.getElementById('emailStatus').innerHTML = '✅ Email notification sent!';
-                document.getElementById('emailStatus').style.color = '#4caf50';
-            } else {
-                console.warn('⚠️ Email not sent:', result.error);
-                document.getElementById('emailStatus').innerHTML = '⚠️ Email notification failed';
-                document.getElementById('emailStatus').style.color = '#ff9800';
-            }
-        })
-        .catch(error => {
-            console.warn('⚠️ Email not sent:', error);
-            document.getElementById('emailStatus').innerHTML = '⚠️ Email not configured';
-            document.getElementById('emailStatus').style.color = '#ff9800';
-        });
-    
-    // Order confirmation
-    document.getElementById('orderStatus').innerHTML = `
-        <div class="order-placed-banner">
-            <i class="fas fa-check-circle"></i> ✅ Order confirmed, ${name}! 
-            <br>🛵 A delivery girl will arrive soon.
-            <br>📱 We'll call you at ${phone}
-            <br><span id="emailStatus" style="font-size:9px;color:#ffcc00;">📧 Sending email notification...</span>
-        </div>
-    `;
-    
-    cart = [];
-    customerName = name;
-    customerPhone = phone;
-    customerLocation = address;
-    
-    setTimeout(() => {
-        document.getElementById('orderStatus').innerHTML = '';
-        renderApp();
-    }, 10000);
-    
-    alert(`✅ Order placed successfully, ${name}!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}\n📧 Email notification sent to admin!`);
+    try {
+        // 1. Save to Supabase
+        const savedOrder = await saveOrderToSupabase(orderData);
+        
+        if (savedOrder) {
+            // Add to local orders
+            allOrders.unshift(savedOrder);
+            
+            // 2. Send WhatsApp notification
+            const orderDetails = {
+                name: name,
+                phone: phone,
+                address: address,
+                total: totalPrice,
+                items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
+                deliveryGirl: isDeliveryLoggedIn ? deliveryGirlName : 'Not assigned yet'
+            };
+            
+            // Send WhatsApp notification (opens WhatsApp)
+            sendWhatsAppNotification(orderDetails);
+            
+            // 3. Show success with WhatsApp status
+            document.getElementById('orderStatus').innerHTML = `
+                <div class="order-placed-banner">
+                    <i class="fas fa-check-circle"></i> ✅ Order confirmed, ${name}! 
+                    <br>🛵 A delivery girl will arrive soon.
+                    <br>📱 We'll call you at ${phone}
+                    <br><span class="whatsapp-notification">
+                        <i class="fab fa-whatsapp"></i> WhatsApp notification sent to admin!
+                    </span>
+                    <div class="order-status-wa">
+                        <i class="fab fa-whatsapp" style="color:#25D366;"></i>
+                        Order #${savedOrder.id} - Check WhatsApp for details
+                    </div>
+                </div>
+            `;
+            
+            cart = [];
+            customerName = name;
+            customerPhone = phone;
+            customerLocation = address;
+            
+            setTimeout(() => {
+                document.getElementById('orderStatus').innerHTML = '';
+                renderApp();
+            }, 12000);
+            
+            alert(`✅ Order placed successfully, ${name}!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}\n📦 Order #${savedOrder.id} saved to database!\n📱 WhatsApp notification sent to admin!`);
+        }
+    } catch (error) {
+        alert('❌ Failed to place order: ' + error.message);
+        console.error('Order error:', error);
+    }
 }
 
 function shareLocation() {
@@ -1514,7 +1570,7 @@ function shareLocation() {
 // ============================================
 // ADMIN FUNCTIONS
 // ============================================
-function addDeliveryGirl() {
+async function addDeliveryGirl() {
     const input = document.getElementById('newGirlInput');
     const name = input.value.trim();
     if (!name) { alert('Please enter a name'); return; }
@@ -1524,20 +1580,43 @@ function addDeliveryGirl() {
     alert('✅ ' + name + ' added as delivery girl!');
 }
 
-function assignOrder(orderId, girlName) {
-    const order = allOrders.find(o => o.id === orderId); 
+async function assignOrder(orderId, girlName) {
+    const order = allOrders.find(o => o.id === orderId);
     if (order) {
         order.status = 'assigned';
         order.delivery_girl = girlName;
+        
+        // Update in Supabase
+        try {
+            await supabaseClient
+                .from('orders')
+                .update({ status: 'assigned', delivery_girl: girlName })
+                .eq('id', orderId);
+            console.log('✅ Order updated in Supabase');
+        } catch (error) {
+            console.error('Error updating order:', error);
+        }
+        
         renderApp();
         alert('✅ Order #' + orderId + ' assigned to ' + girlName);
     }
 }
 
-function completeOrder(orderId) {
+async function completeOrder(orderId) {
     const order = allOrders.find(o => o.id === orderId);
     if (order) {
         order.status = 'completed';
+        
+        try {
+            await supabaseClient
+                .from('orders')
+                .update({ status: 'completed' })
+                .eq('id', orderId);
+            console.log('✅ Order completed in Supabase');
+        } catch (error) {
+            console.error('Error completing order:', error);
+        }
+        
         renderApp();
         alert('✅ Order #' + orderId + ' marked as completed!');
     }
@@ -1546,40 +1625,84 @@ function completeOrder(orderId) {
 // ============================================
 // DELIVERY GIRL FUNCTIONS
 // ============================================
-function acceptOrder(orderId) {
+async function acceptOrder(orderId) {
     const order = allOrders.find(o => o.id === orderId);
     if (order) {
         order.status = 'assigned';
         order.delivery_girl = deliveryGirlName;
+        
+        try {
+            await supabaseClient
+                .from('orders')
+                .update({ status: 'assigned', delivery_girl: deliveryGirlName })
+                .eq('id', orderId);
+            console.log('✅ Order accepted in Supabase');
+        } catch (error) {
+            console.error('Error accepting order:', error);
+        }
+        
         renderApp();
         alert('✅ Order #' + orderId + ' accepted!');
     }
 }
 
-function declineOrder(orderId) {
+async function declineOrder(orderId) {
     if (!confirm('Are you sure you want to decline this order?')) return;
     const order = allOrders.find(o => o.id === orderId);
     if (order) {
         order.status = 'pending';
         order.delivery_girl = '';
+        
+        try {
+            await supabaseClient
+                .from('orders')
+                .update({ status: 'pending', delivery_girl: '' })
+                .eq('id', orderId);
+            console.log('✅ Order declined in Supabase');
+        } catch (error) {
+            console.error('Error declining order:', error);
+        }
+        
         renderApp();
         alert('❌ Order #' + orderId + ' declined');
     }
 }
 
-function pickupOrder(orderId) {
+async function pickupOrder(orderId) {
     const order = allOrders.find(o => o.id === orderId);
     if (order) {
         order.status = 'picked_up';
+        
+        try {
+            await supabaseClient
+                .from('orders')
+                .update({ status: 'picked_up' })
+                .eq('id', orderId);
+            console.log('✅ Order picked up in Supabase');
+        } catch (error) {
+            console.error('Error updating order:', error);
+        }
+        
         renderApp();
         alert('🛵 Order #' + orderId + ' picked up!');
     }
 }
 
-function deliverOrder(orderId) {
+async function deliverOrder(orderId) {
     const order = allOrders.find(o => o.id === orderId);
     if (order) {
         order.status = 'delivered';
+        
+        try {
+            await supabaseClient
+                .from('orders')
+                .update({ status: 'delivered' })
+                .eq('id', orderId);
+            console.log('✅ Order delivered in Supabase');
+        } catch (error) {
+            console.error('Error delivering order:', error);
+        }
+        
         renderApp();
         alert('✅ Order #' + orderId + ' delivered! Thank you!');
     }
@@ -1588,15 +1711,21 @@ function deliverOrder(orderId) {
 // ============================================
 // START THE APP
 // ============================================
-renderApp();
-console.log('✅ Chikorlando Restaurant App Loaded!');
-console.log(`📋 ${MENU.length} menu items loaded`);
-console.log('📍 Serving Kasama District, Zambia');
-console.log('👩 Delivery Girls:', DELIVERY_GIRLS.join(', '));
-console.log('📧 Email notifications: ' + (EMAIL_CONFIG.serviceId !== 'service_xxxxxxxx' ? '✅ Configured' : '⚠️ Not configured'));
-console.log('📧 Service ID:', EMAIL_CONFIG.serviceId);
-console.log('📧 User ID:', EMAIL_CONFIG.userId);
-console.log('📧 Admin Email:', EMAIL_CONFIG.adminEmail);
+async function startApp() {
+    // Initialize Supabase
+    await initSupabase();
+    renderApp();
+    
+    console.log('✅ Chikorlando Restaurant App Loaded!');
+    console.log(`📋 ${MENU.length} menu items loaded`);
+    console.log('📍 Serving Kasama District, Zambia');
+    console.log('👩 Delivery Girls:', DELIVERY_GIRLS.join(', '));
+    console.log('📱 WhatsApp notifications enabled for:', WHATSAPP_CONFIG.adminNumber);
+    console.log('📦 Orders will be saved to Supabase');
+}
+
+// Start the app
+startApp();
 </script>
 </body>
 </html>
