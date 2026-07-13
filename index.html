@@ -605,8 +605,6 @@
         .status-badge.picked_up { background: #fff9c4; color: #f57f17; }
         .status-badge.completed { background: #c8e6c9; color: #2e7d32; }
         .status-badge.archived { background: #e0e0e0; color: #666; }
-        .status-badge.payment_pending { background: #fff3e0; color: #e65100; }
-        .status-badge.payment_confirmed { background: #c8e6c9; color: #2e7d32; }
 
         .tab-bar {
             display: flex;
@@ -696,52 +694,6 @@
             color: #2e7d32;
             margin-bottom: 8px;
             font-size: 13px;
-        }
-        .payment-option {
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: 0.2s;
-            display: flex;
-            align-items: center;
-        }
-        .payment-option:hover {
-            border-color: #cc0000;
-        }
-        .payment-option.selected {
-            border-color: #cc0000;
-            background: #fff5f5;
-        }
-        .payment-option .icon {
-            font-size: 22px;
-            margin-right: 10px;
-        }
-        .payment-option .title {
-            font-weight: 600;
-            font-size: 13px;
-        }
-        .payment-option .sub {
-            font-size: 10px;
-            color: #666;
-        }
-        .payment-option .badge {
-            margin-left: auto;
-            color: #4caf50;
-            font-weight: 700;
-            font-size: 11px;
-        }
-        .payment-details {
-            display: none;
-            margin-top: 10px;
-            padding: 12px;
-            background: white;
-            border-radius: 10px;
-            border: 1px solid #ddd;
-        }
-        .payment-details.active {
-            display: block;
         }
         .payment-details .phone-numbers {
             background: #f9f9f9;
@@ -1025,8 +977,6 @@ let allOrders = [];
 let orderIdCounter = 1;
 let supabaseClient = null;
 let adminTab = 'active';
-let selectedPayment = null;
-let customerBalance = 0;
 
 // ============================================
 // SUPABASE FUNCTIONS
@@ -1076,7 +1026,7 @@ async function saveOrderToSupabase(orderData) {
         
         if (error) {
             console.error('❌ Supabase insert error:', error);
-            throw error; 
+            throw error;
         }
         
         console.log('✅ Order saved to Supabase:', data);
@@ -1138,29 +1088,6 @@ ${orderDetails.items.map(item => `  • ${item.qty}x ${item.name} - ZMW ${(item.
     window.open(whatsappUrl, '_blank');
     console.log('📱 WhatsApp notification sent to:', WHATSAPP_CONFIG.adminNumber);
     return true;
-}
-
-// ============================================
-// PAYMENT FUNCTIONS
-// ============================================
-function selectPayment(method) {
-    selectedPayment = method;
-    
-    document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('selected'));
-    const opt = document.getElementById('opt_' + method);
-    if (opt) opt.classList.add('selected');
-    
-    document.querySelectorAll('.payment-details').forEach(el => el.classList.remove('active'));
-    const details = document.getElementById('details_' + method);
-    if (details) details.classList.add('active');
-}
-
-function showPaymentSection() {
-    const section = document.getElementById('paymentSection');
-    if (section) {
-        section.style.display = 'block';
-        section.scrollIntoView({ behavior: 'smooth' });
-    }
 }
 
 // ============================================
@@ -1321,7 +1248,7 @@ function renderApp() {
         const activeOrders = allOrders.filter(o => o.status !== 'completed' && o.status !== 'delivered' && o.status !== 'archived');
         const completedOrders = allOrders.filter(o => o.status === 'completed' || o.status === 'delivered' || o.status === 'archived');
         const totalOrders = allOrders.length;
-        const pendingOrders = activeOrders.filter(o => o.status === 'pending' || o.status === 'payment_pending').length;
+        const pendingOrders = activeOrders.filter(o => o.status === 'pending').length;
         const completedCount = completedOrders.length;
         const totalRevenue = allOrders.reduce((sum, o) => sum + o.total, 0);
         
@@ -1345,21 +1272,15 @@ function renderApp() {
                 
                 let actionButtons = '';
                 if (adminTab === 'active') {
-                    if (order.status === 'payment_pending') {
+                    if (order.status === 'pending') {
                         actionButtons = `
                             <div style="margin-top:4px;">
                                 <button class="action-btn-small" onclick="confirmPayment(${order.id})" style="background:#4caf50;">✅ Confirm Payment</button>
-                            </div>
-                        `;
-                    }
-                    if (order.status === 'pending' || order.status === 'assigned') {
-                        actionButtons += `
-                            <div style="margin-top:4px;">
                                 <button class="action-btn-small" onclick="assignOrder(${order.id}, '${DELIVERY_GIRLS[0]}')" style="background:#2196f3;">Assign</button>
                             </div>
                         `;
                     }
-                    if (order.status !== 'completed' && order.status !== 'delivered') {
+                    if (order.status === 'assigned') {
                         actionButtons += `
                             <div style="margin-top:4px;">
                                 <button class="action-btn-small" onclick="completeOrder(${order.id})" style="background:#4caf50;">Mark Complete</button>
@@ -1419,7 +1340,7 @@ function renderApp() {
                 </div>
                 
                 <div class="section-title" style="margin-top:6px;font-size:11px;color:#666;">
-                    ${adminTab === 'active' ? '📋 Active Orders (Pending Payment, Assigned, Picked Up)' : '✅ Completed Orders (Delivered, Completed)'}
+                    ${adminTab === 'active' ? '📋 Active Orders (Pending, Assigned, Picked Up)' : '✅ Completed Orders (Delivered, Completed)'}
                 </div>
                 <div style="max-height:300px;overflow-y:auto;">${ordersListHTML}</div>
                 
@@ -1442,7 +1363,7 @@ function renderApp() {
     let deliveryHTML = '';
     if (isDeliveryLoggedIn) {
         const myOrders = allOrders.filter(o => 
-            (o.delivery_girl === deliveryGirlName || o.status === 'pending' || o.status === 'payment_pending') && 
+            (o.delivery_girl === deliveryGirlName || o.status === 'pending') && 
             o.status !== 'completed' && o.status !== 'delivered' && o.status !== 'archived'
         );
         
@@ -1457,7 +1378,7 @@ function renderApp() {
             const paymentBadge = `<span class="payment-status-badge ${paymentStatus}">${paymentStatus.toUpperCase()}</span>`;
             
             let actionsHTML = '';
-            if ((order.status === 'pending' || order.status === 'payment_pending') && !order.delivery_girl) {
+            if (order.status === 'pending' && !order.delivery_girl) {
                 actionsHTML = `
                     <div class="action-btns">
                         <button class="btn-accept" onclick="acceptOrder(${order.id})"><i class="fas fa-check"></i> Accept</button>
@@ -1510,19 +1431,10 @@ function renderApp() {
     // PAYMENT SECTION HTML
     // ============================================
     const paymentHTML = `
-        <div id="paymentSection" class="payment-section" style="display:none;">
-            <h4><i class="fas fa-credit-card"></i> Payment Method</h4>
+        <div id="paymentSection" class="payment-section">
+            <h4><i class="fas fa-credit-card"></i> Mobile Money Payment</h4>
             
-            <div class="payment-option" onclick="selectPayment('mobile_money')" id="opt_mobile_money">
-                <span class="icon">📱</span>
-                <div>
-                    <div class="title">Mobile Money</div>
-                    <div class="sub">MTN MoMo, Airtel Money, Zamtel</div>
-                </div>
-                <span class="badge">✓ Popular</span>
-            </div>
-            
-            <div id="details_mobile_money" class="payment-details">
+            <div style="margin-bottom:8px;">
                 <p style="font-size:12px;font-weight:600;margin-bottom:6px;">Send payment to:</p>
                 <div class="phone-numbers">
                     <div class="phone-row">
@@ -1538,13 +1450,14 @@ function renderApp() {
                         <span class="number">${PAYMENT_CONFIG.zamtelNumber}</span>
                     </div>
                 </div>
-                <div style="margin-top:8px;">
-                    <label style="font-size:11px;font-weight:600;">Transaction Reference Number *</label>
-                    <input type="text" id="transactionRef" placeholder="Enter payment reference (e.g., MOMO123456)">
-                    <div class="help-text"><i class="fas fa-info-circle"></i> We'll confirm payment before cooking your food</div>
-                </div>
-                <div class="warning">⚠️ Orders without payment confirmation will be cancelled after 15 minutes</div>
             </div>
+            
+            <div>
+                <label style="font-size:11px;font-weight:600;">Transaction Reference Number *</label>
+                <input type="text" id="transactionRef" placeholder="Enter payment reference (e.g., MOMO123456)">
+                <div class="help-text"><i class="fas fa-info-circle"></i> We'll confirm payment before cooking your food</div>
+            </div>
+            <div class="warning">⚠️ Orders without payment confirmation will be cancelled after 15 minutes</div>
         </div>
     `;
     
@@ -1733,7 +1646,7 @@ function removeFromCart(id) {
 }
 
 // ============================================
-// PLACE ORDER WITH PAYMENT
+// PLACE ORDER WITH PAYMENT (FIXED)
 // ============================================
 async function placeOrderWithPayment() {
     if (cart.length === 0) {
@@ -1753,20 +1666,10 @@ async function placeOrderWithPayment() {
     if (!phone) { alert('⚠️ Please enter your phone number'); phoneInput?.focus(); return; }
     if (!address) { alert('⚠️ Please enter your delivery address'); addressInput?.focus(); return; }
     
-    // Auto-select mobile money if not selected
-    if (!selectedPayment) {
-        selectedPayment = 'mobile_money';
-        document.getElementById('opt_mobile_money')?.classList.add('selected');
-        document.getElementById('details_mobile_money')?.classList.add('active');
-        showPaymentSection();
-        alert('⚠️ Please select Mobile Money as payment method');
-        return;
-    }
-    
     const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
     
     // Get transaction reference
-    let ref = document.getElementById('transactionRef')?.value.trim() || '';
+    const ref = document.getElementById('transactionRef')?.value.trim() || '';
     if (!ref) {
         alert('⚠️ Please enter your transaction reference number');
         document.getElementById('transactionRef')?.focus();
@@ -1779,7 +1682,7 @@ async function placeOrderWithPayment() {
         customer_location: address,
         items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
         total: totalPrice,
-        status: 'payment_pending',
+        status: 'pending', // Use 'pending' instead of 'payment_pending'
         payment_method: 'mobile_money',
         payment_reference: ref,
         payment_status: 'pending',
@@ -1829,13 +1732,7 @@ async function placeOrderWithPayment() {
             customerName = name;
             customerPhone = phone;
             customerLocation = address;
-            selectedPayment = null;
-            document.getElementById('paymentSection').style.display = 'none';
             document.getElementById('transactionRef').value = '';
-            
-            // Reset payment selection
-            document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('selected'));
-            document.querySelectorAll('.payment-details').forEach(el => el.classList.remove('active'));
             
             setTimeout(() => {
                 document.getElementById('orderStatus').innerHTML = '';
@@ -1862,14 +1759,12 @@ async function confirmPayment(orderId) {
     
     const order = allOrders.find(o => o.id === orderId);
     if (order) {
-        order.status = 'pending';
         order.payment_status = 'confirmed';
         
         try {
             await supabaseClient
                 .from('orders')
                 .update({ 
-                    status: 'pending', 
                     payment_status: 'confirmed' 
                 })
                 .eq('id', orderId);
