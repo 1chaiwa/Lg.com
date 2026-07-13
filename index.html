@@ -605,6 +605,8 @@
         .status-badge.picked_up { background: #fff9c4; color: #f57f17; }
         .status-badge.completed { background: #c8e6c9; color: #2e7d32; }
         .status-badge.archived { background: #e0e0e0; color: #666; }
+        .status-badge.payment_pending { background: #fff3e0; color: #e65100; }
+        .status-badge.payment_confirmed { background: #c8e6c9; color: #2e7d32; }
 
         .tab-bar {
             display: flex;
@@ -681,6 +683,126 @@
             align-items: center;
             gap: 6px;
         }
+        
+        /* Payment Styles */
+        .payment-section {
+            background: #f0f8f0;
+            border-radius: 10px;
+            border: 1px solid #4caf50;
+            padding: 12px;
+            margin-top: 10px;
+        }
+        .payment-section h4 {
+            color: #2e7d32;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .payment-option {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        .payment-option:hover {
+            border-color: #cc0000;
+        }
+        .payment-option.selected {
+            border-color: #cc0000;
+            background: #fff5f5;
+        }
+        .payment-option .icon {
+            font-size: 22px;
+            margin-right: 10px;
+        }
+        .payment-option .title {
+            font-weight: 600;
+            font-size: 13px;
+        }
+        .payment-option .sub {
+            font-size: 10px;
+            color: #666;
+        }
+        .payment-option .badge {
+            margin-left: auto;
+            color: #4caf50;
+            font-weight: 700;
+            font-size: 11px;
+        }
+        .payment-details {
+            display: none;
+            margin-top: 10px;
+            padding: 12px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+        .payment-details.active {
+            display: block;
+        }
+        .payment-details .phone-numbers {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        .payment-details .phone-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            padding: 4px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .payment-details .phone-row:last-child {
+            border-bottom: none;
+        }
+        .payment-details .phone-row .number {
+            color: #cc0000;
+            font-weight: 700;
+        }
+        .payment-details input[type="text"] {
+            width: 100%;
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        .payment-details .help-text {
+            font-size: 10px;
+            color: #666;
+            margin-top: 4px;
+        }
+        .payment-details .warning {
+            font-size: 10px;
+            color: #e65100;
+            background: #fff3e0;
+            padding: 6px;
+            border-radius: 6px;
+            margin-top: 6px;
+        }
+        .payment-status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 9px;
+            font-weight: 600;
+        }
+        .payment-status-badge.pending {
+            background: #fff3e0;
+            color: #e65100;
+        }
+        .payment-status-badge.confirmed {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+        .payment-status-badge.failed {
+            background: #ffcdd2;
+            color: #c62828;
+        }
     </style>
 </head>
 <body>
@@ -714,7 +836,7 @@
         <!-- Content will be rendered here -->
     </div>
     <div class="footnote">
-        <i class="fas fa-shield-alt"></i> Cash on delivery · Serving Kasama District, Northern Province, Zambia
+        <i class="fas fa-shield-alt"></i> Prepayment required · Serving Kasama District, Northern Province, Zambia
     </div>
 </div>
 
@@ -738,7 +860,7 @@
         <button onclick="adminLogin()">Login</button>
         <div class="error" id="adminLoginError">❌ Incorrect password</div>
         <div style="margin-top:4px;text-align:center;font-size:9px;color:#999;">
-            <i class="fas fa-info-circle"></i> Default: <strong>######</strong>
+            <i class="fas fa-info-circle"></i> Default: <strong>admin2426</strong>
         </div>
         <button class="close-btn" onclick="closeAdminLogin()">Cancel</button>
     </div>
@@ -757,6 +879,15 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const WHATSAPP_CONFIG = {
     adminNumber: '260971157284',
     restaurantName: 'Chikorlando Restaurant'
+};
+
+// ============================================
+// PAYMENT CONFIGURATION
+// ============================================
+const PAYMENT_CONFIG = {
+    momoNumber: '0971157284',
+    airtelNumber: '0971157284',
+    zamtelNumber: '0971157284'
 };
 
 // ============================================
@@ -893,7 +1024,9 @@ let customerLocation = '';
 let allOrders = [];
 let orderIdCounter = 1;
 let supabaseClient = null;
-let adminTab = 'active'; // 'active' or 'completed'
+let adminTab = 'active';
+let selectedPayment = null;
+let customerBalance = 0;
 
 // ============================================
 // SUPABASE FUNCTIONS
@@ -933,6 +1066,9 @@ async function saveOrderToSupabase(orderData) {
                 items: orderData.items,
                 total: orderData.total,
                 status: orderData.status || 'pending',
+                payment_method: orderData.payment_method || 'mobile_money',
+                payment_reference: orderData.payment_reference || '',
+                payment_status: orderData.payment_status || 'pending',
                 district: orderData.district || 'Kasama',
                 province: orderData.province || 'Northern Province'
             }])
@@ -974,6 +1110,10 @@ async function loadOrders() {
 // WHATSAPP NOTIFICATION FUNCTION
 // ============================================
 function sendWhatsAppNotification(orderDetails) {
+    const paymentStatus = orderDetails.payment_status || 'Pending';
+    const paymentMethod = orderDetails.payment_method || 'Mobile Money';
+    const paymentRef = orderDetails.payment_reference || 'N/A';
+    
     const message = `🆕 *NEW ORDER!* 🛵
 
 👤 *Customer:* ${orderDetails.name}
@@ -984,16 +1124,43 @@ function sendWhatsAppNotification(orderDetails) {
 🛒 *Items:*
 ${orderDetails.items.map(item => `  • ${item.qty}x ${item.name} - ZMW ${(item.price * item.qty).toFixed(2)}`).join('\n')}
 
+💳 *Payment Method:* ${paymentMethod}
+💵 *Payment Status:* ${paymentStatus}
+🔑 *Reference:* ${paymentRef}
+
 ⏰ *Order Time:* ${new Date().toLocaleString()}
 📍 *Location:* Kasama, Zambia
 
-📋 *Please prepare this order ASAP!* 🙏`;
+📋 *Please verify payment before preparing!* 🙏`;
 
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${WHATSAPP_CONFIG.adminNumber}?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
     console.log('📱 WhatsApp notification sent to:', WHATSAPP_CONFIG.adminNumber);
     return true;
+}
+
+// ============================================
+// PAYMENT FUNCTIONS
+// ============================================
+function selectPayment(method) {
+    selectedPayment = method;
+    
+    document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('selected'));
+    const opt = document.getElementById('opt_' + method);
+    if (opt) opt.classList.add('selected');
+    
+    document.querySelectorAll('.payment-details').forEach(el => el.classList.remove('active'));
+    const details = document.getElementById('details_' + method);
+    if (details) details.classList.add('active');
+}
+
+function showPaymentSection() {
+    const section = document.getElementById('paymentSection');
+    if (section) {
+        section.style.display = 'block';
+        section.scrollIntoView({ behavior: 'smooth' });
+    }
 }
 
 // ============================================
@@ -1147,15 +1314,14 @@ function renderApp() {
     }).join('');
     
     // ============================================
-    // ADMIN DASHBOARD - HIDES COMPLETED ORDERS
+    // ADMIN DASHBOARD
     // ============================================
     let adminHTML = '';
     if (isAdmin) {
-        // Filter orders: Only show active orders (pending, assigned, picked_up)
         const activeOrders = allOrders.filter(o => o.status !== 'completed' && o.status !== 'delivered' && o.status !== 'archived');
         const completedOrders = allOrders.filter(o => o.status === 'completed' || o.status === 'delivered' || o.status === 'archived');
         const totalOrders = allOrders.length;
-        const pendingOrders = activeOrders.filter(o => o.status === 'pending').length;
+        const pendingOrders = activeOrders.filter(o => o.status === 'pending' || o.status === 'payment_pending').length;
         const completedCount = completedOrders.length;
         const totalRevenue = allOrders.reduce((sum, o) => sum + o.total, 0);
         
@@ -1173,12 +1339,17 @@ function renderApp() {
                 const date = new Date(order.created_at).toLocaleDateString();
                 const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 
+                // Payment status display
+                const paymentStatus = order.payment_status || 'pending';
+                const paymentBadge = `<span class="payment-status-badge ${paymentStatus}">${paymentStatus.toUpperCase()}</span>`;
+                
                 let actionButtons = '';
                 if (adminTab === 'active') {
-                    if (order.status === 'pending') {
+                    if (order.status === 'pending' || order.status === 'payment_pending') {
                         actionButtons = `
                             <div style="margin-top:4px;">
-                                <button class="action-btn-small" onclick="assignOrder(${order.id}, '${DELIVERY_GIRLS[0]}')">Assign to ${DELIVERY_GIRLS[0]}</button>
+                                <button class="action-btn-small" onclick="confirmPayment(${order.id})" style="background:#4caf50;">✅ Confirm Payment</button>
+                                <button class="action-btn-small" onclick="assignOrder(${order.id}, '${DELIVERY_GIRLS[0]}')" style="background:#2196f3;">Assign</button>
                             </div>
                         `;
                     }
@@ -1190,7 +1361,6 @@ function renderApp() {
                         `;
                     }
                 } else {
-                    // Show archive/restore button for completed orders
                     actionButtons = `
                         <div style="margin-top:4px;">
                             <button class="action-btn-small" onclick="restoreOrder(${order.id})" style="background:#ff9800;">Restore</button>
@@ -1208,9 +1378,13 @@ function renderApp() {
                         <div class="customer-info"><i class="fas fa-phone"></i> ${order.customer_phone}</div>
                         <div class="customer-info"><i class="fas fa-map-marker-alt"></i> ${order.customer_location}</div>
                         <div class="order-items">${itemsText}</div>
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;flex-wrap:wrap;gap:4px;">
                             <span class="order-total">ZMW ${order.total.toFixed(2)}</span>
                             <span class="status-badge ${statusClass}">${statusClass.toUpperCase()}</span>
+                            ${paymentBadge}
+                        </div>
+                        <div style="font-size:9px;color:#666;margin-top:2px;">
+                            💳 ${order.payment_method || 'Mobile Money'} | Ref: ${order.payment_reference || 'N/A'}
                         </div>
                         ${order.delivery_girl ? `<div style="font-size:9px;color:#666;margin-top:2px;"><i class="fas fa-motorcycle"></i> ${order.delivery_girl}</div>` : ''}
                         ${actionButtons}
@@ -1224,7 +1398,7 @@ function renderApp() {
                 <div class="section-title"><i class="fas fa-chart-line"></i> Admin Dashboard</div>
                 <div class="stats-grid">
                     <div class="stat-card"><div class="number">${totalOrders}</div><div class="label">Total Orders</div></div>
-                    <div class="stat-card"><div class="number">${pendingOrders}</div><div class="label">Active</div></div>
+                    <div class="stat-card"><div class="number">${pendingOrders}</div><div class="label">Pending</div></div>
                     <div class="stat-card"><div class="number">${completedCount}</div><div class="label">Completed</div></div>
                 </div>
                 <div style="font-size:11px;font-weight:700;color:#cc0000;text-align:center;margin-bottom:4px;">Total Revenue: ZMW ${totalRevenue.toFixed(2)}</div>
@@ -1239,7 +1413,7 @@ function renderApp() {
                 </div>
                 
                 <div class="section-title" style="margin-top:6px;font-size:11px;color:#666;">
-                    ${adminTab === 'active' ? '📋 Active Orders (Pending, Assigned, Picked Up)' : '✅ Completed Orders (Delivered, Completed)'}
+                    ${adminTab === 'active' ? '📋 Active Orders (Pending Payment, Assigned, Picked Up)' : '✅ Completed Orders (Delivered, Completed)'}
                 </div>
                 <div style="max-height:300px;overflow-y:auto;">${ordersListHTML}</div>
                 
@@ -1257,13 +1431,12 @@ function renderApp() {
     }
     
     // ============================================
-    // DELIVERY PANEL - HIDES COMPLETED ORDERS
+    // DELIVERY PANEL
     // ============================================
     let deliveryHTML = '';
     if (isDeliveryLoggedIn) {
-        // Only show pending and assigned orders (not completed)
         const myOrders = allOrders.filter(o => 
-            (o.delivery_girl === deliveryGirlName || o.status === 'pending') && 
+            (o.delivery_girl === deliveryGirlName || o.status === 'pending' || o.status === 'payment_pending') && 
             o.status !== 'completed' && o.status !== 'delivered' && o.status !== 'archived'
         );
         
@@ -1274,8 +1447,11 @@ function renderApp() {
             const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const isMine = order.delivery_girl === deliveryGirlName;
             
+            const paymentStatus = order.payment_status || 'pending';
+            const paymentBadge = `<span class="payment-status-badge ${paymentStatus}">${paymentStatus.toUpperCase()}</span>`;
+            
             let actionsHTML = '';
-            if (order.status === 'pending' && !order.delivery_girl) {
+            if ((order.status === 'pending' || order.status === 'payment_pending') && !order.delivery_girl) {
                 actionsHTML = `
                     <div class="action-btns">
                         <button class="btn-accept" onclick="acceptOrder(${order.id})"><i class="fas fa-check"></i> Accept</button>
@@ -1305,9 +1481,10 @@ function renderApp() {
                     <div class="customer-info"><i class="fas fa-phone"></i> ${order.customer_phone}</div>
                     <div class="customer-info"><i class="fas fa-map-marker-alt"></i> ${order.customer_location}</div>
                     <div class="order-items">${itemsText}</div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;flex-wrap:wrap;gap:4px;">
                         <span class="order-total">ZMW ${order.total.toFixed(2)}</span>
                         <span class="status-badge ${statusClass}">${statusClass.toUpperCase()}</span>
+                        ${paymentBadge}
                     </div>
                     ${actionsHTML}
                 </div>
@@ -1322,6 +1499,48 @@ function renderApp() {
             </div>
         `;
     }
+    
+    // ============================================
+    // PAYMENT SECTION HTML
+    // ============================================
+    const paymentHTML = `
+        <div id="paymentSection" class="payment-section" style="display:none;">
+            <h4><i class="fas fa-credit-card"></i> Payment Method</h4>
+            
+            <div class="payment-option" onclick="selectPayment('mobile_money')" id="opt_mobile_money">
+                <span class="icon">📱</span>
+                <div>
+                    <div class="title">Mobile Money</div>
+                    <div class="sub">MTN MoMo, Airtel Money, Zamtel</div>
+                </div>
+                <span class="badge">✓ Popular</span>
+            </div>
+            
+            <div id="details_mobile_money" class="payment-details">
+                <p style="font-size:12px;font-weight:600;margin-bottom:6px;">Send payment to:</p>
+                <div class="phone-numbers">
+                    <div class="phone-row">
+                        <span><i class="fas fa-network-wired"></i> <strong>MTN MoMo</strong></span>
+                        <span class="number">${PAYMENT_CONFIG.momoNumber}</span>
+                    </div>
+                    <div class="phone-row">
+                        <span><i class="fas fa-signal"></i> <strong>Airtel Money</strong></span>
+                        <span class="number">${PAYMENT_CONFIG.airtelNumber}</span>
+                    </div>
+                    <div class="phone-row">
+                        <span><i class="fas fa-signal"></i> <strong>Zamtel Kwacha</strong></span>
+                        <span class="number">${PAYMENT_CONFIG.zamtelNumber}</span>
+                    </div>
+                </div>
+                <div style="margin-top:8px;">
+                    <label style="font-size:11px;font-weight:600;">Transaction Reference Number *</label>
+                    <input type="text" id="transactionRef" placeholder="Enter payment reference (e.g., MOMO123456)">
+                    <div class="help-text"><i class="fas fa-info-circle"></i> We'll confirm payment before cooking your food</div>
+                </div>
+                <div class="warning">⚠️ Orders without payment confirmation will be cancelled after 15 minutes</div>
+            </div>
+        </div>
+    `;
     
     container.innerHTML = `
         <div style="background:linear-gradient(135deg,#cc0000,#990000);color:white;padding:5px 10px;border-radius:10px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
@@ -1384,8 +1603,10 @@ function renderApp() {
                     </div>
                 </div>
                 
-                <button class="action-btn" onclick="placeOrder()" ${cart.length === 0 ? 'disabled' : ''}>
-                    <i class="fas fa-motorcycle"></i> Place Order · Cash
+                ${paymentHTML}
+                
+                <button class="action-btn" onclick="placeOrderWithPayment()" ${cart.length === 0 ? 'disabled' : ''}>
+                    <i class="fas fa-motorcycle"></i> Place Order · Prepay Required
                 </button>
                 <div id="orderStatus"></div>
             </div>
@@ -1399,7 +1620,7 @@ function renderApp() {
                 </div>
                 <div style="font-size:10px;margin-top:2px;">
                     <i class="fas fa-location-dot" style="color:#cc0000;"></i> 
-                    <strong>Customer:</strong> ${customerLocation}
+                    <strong>Customer:</strong> ${customerLocation || 'Kasama, Northern Province, Zambia'}
                 </div>
                 <button class="whatsapp-btn" onclick="shareLocation()">
                     <i class="fab fa-whatsapp"></i> Share Location
@@ -1419,7 +1640,7 @@ function renderApp() {
         initMap(customerLocation);
     });
     
-    setTimeout(() => initMap(customerLocation), 300);
+    setTimeout(() => initMap(customerLocation || 'Kasama, Northern Province, Zambia'), 300);
 }
 
 // ============================================
@@ -1444,16 +1665,16 @@ function initMap(location) {
         let lat = -10.2129;
         let lng = 31.1809;
         
-        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}&limit=1`)
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location || 'Kasama')}&limit=1`)
             .then(r => r.json())
             .then(data => {
                 if (data && data.length > 0) {
                     lat = parseFloat(data[0].lat);
                     lng = parseFloat(data[0].lon);
                 }
-                createMap(lat, lng, location);
+                createMap(lat, lng, location || 'Kasama, Zambia');
             })
-            .catch(() => createMap(lat, lng, location));
+            .catch(() => createMap(lat, lng, location || 'Kasama, Zambia'));
     } catch (e) {
         console.error('Map error:', e);
     }
@@ -1505,7 +1726,10 @@ function removeFromCart(id) {
     renderApp();
 }
 
-async function placeOrder() {
+// ============================================
+// PLACE ORDER WITH PAYMENT
+// ============================================
+async function placeOrderWithPayment() {
     if (cart.length === 0) {
         alert('Please add items to your order');
         return;
@@ -1523,7 +1747,25 @@ async function placeOrder() {
     if (!phone) { alert('⚠️ Please enter your phone number'); phoneInput?.focus(); return; }
     if (!address) { alert('⚠️ Please enter your delivery address'); addressInput?.focus(); return; }
     
+    // Check if payment method is selected
+    if (!selectedPayment) {
+        showPaymentSection();
+        alert('⚠️ Please select a payment method first');
+        return;
+    }
+    
     const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
+    
+    // Get transaction reference for mobile money
+    let ref = '';
+    if (selectedPayment === 'mobile_money') {
+        ref = document.getElementById('transactionRef')?.value.trim() || '';
+        if (!ref) {
+            alert('⚠️ Please enter your transaction reference number');
+            document.getElementById('transactionRef')?.focus();
+            return;
+        }
+    }
     
     const orderData = {
         customer_name: name,
@@ -1531,7 +1773,10 @@ async function placeOrder() {
         customer_location: address,
         items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
         total: totalPrice,
-        status: 'pending',
+        status: 'payment_pending',
+        payment_method: 'mobile_money',
+        payment_reference: ref,
+        payment_status: 'pending',
         district: 'Kasama',
         province: 'Northern Province'
     };
@@ -1548,6 +1793,9 @@ async function placeOrder() {
                 address: address,
                 total: totalPrice,
                 items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
+                payment_method: 'Mobile Money',
+                payment_status: 'Pending Verification',
+                payment_reference: ref,
                 deliveryGirl: isDeliveryLoggedIn ? deliveryGirlName : 'Not assigned yet'
             };
             
@@ -1555,15 +1803,18 @@ async function placeOrder() {
             
             document.getElementById('orderStatus').innerHTML = `
                 <div class="order-placed-banner">
-                    <i class="fas fa-check-circle"></i> ✅ Order confirmed, ${name}! 
-                    <br>🛵 A delivery girl will arrive soon.
+                    <i class="fas fa-check-circle"></i> ✅ Order placed, ${name}! 
+                    <br>🛵 Payment is being verified.
                     <br>📱 We'll call you at ${phone}
                     <br><span class="whatsapp-notification">
                         <i class="fab fa-whatsapp"></i> WhatsApp notification sent to admin!
                     </span>
                     <div class="order-status-wa">
                         <i class="fab fa-whatsapp" style="color:#25D366;"></i>
-                        Order #${savedOrder.id} - Check WhatsApp for details
+                        Order #${savedOrder.id} - Payment Pending Verification
+                    </div>
+                    <div style="background:#fff3e0;padding:6px;border-radius:8px;margin-top:4px;font-size:11px;color:#e65100;">
+                        💳 Payment Reference: ${ref} - Awaiting confirmation
                     </div>
                 </div>
             `;
@@ -1572,13 +1823,19 @@ async function placeOrder() {
             customerName = name;
             customerPhone = phone;
             customerLocation = address;
+            selectedPayment = null;
+            document.getElementById('paymentSection').style.display = 'none';
             
             setTimeout(() => {
                 document.getElementById('orderStatus').innerHTML = '';
                 renderApp();
-            }, 12000);
+            }, 15000);
             
-            alert(`✅ Order placed successfully, ${name}!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}\n📦 Order #${savedOrder.id} saved to database!\n📱 WhatsApp notification sent to admin!`);
+            alert(`✅ Order #${savedOrder.id} placed successfully!\n\n` +
+                `📱 We'll call you at ${phone}\n` +
+                `📍 Delivering to: ${address}\n` +
+                `💳 Payment Reference: ${ref}\n` +
+                `⏳ We'll confirm payment before cooking.`);
         }
     } catch (error) {
         alert('❌ Failed to place order: ' + error.message);
@@ -1586,10 +1843,47 @@ async function placeOrder() {
     }
 }
 
-function shareLocation() {
-    const message = `📍 I'm ordering from Chikorlando Restaurant in Kasama!\n📍 Location: ${customerLocation}\n👤 Name: ${customerName}\n📱 Phone: ${customerPhone}`;
-    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-    window.open(url, '_blank');
+// ============================================
+// ADMIN - CONFIRM PAYMENT
+// ============================================
+async function confirmPayment(orderId) {
+    if (!confirm('✅ Confirm payment for this order?')) return;
+    
+    const order = allOrders.find(o => o.id === orderId);
+    if (order) {
+        order.status = 'pending';
+        order.payment_status = 'confirmed';
+        
+        try {
+            await supabaseClient
+                .from('orders')
+                .update({ 
+                    status: 'pending', 
+                    payment_status: 'confirmed' 
+                })
+                .eq('id', orderId);
+            console.log('✅ Payment confirmed in Supabase');
+            
+            // Send confirmation WhatsApp
+            const confirmMessage = `✅ *PAYMENT CONFIRMED!* 🎉
+
+Order #${orderId}
+Customer: ${order.customer_name}
+Amount: ZMW ${order.total.toFixed(2)}
+Reference: ${order.payment_reference || 'N/A'}
+
+📋 Ready to prepare and deliver! 🛵`;
+            
+            const encodedMessage = encodeURIComponent(confirmMessage);
+            window.open(`https://wa.me/${WHATSAPP_CONFIG.adminNumber}?text=${encodedMessage}`, '_blank');
+            
+        } catch (error) {
+            console.error('Error confirming payment:', error);
+        }
+        
+        renderApp();
+        alert('✅ Payment confirmed! Order is now ready for preparation.');
+    }
 }
 
 // ============================================
@@ -1692,6 +1986,12 @@ async function deleteOrder(orderId) {
 async function acceptOrder(orderId) {
     const order = allOrders.find(o => o.id === orderId);
     if (order) {
+        // Check if payment is confirmed
+        if (order.payment_status !== 'confirmed') {
+            alert('⚠️ Payment not confirmed yet. Please wait for admin to confirm payment.');
+            return;
+        }
+        
         order.status = 'assigned';
         order.delivery_girl = deliveryGirlName;
         
@@ -1773,6 +2073,12 @@ async function deliverOrder(orderId) {
     }
 }
 
+function shareLocation() {
+    const message = `📍 I'm ordering from Chikorlando Restaurant in Kasama!\n📍 Location: ${customerLocation || 'Kasama'}\n👤 Name: ${customerName}\n📱 Phone: ${customerPhone}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank');
+}
+
 // ============================================
 // START THE APP
 // ============================================
@@ -1785,6 +2091,7 @@ async function startApp() {
     console.log('📍 Serving Kasama District, Zambia');
     console.log('📱 WhatsApp notifications enabled');
     console.log('📦 Orders saved to Supabase');
+    console.log('💳 Prepayment required via Mobile Money');
     console.log('📊 Completed orders are hidden from main view');
 }
 
