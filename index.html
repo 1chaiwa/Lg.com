@@ -1076,7 +1076,7 @@ async function saveOrderToSupabase(orderData) {
         
         if (error) {
             console.error('❌ Supabase insert error:', error);
-            throw error;
+            throw error; 
         }
         
         console.log('✅ Order saved to Supabase:', data);
