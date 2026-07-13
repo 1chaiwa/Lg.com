@@ -604,6 +604,7 @@
         .status-badge.assigned { background: #b3e5fc; color: #01579b; }
         .status-badge.picked_up { background: #fff9c4; color: #f57f17; }
         .status-badge.completed { background: #c8e6c9; color: #2e7d32; }
+        .status-badge.archived { background: #e0e0e0; color: #666; }
 
         .tab-bar {
             display: flex;
@@ -692,9 +693,9 @@
                 <span class="subtitle">Restaurant & Food Delivery</span>
                 <div class="contact-info">
                     <i class="fas fa-phone"></i> 
-                    <span>0971 157 284</span>
+                    <span>0977 123 456</span>
                     <i class="fas fa-whatsapp" style="margin-left:4px;"></i>
-                    <span>0971 157 284</span>
+                    <span>0977 654 321</span>
                 </div>
             </div>
         </div>
@@ -754,7 +755,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // WHATSAPP CONFIGURATION
 // ============================================
 const WHATSAPP_CONFIG = {
-    adminNumber: '+0971157284',  // Replace with actual admin number
+    adminNumber: '260977123456',
     restaurantName: 'Chikorlando Restaurant'
 };
 
@@ -877,7 +878,7 @@ const MENU = [
 ];
 
 const DELIVERY_GIRLS = ['Chaiwa Justine', 'Brenda Mwansa', 'Chola Williams'];
-const ADMIN_PASSWORD = 'ChiFastFood';
+const ADMIN_PASSWORD = 'admin2426';
 
 // ============================================
 // STATE
@@ -892,6 +893,7 @@ let customerLocation = 'Kasama, Northern Province, Zambia';
 let allOrders = [];
 let orderIdCounter = 1;
 let supabaseClient = null;
+let adminTab = 'active'; // 'active' or 'completed'
 
 // ============================================
 // SUPABASE FUNCTIONS
@@ -1144,56 +1146,101 @@ function renderApp() {
         `;
     }).join('');
     
+    // ============================================
+    // ADMIN DASHBOARD - HIDES COMPLETED ORDERS
+    // ============================================
     let adminHTML = '';
     if (isAdmin) {
+        // Filter orders: Only show active orders (pending, assigned, picked_up)
+        const activeOrders = allOrders.filter(o => o.status !== 'completed' && o.status !== 'delivered' && o.status !== 'archived');
+        const completedOrders = allOrders.filter(o => o.status === 'completed' || o.status === 'delivered' || o.status === 'archived');
         const totalOrders = allOrders.length;
-        const pendingOrders = allOrders.filter(o => o.status === 'pending' || o.status === 'assigned').length;
-        const completedOrders = allOrders.filter(o => o.status === 'delivered' || o.status === 'completed').length;
+        const pendingOrders = activeOrders.filter(o => o.status === 'pending').length;
+        const completedCount = completedOrders.length;
         const totalRevenue = allOrders.reduce((sum, o) => sum + o.total, 0);
         
-        let ordersListHTML = allOrders.map(order => {
-            const statusClass = order.status || 'pending';
-            const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name}`).join(', ') : 'No items';
-            const date = new Date(order.created_at).toLocaleDateString();
-            const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            return `
-                <div class="order-card">
-                    <div class="header">
-                        <span class="order-id">#${order.id} - ${order.customer_name}</span>
-                        <span class="order-time">${date} ${time}</span>
-                    </div>
-                    <div class="customer-info"><i class="fas fa-phone"></i> ${order.customer_phone}</div>
-                    <div class="customer-info"><i class="fas fa-map-marker-alt"></i> ${order.customer_location}</div>
-                    <div class="order-items">${itemsText}</div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
-                        <span class="order-total">ZMW ${order.total.toFixed(2)}</span>
-                        <span class="status-badge ${statusClass}">${statusClass.toUpperCase()}</span>
-                    </div>
-                    ${order.status === 'pending' ? `
+        let ordersListHTML = '';
+        let displayOrders = adminTab === 'active' ? activeOrders : completedOrders;
+        
+        if (displayOrders.length === 0) {
+            ordersListHTML = `<div style="color:#7a6e86;padding:10px;text-align:center;font-size:11px;">
+                ${adminTab === 'active' ? 'No active orders' : 'No completed orders'}
+            </div>`;
+        } else {
+            ordersListHTML = displayOrders.map(order => {
+                const statusClass = order.status || 'pending';
+                const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name}`).join(', ') : 'No items';
+                const date = new Date(order.created_at).toLocaleDateString();
+                const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                let actionButtons = '';
+                if (adminTab === 'active') {
+                    if (order.status === 'pending') {
+                        actionButtons = `
+                            <div style="margin-top:4px;">
+                                <button class="action-btn-small" onclick="assignOrder(${order.id}, '${DELIVERY_GIRLS[0]}')">Assign to ${DELIVERY_GIRLS[0]}</button>
+                            </div>
+                        `;
+                    }
+                    if (order.status !== 'completed' && order.status !== 'delivered') {
+                        actionButtons += `
+                            <div style="margin-top:4px;">
+                                <button class="action-btn-small" onclick="completeOrder(${order.id})" style="background:#4caf50;">Mark Complete</button>
+                            </div>
+                        `;
+                    }
+                } else {
+                    // Show archive/restore button for completed orders
+                    actionButtons = `
                         <div style="margin-top:4px;">
-                            <button class="action-btn-small" onclick="assignOrder(${order.id}, '${DELIVERY_GIRLS[0]}')">Assign to ${DELIVERY_GIRLS[0]}</button>
+                            <button class="action-btn-small" onclick="restoreOrder(${order.id})" style="background:#ff9800;">Restore</button>
+                            <button class="action-btn-small" onclick="deleteOrder(${order.id})" style="background:#f44336;">Delete</button>
                         </div>
-                    ` : ''}
-                    ${order.status !== 'completed' && order.status !== 'delivered' ? `
-                        <div style="margin-top:4px;">
-                            <button class="action-btn-small" onclick="completeOrder(${order.id})" style="background:#4caf50;">Mark Complete</button>
+                    `;
+                }
+                
+                return `
+                    <div class="order-card" style="${adminTab === 'completed' ? 'opacity:0.7;background:#f9f9f9;' : ''}">
+                        <div class="header">
+                            <span class="order-id">#${order.id} - ${order.customer_name}</span>
+                            <span class="order-time">${date} ${time}</span>
                         </div>
-                    ` : ''}
-                </div>
-            `;
-        }).join('');
+                        <div class="customer-info"><i class="fas fa-phone"></i> ${order.customer_phone}</div>
+                        <div class="customer-info"><i class="fas fa-map-marker-alt"></i> ${order.customer_location}</div>
+                        <div class="order-items">${itemsText}</div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;">
+                            <span class="order-total">ZMW ${order.total.toFixed(2)}</span>
+                            <span class="status-badge ${statusClass}">${statusClass.toUpperCase()}</span>
+                        </div>
+                        ${order.delivery_girl ? `<div style="font-size:9px;color:#666;margin-top:2px;"><i class="fas fa-motorcycle"></i> ${order.delivery_girl}</div>` : ''}
+                        ${actionButtons}
+                    </div>
+                `;
+            }).join('');
+        }
         
         adminHTML = `
             <div class="admin-panel show">
                 <div class="section-title"><i class="fas fa-chart-line"></i> Admin Dashboard</div>
                 <div class="stats-grid">
                     <div class="stat-card"><div class="number">${totalOrders}</div><div class="label">Total Orders</div></div>
-                    <div class="stat-card"><div class="number">${pendingOrders}</div><div class="label">Pending</div></div>
-                    <div class="stat-card"><div class="number">${completedOrders}</div><div class="label">Delivered</div></div>
+                    <div class="stat-card"><div class="number">${pendingOrders}</div><div class="label">Active</div></div>
+                    <div class="stat-card"><div class="number">${completedCount}</div><div class="label">Completed</div></div>
                 </div>
                 <div style="font-size:11px;font-weight:700;color:#cc0000;text-align:center;margin-bottom:4px;">Total Revenue: ZMW ${totalRevenue.toFixed(2)}</div>
                 
-                <div class="section-title" style="margin-top:6px;"><i class="fas fa-list"></i> All Orders</div>
+                <div class="tab-bar">
+                    <button class="tab-btn ${adminTab === 'active' ? 'active' : ''}" onclick="switchAdminTab('active')">
+                        <i class="fas fa-clock"></i> Active (${activeOrders.length})
+                    </button>
+                    <button class="tab-btn ${adminTab === 'completed' ? 'active' : ''}" onclick="switchAdminTab('completed')">
+                        <i class="fas fa-check-circle"></i> Completed (${completedOrders.length})
+                    </button>
+                </div>
+                
+                <div class="section-title" style="margin-top:6px;font-size:11px;color:#666;">
+                    ${adminTab === 'active' ? '📋 Active Orders (Pending, Assigned, Picked Up)' : '✅ Completed Orders (Delivered, Completed)'}
+                </div>
                 <div style="max-height:300px;overflow-y:auto;">${ordersListHTML}</div>
                 
                 <div class="section-title" style="margin-top:6px;"><i class="fas fa-female"></i> Delivery Girls</div>
@@ -1209,9 +1256,16 @@ function renderApp() {
         `;
     }
     
+    // ============================================
+    // DELIVERY PANEL - HIDES COMPLETED ORDERS
+    // ============================================
     let deliveryHTML = '';
     if (isDeliveryLoggedIn) {
-        const myOrders = allOrders.filter(o => o.delivery_girl === deliveryGirlName || o.status === 'pending');
+        // Only show pending and assigned orders (not completed)
+        const myOrders = allOrders.filter(o => 
+            (o.delivery_girl === deliveryGirlName || o.status === 'pending') && 
+            o.status !== 'completed' && o.status !== 'delivered' && o.status !== 'archived'
+        );
         
         let ordersListHTML = myOrders.map(order => {
             const statusClass = order.status || 'pending';
@@ -1264,7 +1318,7 @@ function renderApp() {
             <div class="delivery-panel show">
                 <div class="section-title"><i class="fas fa-motorcycle"></i> My Deliveries</div>
                 <div style="font-size:10px;color:#666;margin-bottom:4px;">Logged in as: <strong>${deliveryGirlName}</strong></div>
-                ${ordersListHTML || '<div style="color:#7a6e86;padding:10px;text-align:center;font-size:11px;">No orders available</div>'}
+                ${ordersListHTML || '<div style="color:#7a6e86;padding:10px;text-align:center;font-size:11px;">No active orders available</div>'}
             </div>
         `;
     }
@@ -1366,6 +1420,14 @@ function renderApp() {
     });
     
     setTimeout(() => initMap(customerLocation), 300);
+}
+
+// ============================================
+// ADMIN TAB SWITCHING
+// ============================================
+function switchAdminTab(tab) {
+    adminTab = tab;
+    renderApp();
 }
 
 // ============================================
@@ -1584,6 +1646,46 @@ async function completeOrder(orderId) {
     }
 }
 
+async function restoreOrder(orderId) {
+    const order = allOrders.find(o => o.id === orderId);
+    if (order) {
+        order.status = 'pending';
+        order.delivery_girl = '';
+        
+        try {
+            await supabaseClient
+                .from('orders')
+                .update({ status: 'pending', delivery_girl: '' })
+                .eq('id', orderId);
+            console.log('✅ Order restored in Supabase');
+        } catch (error) {
+            console.error('Error restoring order:', error);
+        }
+        
+        renderApp();
+        alert('✅ Order #' + orderId + ' restored!');
+    }
+}
+
+async function deleteOrder(orderId) {
+    if (!confirm('⚠️ Are you sure you want to permanently delete this order?')) return;
+    
+    try {
+        await supabaseClient
+            .from('orders')
+            .delete()
+            .eq('id', orderId);
+        console.log('✅ Order deleted from Supabase');
+        
+        allOrders = allOrders.filter(o => o.id !== orderId);
+        renderApp();
+        alert('✅ Order #' + orderId + ' permanently deleted!');
+    } catch (error) {
+        console.error('Error deleting order:', error);
+        alert('❌ Failed to delete order');
+    }
+}
+
 // ============================================
 // DELIVERY GIRL FUNCTIONS
 // ============================================
@@ -1651,6 +1753,7 @@ async function pickupOrder(orderId) {
 }
 
 async function deliverOrder(orderId) {
+    if (!confirm('✅ Confirm delivery of this order?')) return;
     const order = allOrders.find(o => o.id === orderId);
     if (order) {
         order.status = 'delivered';
@@ -1681,7 +1784,8 @@ async function startApp() {
     console.log(`📋 ${MENU.length} menu items loaded`);
     console.log('📍 Serving Kasama District, Zambia');
     console.log('📱 WhatsApp notifications enabled');
-    console.log('📦 Orders will be saved to Supabase');
+    console.log('📦 Orders saved to Supabase');
+    console.log('📊 Completed orders are hidden from main view');
 }
 
 startApp();
