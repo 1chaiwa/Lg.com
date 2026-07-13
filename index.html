@@ -877,7 +877,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // WHATSAPP CONFIGURATION
 // ============================================
 const WHATSAPP_CONFIG = {
-    adminNumber: '0971130511',
+    adminNumber: '260971157284',
     restaurantName: 'Chikorlando Restaurant'
 };
 
@@ -885,9 +885,9 @@ const WHATSAPP_CONFIG = {
 // PAYMENT CONFIGURATION
 // ============================================
 const PAYMENT_CONFIG = {
-    momoNumber: '0763209826',
-    airtelNumber: '0971130511',
-    zamtelNumber: '0952057753'
+    momoNumber: '0971157284',
+    airtelNumber: '0971157284',
+    zamtelNumber: '0971157284'
 };
 
 // ============================================
@@ -1345,10 +1345,16 @@ function renderApp() {
                 
                 let actionButtons = '';
                 if (adminTab === 'active') {
-                    if (order.status === 'pending' || order.status === 'payment_pending') {
+                    if (order.status === 'payment_pending') {
                         actionButtons = `
                             <div style="margin-top:4px;">
                                 <button class="action-btn-small" onclick="confirmPayment(${order.id})" style="background:#4caf50;">✅ Confirm Payment</button>
+                            </div>
+                        `;
+                    }
+                    if (order.status === 'pending' || order.status === 'assigned') {
+                        actionButtons += `
+                            <div style="margin-top:4px;">
                                 <button class="action-btn-small" onclick="assignOrder(${order.id}, '${DELIVERY_GIRLS[0]}')" style="background:#2196f3;">Assign</button>
                             </div>
                         `;
@@ -1747,24 +1753,24 @@ async function placeOrderWithPayment() {
     if (!phone) { alert('⚠️ Please enter your phone number'); phoneInput?.focus(); return; }
     if (!address) { alert('⚠️ Please enter your delivery address'); addressInput?.focus(); return; }
     
-    // Check if payment method is selected
+    // Auto-select mobile money if not selected
     if (!selectedPayment) {
+        selectedPayment = 'mobile_money';
+        document.getElementById('opt_mobile_money')?.classList.add('selected');
+        document.getElementById('details_mobile_money')?.classList.add('active');
         showPaymentSection();
-        alert('⚠️ Please select a payment method first');
+        alert('⚠️ Please select Mobile Money as payment method');
         return;
     }
     
     const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
     
-    // Get transaction reference for mobile money
-    let ref = '';
-    if (selectedPayment === 'mobile_money') {
-        ref = document.getElementById('transactionRef')?.value.trim() || '';
-        if (!ref) {
-            alert('⚠️ Please enter your transaction reference number');
-            document.getElementById('transactionRef')?.focus();
-            return;
-        }
+    // Get transaction reference
+    let ref = document.getElementById('transactionRef')?.value.trim() || '';
+    if (!ref) {
+        alert('⚠️ Please enter your transaction reference number');
+        document.getElementById('transactionRef')?.focus();
+        return;
     }
     
     const orderData = {
@@ -1825,6 +1831,11 @@ async function placeOrderWithPayment() {
             customerLocation = address;
             selectedPayment = null;
             document.getElementById('paymentSection').style.display = 'none';
+            document.getElementById('transactionRef').value = '';
+            
+            // Reset payment selection
+            document.querySelectorAll('.payment-option').forEach(el => el.classList.remove('selected'));
+            document.querySelectorAll('.payment-details').forEach(el => el.classList.remove('active'));
             
             setTimeout(() => {
                 document.getElementById('orderStatus').innerHTML = '';
