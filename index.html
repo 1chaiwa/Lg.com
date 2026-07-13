@@ -171,9 +171,6 @@
             height: 100%;
             object-fit: cover;
         }
-        .menu-item-card .image-container .emoji-placeholder {
-            font-size: 50px;
-        }
         .menu-item-card .item-info {
             padding: 8px 10px;
         }
@@ -657,7 +654,6 @@
             font-size: 7px;
             color: #6d6a7a;
         }
-        /* WhatsApp notification badge */
         .whatsapp-notification {
             background: #25D366;
             color: white;
@@ -758,7 +754,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 // WHATSAPP CONFIGURATION
 // ============================================
 const WHATSAPP_CONFIG = {
-    adminNumber: '260971130511',  // ← Replace with your actual phone number
+    adminNumber: '260977123456',  // Replace with actual admin number
     restaurantName: 'Chikorlando Restaurant'
 };
 
@@ -902,7 +898,6 @@ let supabaseClient = null;
 // ============================================
 async function initSupabase() {
     try {
-        // Load Supabase library dynamically
         if (typeof window.supabase === 'undefined') {
             await new Promise((resolve, reject) => {
                 const script = document.createElement('script');
@@ -915,8 +910,6 @@ async function initSupabase() {
         
         supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         console.log('✅ Supabase initialized');
-        
-        // Load existing orders
         await loadOrders();
         return true;
     } catch (error) {
@@ -938,7 +931,6 @@ async function saveOrderToSupabase(orderData) {
                 items: orderData.items,
                 total: orderData.total,
                 status: orderData.status || 'pending',
-                delivery_girl: orderData.delivery_girl || '',
                 district: orderData.district || 'Kasama',
                 province: orderData.province || 'Northern Province'
             }])
@@ -980,7 +972,6 @@ async function loadOrders() {
 // WHATSAPP NOTIFICATION FUNCTION
 // ============================================
 function sendWhatsAppNotification(orderDetails) {
-    // Build the WhatsApp message
     const message = `🆕 *NEW ORDER!* 🛵
 
 👤 *Customer:* ${orderDetails.name}
@@ -996,15 +987,9 @@ ${orderDetails.items.map(item => `  • ${item.qty}x ${item.name} - ZMW ${(item.
 
 📋 *Please prepare this order ASAP!* 🙏`;
 
-    // Encode the message for WhatsApp URL
     const encodedMessage = encodeURIComponent(message);
-    
-    // Create WhatsApp URL
     const whatsappUrl = `https://wa.me/${WHATSAPP_CONFIG.adminNumber}?text=${encodedMessage}`;
-    
-    // Open WhatsApp in new window
     window.open(whatsappUrl, '_blank');
-    
     console.log('📱 WhatsApp notification sent to:', WHATSAPP_CONFIG.adminNumber);
     return true;
 }
@@ -1102,7 +1087,6 @@ function adminLogout() {
     renderApp();
 }
 
-// Close modals on outside click
 document.getElementById('deliveryLoginModal')?.addEventListener('click', function(e) {
     if (e.target === this) closeDeliveryLogin();
 });
@@ -1119,7 +1103,6 @@ function renderApp() {
     const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
     const cartCount = cart.reduce((acc, i) => acc + i.qty, 0);
     
-    // Cart HTML
     let cartHTML = cart.length === 0 ? 
         '<div style="color:#7a6e86;padding:4px 0;font-size:12px;"><i class="fas fa-shopping-cart"></i> Cart is empty</div>' :
         cart.map(item => `
@@ -1134,7 +1117,6 @@ function renderApp() {
             </div>
         `).join('');
     
-    // Menu Grid HTML
     let menuHTML = MENU.map(item => {
         const qty = cart.find(i => i.id === item.id)?.qty || 0;
         return `
@@ -1162,7 +1144,6 @@ function renderApp() {
         `;
     }).join('');
     
-    // Admin Dashboard
     let adminHTML = '';
     if (isAdmin) {
         const totalOrders = allOrders.length;
@@ -1188,7 +1169,6 @@ function renderApp() {
                         <span class="order-total">ZMW ${order.total.toFixed(2)}</span>
                         <span class="status-badge ${statusClass}">${statusClass.toUpperCase()}</span>
                     </div>
-                    ${order.delivery_girl ? `<div style="font-size:9px;color:#666;margin-top:2px;"><i class="fas fa-motorcycle"></i> ${order.delivery_girl}</div>` : ''}
                     ${order.status === 'pending' ? `
                         <div style="margin-top:4px;">
                             <button class="action-btn-small" onclick="assignOrder(${order.id}, '${DELIVERY_GIRLS[0]}')">Assign to ${DELIVERY_GIRLS[0]}</button>
@@ -1229,7 +1209,6 @@ function renderApp() {
         `;
     }
     
-    // Delivery Panel
     let deliveryHTML = '';
     if (isDeliveryLoggedIn) {
         const myOrders = allOrders.filter(o => o.delivery_girl === deliveryGirlName || o.status === 'pending');
@@ -1290,9 +1269,7 @@ function renderApp() {
         `;
     }
     
-    // Main view
     container.innerHTML = `
-        <!-- Banner -->
         <div style="background:linear-gradient(135deg,#cc0000,#990000);color:white;padding:5px 10px;border-radius:10px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
             <div>
                 <i class="fas fa-map-marker-alt"></i> 
@@ -1316,7 +1293,6 @@ function renderApp() {
         ${isDeliveryLoggedIn ? deliveryHTML : ''}
         
         ${!isAdmin && !isDeliveryLoggedIn ? `
-            <!-- Menu -->
             <div class="card">
                 <div class="section-title">
                     <i class="fas fa-th-large"></i> Today's Menu
@@ -1325,7 +1301,6 @@ function renderApp() {
                 <div class="menu-grid">${menuHTML}</div>
             </div>
             
-            <!-- Order Summary -->
             <div class="order-summary">
                 <div class="section-title">
                     <i class="fas fa-shopping-bag"></i> Your Order
@@ -1361,7 +1336,6 @@ function renderApp() {
                 <div id="orderStatus"></div>
             </div>
             
-            <!-- Map -->
             <div class="card">
                 <div class="section-title">
                     <i class="fas fa-map-marked-alt"></i> Location
@@ -1380,7 +1354,6 @@ function renderApp() {
         ` : ''}
     `;
     
-    // Update input listeners
     document.getElementById('customerNameInput')?.addEventListener('input', function() {
         customerName = this.value;
     });
@@ -1392,7 +1365,6 @@ function renderApp() {
         initMap(customerLocation);
     });
     
-    // Initialize map
     setTimeout(() => initMap(customerLocation), 300);
 }
 
@@ -1491,7 +1463,6 @@ async function placeOrder() {
     
     const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
     
-    // Prepare order data
     const orderData = {
         customer_name: name,
         customer_phone: phone,
@@ -1499,20 +1470,16 @@ async function placeOrder() {
         items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
         total: totalPrice,
         status: 'pending',
-        delivery_girl: isDeliveryLoggedIn ? deliveryGirlName : '',
         district: 'Kasama',
         province: 'Northern Province'
     };
     
     try {
-        // 1. Save to Supabase
         const savedOrder = await saveOrderToSupabase(orderData);
         
         if (savedOrder) {
-            // Add to local orders
             allOrders.unshift(savedOrder);
             
-            // 2. Send WhatsApp notification
             const orderDetails = {
                 name: name,
                 phone: phone,
@@ -1522,10 +1489,8 @@ async function placeOrder() {
                 deliveryGirl: isDeliveryLoggedIn ? deliveryGirlName : 'Not assigned yet'
             };
             
-            // Send WhatsApp notification (opens WhatsApp)
             sendWhatsAppNotification(orderDetails);
             
-            // 3. Show success with WhatsApp status
             document.getElementById('orderStatus').innerHTML = `
                 <div class="order-placed-banner">
                     <i class="fas fa-check-circle"></i> ✅ Order confirmed, ${name}! 
@@ -1584,7 +1549,6 @@ async function assignOrder(orderId, girlName) {
         order.status = 'assigned';
         order.delivery_girl = girlName;
         
-        // Update in Supabase
         try {
             await supabaseClient
                 .from('orders')
@@ -1710,19 +1674,16 @@ async function deliverOrder(orderId) {
 // START THE APP
 // ============================================
 async function startApp() {
-    // Initialize Supabase
     await initSupabase();
     renderApp();
     
     console.log('✅ Chikorlando Restaurant App Loaded!');
     console.log(`📋 ${MENU.length} menu items loaded`);
     console.log('📍 Serving Kasama District, Zambia');
-    console.log('👩 Delivery Girls:', DELIVERY_GIRLS.join(', '));
-    console.log('📱 WhatsApp notifications enabled for:', WHATSAPP_CONFIG.adminNumber);
+    console.log('📱 WhatsApp notifications enabled');
     console.log('📦 Orders will be saved to Supabase');
 }
 
-// Start the app
 startApp();
 </script>
 </body>
