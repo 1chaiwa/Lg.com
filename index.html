@@ -669,6 +669,8 @@
             font-size: 7px;
             color: #6d6a7a;
         }
+
+        /* Simplified Payment Section - Just Numbers */
         .payment-section {
             background: #f0f8f0;
             border-radius: 10px;
@@ -681,13 +683,13 @@
             margin-bottom: 6px;
             font-size: 12px;
         }
-        .payment-details .phone-numbers {
+        .payment-numbers {
             background: #f9f9f9;
             padding: 8px;
             border-radius: 8px;
             border: 1px solid #eee;
         }
-        .payment-details .phone-row {
+        .payment-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -695,16 +697,18 @@
             padding: 4px 2px;
             border-bottom: 1px solid #eee;
         }
-        .payment-details .phone-row:last-child {
+        .payment-row:last-child {
             border-bottom: none;
         }
-        .payment-details .phone-row .number {
+        .payment-row .number {
             color: #cc0000;
             font-weight: 700;
-            font-size: 12px;
+            font-size: 13px;
+            font-family: monospace;
+            letter-spacing: 1px;
         }
-        .payment-details .phone-row .click-btn {
-            background: #25D366;
+        .payment-row .copy-btn {
+            background: #2196f3;
             color: white;
             border: none;
             border-radius: 30px;
@@ -717,44 +721,41 @@
             gap: 3px;
             transition: 0.2s;
         }
-        .payment-details .phone-row .click-btn:active {
+        .payment-row .copy-btn:active {
             transform: scale(0.95);
         }
-        .payment-details .phone-row .click-btn i {
+        .payment-row .copy-btn i {
             font-size: 10px;
         }
-        .payment-details .phone-row .click-btn.mtn {
+        .payment-row .copy-btn.mtn {
             background: #ffcc00;
             color: #990000;
         }
-        .payment-details .phone-row .click-btn.airtel {
+        .payment-row .copy-btn.airtel {
             background: #ff0000;
             color: white;
         }
-        .payment-details .phone-row .click-btn.zamtel {
+        .payment-row .copy-btn.zamtel {
             background: #00a651;
             color: white;
         }
-        .payment-details input[type="text"] {
-            width: 100%;
-            padding: 5px 8px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 11px;
-            margin-top: 3px;
-        }
-        .payment-details .help-text {
+        .payment-hint {
             font-size: 9px;
             color: #666;
-            margin-top: 3px;
+            margin-top: 4px;
+            text-align: center;
         }
-        .payment-details .warning {
+        .payment-hint i {
+            color: #cc0000;
+        }
+        .payment-warning {
             font-size: 9px;
             color: #e65100;
             background: #fff3e0;
-            padding: 5px;
+            padding: 4px;
             border-radius: 6px;
             margin-top: 4px;
+            text-align: center;
         }
         .payment-status-badge {
             display: inline-block;
@@ -770,18 +771,6 @@
         .payment-status-badge.confirmed {
             background: #c8e6c9;
             color: #2e7d32;
-        }
-        .send-money-hint {
-            font-size: 10px;
-            color: #2e7d32;
-            font-weight: 600;
-            margin-bottom: 4px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        .send-money-hint i {
-            font-size: 12px;
         }
         .whatsapp-notification {
             background: #25D366;
@@ -805,6 +794,18 @@
             display: flex;
             align-items: center;
             gap: 4px;
+        }
+        .payment-instruction {
+            background: #fff8e1;
+            border-left: 3px solid #ff9800;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            color: #666;
+            margin-top: 4px;
+        }
+        .payment-instruction strong {
+            color: #cc0000;
         }
     </style>
 </head>
@@ -886,7 +887,7 @@
         };
 
         // ============================================
-        // PAYMENT CONFIGURATION
+        // PAYMENT CONFIGURATION - JUST NUMBERS
         // ============================================
         const PAYMENT_CONFIG = {
             momoNumber: '0971157284',
@@ -960,41 +961,21 @@
         let adminTab = 'active';
 
         // ============================================
-        // PAYMENT HELPER FUNCTIONS
+        // COPY TO CLIPBOARD FUNCTION
         // ============================================
-        function sendMobileMoney(provider, number, amount) {
-            let cleanNumber = number.replace(/\s/g, '');
-            if (cleanNumber.startsWith('0')) {
-                cleanNumber = cleanNumber.substring(1);
-            }
-
-            let ussdCode = '';
-            let message = '';
-
-            switch (provider) {
-                case 'mtn':
-                    ussdCode = `*121*2*1*${cleanNumber}*${amount}#`;
-                    message = `📱 MTN MoMo: Send ZMW ${amount} to ${number}\nDial: ${ussdCode}`;
-                    break;
-                case 'airtel':
-                    ussdCode = `*115*2*1*${cleanNumber}*${amount}#`;
-                    message = `📱 Airtel Money: Send ZMW ${amount} to ${number}\nDial: ${ussdCode}`;
-                    break;
-                case 'zamtel':
-                    ussdCode = `*384*2*1*${cleanNumber}*${amount}#`;
-                    message = `📱 Zamtel Kwacha: Send ZMW ${amount} to ${number}\nDial: ${ussdCode}`;
-                    break;
-                default:
-                    message = `Send ZMW ${amount} to ${number}`;
-            }
-
-            navigator.clipboard.writeText(ussdCode).then(() => {
-                alert(`📱 ${message}\n\n✅ USSD code copied to clipboard!\nPlease open your dialer and paste the code.`);
+        function copyNumber(number) {
+            navigator.clipboard.writeText(number).then(() => {
+                alert('✅ Phone number copied to clipboard!');
             }).catch(() => {
-                alert(`📱 ${message}\n\nPlease dial this code on your phone:\n${ussdCode}`);
+                // Fallback
+                const textArea = document.createElement('textarea');
+                textArea.value = number;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('✅ Phone number copied to clipboard!');
             });
-
-            return ussdCode;
         }
 
         // ============================================
@@ -1340,48 +1321,43 @@
                 </div>`;
             }
 
-            // Payment Section
+            // ============================================
+            // SIMPLIFIED PAYMENT SECTION - JUST NUMBERS
+            // ============================================
             const paymentHTML = `<div id="paymentSection" class="payment-section">
                 <h4><i class="fas fa-credit-card"></i> Mobile Money Payment</h4>
-                <div class="send-money-hint">
-                    <i class="fas fa-hand-pointer"></i> 
-                    <span>Tap the button below to send money instantly</span>
-                </div>
-                <div style="margin-bottom:6px;">
-                    <p style="font-size:11px;font-weight:600;margin-bottom:4px;">Send payment to:</p>
-                    <div class="phone-numbers">
-                        <div class="phone-row">
-                            <span><i class="fas fa-network-wired"></i> <strong>MTN MoMo</strong></span>
-                            <span class="number">${PAYMENT_CONFIG.momoNumber}</span>
-                            <button class="click-btn mtn" onclick="sendMobileMoney('mtn', '${PAYMENT_CONFIG.momoNumber}', ${totalPrice || 10})">
-                                <i class="fas fa-paper-plane"></i> Send
-                            </button>
-                        </div>
-                        <div class="phone-row">
-                            <span><i class="fas fa-signal"></i> <strong>Airtel Money</strong></span>
-                            <span class="number">${PAYMENT_CONFIG.airtelNumber}</span>
-                            <button class="click-btn airtel" onclick="sendMobileMoney('airtel', '${PAYMENT_CONFIG.airtelNumber}', ${totalPrice || 10})">
-                                <i class="fas fa-paper-plane"></i> Send
-                            </button>
-                        </div>
-                        <div class="phone-row">
-                            <span><i class="fas fa-signal"></i> <strong>Zamtel Kwacha</strong></span>
-                            <span class="number">${PAYMENT_CONFIG.zamtelNumber}</span>
-                            <button class="click-btn zamtel" onclick="sendMobileMoney('zamtel', '${PAYMENT_CONFIG.zamtelNumber}', ${totalPrice || 10})">
-                                <i class="fas fa-paper-plane"></i> Send
-                            </button>
-                        </div>
+                <div class="payment-numbers">
+                    <div class="payment-row">
+                        <span><i class="fas fa-network-wired"></i> <strong>MTN MoMo</strong></span>
+                        <span class="number">${PAYMENT_CONFIG.momoNumber}</span>
+                        <button class="copy-btn mtn" onclick="copyNumber('${PAYMENT_CONFIG.momoNumber}')">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
                     </div>
-                    <div style="margin-top:4px;font-size:9px;color:#666;text-align:center;">
-                        <i class="fas fa-info-circle"></i> Click "Send" to copy the USSD code
+                    <div class="payment-row">
+                        <span><i class="fas fa-signal"></i> <strong>Airtel Money</strong></span>
+                        <span class="number">${PAYMENT_CONFIG.airtelNumber}</span>
+                        <button class="copy-btn airtel" onclick="copyNumber('${PAYMENT_CONFIG.airtelNumber}')">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <div class="payment-row">
+                        <span><i class="fas fa-signal"></i> <strong>Zamtel Kwacha</strong></span>
+                        <span class="number">${PAYMENT_CONFIG.zamtelNumber}</span>
+                        <button class="copy-btn zamtel" onclick="copyNumber('${PAYMENT_CONFIG.zamtelNumber}')">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
                     </div>
                 </div>
-                <div>
-                    <label style="font-size:10px;font-weight:600;">Transaction Reference Number *</label>
-                    <input type="text" id="transactionRef" placeholder="Enter payment reference (e.g., MOMO123456)">
-                    <div class="help-text"><i class="fas fa-info-circle"></i> We'll confirm payment before cooking your food</div>
+                <div class="payment-hint">
+                    <i class="fas fa-info-circle"></i> Copy the number and send payment via your mobile money app
                 </div>
-                <div class="warning">⚠️ Orders without payment confirmation will be cancelled after 15 minutes</div>
+                <div class="payment-instruction">
+                    <strong>📝 After sending money:</strong> Tell us the reference number via WhatsApp or call <strong>0777035070</strong>
+                </div>
+                <div class="payment-warning">
+                    ⚠️ Orders without payment confirmation will be cancelled after 15 minutes
+                </div>
             </div>`;
 
             container.innerHTML = `
@@ -1501,9 +1477,9 @@
             if (!address) { alert('⚠️ Please enter your delivery address'); return; }
 
             const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
-            const ref = document.getElementById('transactionRef')?.value.trim() || '';
-            if (!ref) { alert('⚠️ Please enter your transaction reference number');
-                document.getElementById('transactionRef')?.focus(); return; }
+
+            // Generate a simple reference number
+            const ref = 'CHIK' + Date.now().toString().slice(-6);
 
             const orderData = {
                 customer_name: name,
@@ -1540,17 +1516,19 @@
                             <br><span class="whatsapp-notification"><i class="fab fa-whatsapp"></i> WhatsApp notification sent to admin!</span>
                             <div class="order-status-wa"><i class="fab fa-whatsapp" style="color:#25D366;"></i> Order #${savedOrder.id} - Payment Pending Verification</div>
                             <div style="background:#fff3e0;padding:4px;border-radius:6px;margin-top:3px;font-size:10px;color:#e65100;">💳 Payment Reference: ${ref} - Awaiting confirmation</div>
+                            <div style="background:#e8f5e9;padding:4px;border-radius:6px;margin-top:3px;font-size:9px;color:#2e7d32;">
+                                📝 Send money to: <strong>${PAYMENT_CONFIG.momoNumber}</strong> (MTN) or <strong>${PAYMENT_CONFIG.airtelNumber}</strong> (Airtel)
+                            </div>
                         </div>
                     `;
                     cart = [];
                     customerName = name;
                     customerPhone = phone;
                     customerLocation = address;
-                    document.getElementById('transactionRef').value = '';
                     setTimeout(() => { document.getElementById('orderStatus').innerHTML = '';
-                        renderApp(); }, 15000);
+                        renderApp(); }, 20000);
                     alert(
-                        `✅ Order #${savedOrder.id} placed successfully!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}\n💳 Payment Reference: ${ref}\n⏳ We'll confirm payment before cooking.`
+                        `✅ Order #${savedOrder.id} placed successfully!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}\n💳 Payment Reference: ${ref}\n📝 Send payment to: ${PAYMENT_CONFIG.momoNumber} (MTN) or ${PAYMENT_CONFIG.airtelNumber} (Airtel)\n⏳ We'll confirm payment before cooking.`
                         );
                 }
             } catch (error) {
@@ -1710,7 +1688,7 @@
             console.log('✅ Chikorlando Restaurant App Loaded!');
             console.log(`📋 ${MENU.length} menu items loaded`);
             console.log('📍 Serving Kasama District, Zambia');
-            console.log('💳 Clickable Mobile Money payment enabled');
+            console.log('💳 Payment numbers displayed - copy and send');
         }
 
         startApp();
