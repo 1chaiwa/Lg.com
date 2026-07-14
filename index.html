@@ -8,963 +8,1712 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-        body { background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 12px; }
-        #root { width: 100%; max-width: 430px; background: white; border-radius: 32px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); overflow: hidden; min-height: 780px; display: flex; flex-direction: column; }
-        .app-header { background: linear-gradient(135deg, #cc0000, #990000); padding: 14px 16px; color: white; display: flex; align-items: center; justify-content: space-between; gap: 6px; flex-wrap: wrap; }
-        .app-header .brand { display: flex; align-items: center; gap: 10px; }
-        .app-header .brand img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid #ffcc00; }
-        .app-header .brand-info { display: flex; flex-direction: column; }
-        .app-header .brand h1 { font-size: 16px; font-weight: 700; line-height: 1.2; }
-        .app-header .brand .subtitle { font-size: 7px; opacity: 0.8; display: block; }
-        .app-header .brand .contact-info { font-size: 10px; opacity: 0.9; display: flex; align-items: center; gap: 4px; margin-top: 1px; font-weight: 500; }
-        .app-header .brand .contact-info i { font-size: 10px; color: #ffcc00; }
-        .app-header .header-actions { display: flex; align-items: center; gap: 4px; }
-        .header-btn { background: rgba(255,255,255,0.15); color: white; border: none; padding: 4px 10px; border-radius: 20px; font-size: 9px; cursor: pointer; display: flex; align-items: center; gap: 3px; transition: 0.15s; }
-        .header-btn:hover { background: rgba(255,255,255,0.25); }
-        .header-btn.active { background: #ffcc00; color: #990000; }
-        .delivery-name { font-size: 8px; background: rgba(255,255,255,0.15); padding: 2px 6px; border-radius: 12px; display: none; max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .delivery-name.show { display: inline-block; }
-        .app-body { flex: 1; padding: 10px; overflow-y: auto; background: #fafafc; }
-        .card { background: white; border-radius: 14px; padding: 10px; margin-bottom: 8px; border: 1px solid #f0eff2; }
-        .section-title { font-weight: 600; font-size: 13px; color: #1a1a2e; margin-bottom: 8px; }
-        .section-title i { color: #cc0000; margin-right: 4px; }
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .menu-item-card { background: white; border-radius: 12px; border: 1px solid #f0eff2; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
-        .menu-item-card .image-container { width: 100%; height: 150px; background: #f5f0f5; overflow: hidden; display: flex; align-items: center; justify-content: center; position: relative; }
-        .menu-item-card .image-container img { width: 100%; height: 100%; object-fit: cover; }
-        .menu-item-card .item-info { padding: 8px 10px; }
-        .menu-item-card .item-name { font-weight: 600; font-size: 13px; color: #1a1a2e; }
-        .menu-item-card .item-price { color: #cc0000; font-weight: 700; font-size: 14px; margin-top: 2px; }
-        .menu-item-card .item-description { font-size: 10px; color: #888; margin-top: 2px; }
-        .menu-item-card .add-btn-grid { background: #cc0000; color: white; border: none; border-radius: 30px; padding: 4px 14px; font-weight: 600; font-size: 11px; cursor: pointer; margin-top: 4px; transition: 0.15s; }
-        .menu-item-card .add-btn-grid:active { transform: scale(0.95); }
-        .order-summary { background: white; border-radius: 14px; padding: 10px; border: 1px solid #e9e6ed; margin-bottom: 8px; }
-        .order-row { display: flex; justify-content: space-between; padding: 3px 0; font-size: 12px; border-bottom: 1px dashed #e3dfe9; }
-        .order-total { font-weight: 700; font-size: 14px; padding-top: 4px; border-top: 2px solid #cc0000; margin-top: 3px; }
-        .order-total span { color: #cc0000; }
-        .action-btn { background: #cc0000; color: white; border: none; border-radius: 40px; padding: 8px; font-weight: 700; font-size: 13px; width: 100%; margin-top: 6px; cursor: pointer; transition: 0.15s; }
-        .action-btn:active { transform: scale(0.97); }
-        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-        .action-btn-small { background: #cc0000; color: white; border: none; border-radius: 30px; padding: 4px 12px; font-weight: 600; font-size: 10px; cursor: pointer; }
-        .action-btn-small:hover { background: #990000; }
-        .map-container { height: 150px; background: #e8e0e0; border-radius: 10px; overflow: hidden; margin: 3px 0; position: relative; }
-        .map-container #map { width: 100%; height: 100%; border: 0; }
-        .footnote { font-size: 8px; color: #6d6a7a; text-align: center; padding: 6px; border-top: 1px solid #ece9f0; background: #fff5f5; }
-        .cart-count { background: #cc0000; color: white; border-radius: 50%; padding: 0 6px; font-size: 10px; font-weight: 700; margin-left: 4px; }
-        .customer-details { background: #fff8f8; border-radius: 10px; padding: 6px; margin-top: 3px; border: 1px solid #ffe0e0; }
-        .customer-details .form-group { margin-bottom: 4px; }
-        .customer-details label { display: block; font-size: 9px; font-weight: 600; color: #6d6a7a; margin-bottom: 1px; }
-        .customer-details input { width: 100%; padding: 5px 8px; border: 1px solid #ffcccc; border-radius: 6px; font-size: 12px; outline: none; }
-        .customer-details .required { color: #cc0000; }
-        .kasama-badge { background: #ffcc00; color: #990000; padding: 1px 5px; border-radius: 10px; font-size: 6px; font-weight: 700; }
-        .real-time-indicator .dot { width: 4px; height: 4px; background: #00cc44; border-radius: 50%; display: inline-block; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
-        .real-time-indicator { display: flex; align-items: center; gap: 2px; font-size: 8px; color: #cc0000; }
-        .order-placed-banner { background: #cc0000; color: white; padding: 6px; border-radius: 10px; text-align: center; margin-top: 4px; font-size: 12px; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .admin-panel { background: #fff5f5; border-radius: 14px; padding: 10px; border: 1px solid #ffe0e0; display: none; }
-        .admin-panel.show { display: block; }
-        .delivery-panel { background: #f0f8ff; border-radius: 14px; padding: 10px; border: 1px solid #b3d9ff; display: none; }
-        .delivery-panel.show { display: block; }
-        .delivery-girl-tag { background: white; border-radius: 40px; padding: 2px 8px; display: inline-block; border: 1px solid #ffcccc; font-size: 10px; margin: 2px; }
-        .qty-control { display: flex; align-items: center; gap: 4px; }
-        .qty-control button { width: 22px; height: 22px; border-radius: 50%; border: none; font-weight: 700; cursor: pointer; font-size: 12px; transition: 0.15s; }
-        .qty-control button:active { transform: scale(0.9); }
-        .qty-btn-minus { background: #f0f0f0; color: #333; }
-        .qty-btn-plus { background: #cc0000; color: white; }
-        .qty-number { font-weight: 700; font-size: 14px; min-width: 16px; text-align: center; }
-        .whatsapp-btn { background: #25D366; color: white; border: none; border-radius: 40px; padding: 4px 12px; font-weight: 600; cursor: pointer; font-size: 11px; margin-top: 3px; }
-        .delivery-login-modal, .admin-login-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.6); z-index: 999; justify-content: center; align-items: center; }
-        .delivery-login-modal.show, .admin-login-modal.show { display: flex; }
-        .delivery-login-box, .admin-login-box { background: white; padding: 20px; border-radius: 24px; max-width: 300px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-        .delivery-login-box h2, .admin-login-box h2 { color: #cc0000; margin-bottom: 12px; text-align: center; font-size: 15px; }
-        .delivery-login-box input, .admin-login-box input { width: 100%; padding: 7px; border: 1px solid #ffcccc; border-radius: 10px; margin-bottom: 6px; font-size: 12px; outline: none; }
-        .delivery-login-box input:focus, .admin-login-box input:focus { border-color: #cc0000; }
-        .delivery-login-box button, .admin-login-box button { width: 100%; padding: 7px; background: #cc0000; color: white; border: none; border-radius: 10px; font-weight: 600; font-size: 12px; cursor: pointer; }
-        .delivery-login-box .error, .admin-login-box .error { color: #cc0000; font-size: 10px; text-align: center; margin-top: 4px; display: none; }
-        .delivery-login-box .error.show, .admin-login-box .error.show { display: block; }
-        .close-btn { margin-top: 4px; background: #999; width: 100%; padding: 5px; border: none; border-radius: 10px; color: white; font-weight: 600; cursor: pointer; font-size: 11px; }
-        .order-card { background: white; border-radius: 10px; padding: 8px; margin-bottom: 6px; border: 1px solid #e9e6ed; }
-        .order-card .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
-        .order-card .order-id { font-weight: 600; font-size: 10px; color: #1a1a2e; }
-        .order-card .order-time { font-size: 8px; color: #999; }
-        .order-card .customer-info { font-size: 10px; color: #333; margin: 2px 0; }
-        .order-card .customer-info i { color: #cc0000; width: 12px; }
-        .order-card .order-items { font-size: 9px; color: #666; margin: 2px 0; padding: 2px 0; border-top: 1px dashed #f0edf3; }
-        .order-card .order-total { font-weight: 700; color: #cc0000; font-size: 12px; }
-        .order-card .action-btns { display: flex; gap: 4px; margin-top: 4px; }
-        .order-card .action-btns button { flex: 1; padding: 4px; border: none; border-radius: 20px; font-weight: 600; font-size: 9px; cursor: pointer; transition: 0.15s; }
-        .order-card .action-btns button:active { transform: scale(0.95); }
-        .btn-accept { background: #4caf50; color: white; }
-        .btn-pickup { background: #ff9800; color: white; }
-        .btn-deliver { background: #2196f3; color: white; }
-        .btn-decline { background: #f44336; color: white; }
-        .btn-complete { background: #4caf50; color: white; }
-        .order-card .status-badge { padding: 1px 6px; border-radius: 10px; font-size: 7px; font-weight: 600; }
-        .status-badge.pending { background: #ffe0b2; color: #e65100; }
-        .status-badge.payment_pending { background: #fff3e0; color: #e65100; }
-        .status-badge.delivered { background: #c8e6c9; color: #2e7d32; }
-        .status-badge.assigned { background: #b3e5fc; color: #01579b; }
-        .status-badge.picked_up { background: #fff9c4; color: #f57f17; }
-        .status-badge.completed { background: #c8e6c9; color: #2e7d32; }
-        .status-badge.archived { background: #e0e0e0; color: #666; }
-        .tab-bar { display: flex; gap: 4px; margin: 6px 0; }
-        .tab-btn { flex: 1; padding: 4px; border: none; border-radius: 8px; background: #f0f0f0; font-weight: 600; font-size: 9px; cursor: pointer; transition: 0.15s; }
-        .tab-btn.active { background: #cc0000; color: white; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; margin: 4px 0; }
-        .stat-card { background: linear-gradient(135deg, #fff5f5, #ffffff); padding: 6px; border-radius: 8px; border: 1px solid #ffe0e0; text-align: center; }
-        .stat-card .number { font-size: 14px; font-weight: 700; color: #cc0000; }
-        .stat-card .label { font-size: 7px; color: #6d6a7a; }
-        .whatsapp-notification { background: #25D366; color: white; padding: 4px 10px; border-radius: 20px; font-size: 9px; display: inline-flex; align-items: center; gap: 4px; margin-top: 4px; }
-        .whatsapp-notification i { font-size: 12px; }
-        .order-status-wa { background: #e8f5e9; border: 1px solid #a5d6a7; padding: 6px 10px; border-radius: 10px; font-size: 11px; color: #2e7d32; margin-top: 4px; display: flex; align-items: center; gap: 6px; }
-        
-        /* Payment Styles - Clickable Numbers */
-        .payment-section { background: #f0f8f0; border-radius: 10px; border: 2px solid #4caf50; padding: 12px; margin-top: 10px; }
-        .payment-section h4 { color: #2e7d32; margin-bottom: 8px; font-size: 13px; }
-        .payment-details .phone-numbers { background: #f9f9f9; padding: 10px; border-radius: 8px; border: 1px solid #eee; }
-        .payment-details .phone-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; padding: 6px 4px; border-bottom: 1px solid #eee; }
-        .payment-details .phone-row:last-child { border-bottom: none; }
-        .payment-details .phone-row .number { color: #cc0000; font-weight: 700; font-size: 13px; }
-        .payment-details .phone-row .click-btn { background: #25D366; color: white; border: none; border-radius: 30px; padding: 4px 12px; font-size: 10px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: 0.2s; }
-        .payment-details .phone-row .click-btn:active { transform: scale(0.95); }
-        .payment-details .phone-row .click-btn i { font-size: 12px; }
-        .payment-details .phone-row .click-btn.mtn { background: #ffcc00; color: #990000; }
-        .payment-details .phone-row .click-btn.airtel { background: #ff0000; color: white; }
-        .payment-details .phone-row .click-btn.zamtel { background: #00a651; color: white; }
-        .payment-details .phone-row .click-btn:hover { opacity: 0.8; }
-        .payment-details input[type="text"] { width: 100%; padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 12px; margin-top: 4px; }
-        .payment-details .help-text { font-size: 10px; color: #666; margin-top: 4px; }
-        .payment-details .warning { font-size: 10px; color: #e65100; background: #fff3e0; padding: 6px; border-radius: 6px; margin-top: 6px; }
-        .payment-status-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 9px; font-weight: 600; }
-        .payment-status-badge.pending { background: #fff3e0; color: #e65100; }
-        .payment-status-badge.confirmed { background: #c8e6c9; color: #2e7d32; }
-        .quick-pay-btn { background: #25D366; color: white; border: none; border-radius: 40px; padding: 6px 12px; font-weight: 600; font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; transition: 0.2s; }
-        .quick-pay-btn:active { transform: scale(0.95); }
-        .send-money-hint { font-size: 11px; color: #2e7d32; font-weight: 600; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
-        .send-money-hint i { font-size: 14px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        body {
+            background: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 12px;
+        }
+        #root {
+            width: 100%;
+            max-width: 430px;
+            background: white;
+            border-radius: 32px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            min-height: 780px;
+            display: flex;
+            flex-direction: column;
+        }
+        .app-header {
+            background: linear-gradient(135deg, #cc0000, #990000);
+            padding: 10px 14px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 6px;
+            min-height: 50px;
+        }
+        .app-header .brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+        .app-header .brand i {
+            font-size: 22px;
+            color: #ffcc00;
+        }
+        .app-header .brand h1 {
+            font-size: 16px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .app-header .brand .subtitle {
+            font-size: 7px;
+            opacity: 0.8;
+            display: block;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+        .app-header .brand .contact-info {
+            font-size: 8px;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 1px;
+        }
+        .app-header .brand .contact-info i {
+            font-size: 8px;
+            color: #ffcc00;
+        }
+        .app-header .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .app-header .header-btn {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border: none;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 9px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            transition: 0.15s;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .app-header .header-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        .app-header .header-btn.active {
+            background: #ffcc00;
+            color: #990000;
+        }
+        .app-header .delivery-name {
+            font-size: 8px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 2px 6px;
+            border-radius: 12px;
+            display: none;
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .app-header .delivery-name.show {
+            display: inline-block;
+        }
+        .app-body {
+            flex: 1;
+            padding: 10px;
+            overflow-y: auto;
+            background: #fafafc;
+            max-height: 700px;
+        }
+        .card {
+            background: white;
+            border-radius: 14px;
+            padding: 10px;
+            margin-bottom: 8px;
+            border: 1px solid #f0eff2;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+        .section-title {
+            font-weight: 600;
+            font-size: 12px;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+        }
+        .section-title i {
+            color: #cc0000;
+            margin-right: 4px;
+        }
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .menu-item-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #f0eff2;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+        }
+        .menu-item-card .image-container {
+            width: 100%;
+            height: 120px;
+            background: #f5f0f5;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .menu-item-card .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .menu-item-card .item-info {
+            padding: 6px 8px;
+        }
+        .menu-item-card .item-name {
+            font-weight: 600;
+            font-size: 12px;
+            color: #1a1a2e;
+        }
+        .menu-item-card .item-price {
+            color: #cc0000;
+            font-weight: 700;
+            font-size: 13px;
+            margin-top: 1px;
+        }
+        .menu-item-card .item-description {
+            font-size: 9px;
+            color: #888;
+            margin-top: 1px;
+        }
+        .menu-item-card .add-btn-grid {
+            background: #cc0000;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 3px 12px;
+            font-weight: 600;
+            font-size: 10px;
+            cursor: pointer;
+            margin-top: 3px;
+            transition: 0.15s;
+        }
+        .menu-item-card .add-btn-grid:active {
+            transform: scale(0.95);
+        }
+        .order-summary {
+            background: white;
+            border-radius: 14px;
+            padding: 10px;
+            border: 1px solid #e9e6ed;
+            margin-bottom: 8px;
+        }
+        .order-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 2px 0;
+            font-size: 11px;
+            border-bottom: 1px dashed #e3dfe9;
+        }
+        .order-total {
+            font-weight: 700;
+            font-size: 13px;
+            padding-top: 3px;
+            border-top: 2px solid #cc0000;
+            margin-top: 2px;
+        }
+        .order-total span {
+            color: #cc0000;
+        }
+        .action-btn {
+            background: #cc0000;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 7px;
+            font-weight: 700;
+            font-size: 12px;
+            width: 100%;
+            margin-top: 5px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .action-btn:active {
+            transform: scale(0.97);
+        }
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .action-btn-small {
+            background: #cc0000;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 3px 10px;
+            font-weight: 600;
+            font-size: 9px;
+            cursor: pointer;
+        }
+        .action-btn-small:hover {
+            background: #990000;
+        }
+        .map-container {
+            height: 140px;
+            background: #e8e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 3px 0;
+            position: relative;
+        }
+        .map-container #map {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        .footnote {
+            font-size: 8px;
+            color: #6d6a7a;
+            text-align: center;
+            padding: 6px;
+            border-top: 1px solid #ece9f0;
+            background: #fff5f5;
+        }
+        .cart-count {
+            background: #cc0000;
+            color: white;
+            border-radius: 50%;
+            padding: 0 5px;
+            font-size: 9px;
+            font-weight: 700;
+            margin-left: 3px;
+        }
+        .customer-details {
+            background: #fff8f8;
+            border-radius: 10px;
+            padding: 6px;
+            margin-top: 3px;
+            border: 1px solid #ffe0e0;
+        }
+        .customer-details .form-group {
+            margin-bottom: 4px;
+        }
+        .customer-details label {
+            display: block;
+            font-size: 9px;
+            font-weight: 600;
+            color: #6d6a7a;
+            margin-bottom: 1px;
+        }
+        .customer-details input {
+            width: 100%;
+            padding: 4px 6px;
+            border: 1px solid #ffcccc;
+            border-radius: 6px;
+            font-size: 11px;
+            outline: none;
+        }
+        .customer-details .required {
+            color: #cc0000;
+        }
+        .real-time-indicator .dot {
+            width: 4px;
+            height: 4px;
+            background: #00cc44;
+            border-radius: 50%;
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        .real-time-indicator {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            font-size: 8px;
+            color: #cc0000;
+        }
+        .order-placed-banner {
+            background: #cc0000;
+            color: white;
+            padding: 5px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 4px;
+            font-size: 11px;
+            animation: fadeIn 0.5s;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .admin-panel {
+            background: #fff5f5;
+            border-radius: 14px;
+            padding: 10px;
+            border: 1px solid #ffe0e0;
+            display: none;
+        }
+        .admin-panel.show {
+            display: block;
+        }
+        .delivery-panel {
+            background: #f0f8ff;
+            border-radius: 14px;
+            padding: 10px;
+            border: 1px solid #b3d9ff;
+            display: none;
+        }
+        .delivery-panel.show {
+            display: block;
+        }
+        .delivery-girl-tag {
+            background: white;
+            border-radius: 40px;
+            padding: 2px 8px;
+            display: inline-block;
+            border: 1px solid #ffcccc;
+            font-size: 9px;
+            margin: 2px;
+        }
+        .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .qty-control button {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 11px;
+            transition: 0.15s;
+        }
+        .qty-control button:active {
+            transform: scale(0.9);
+        }
+        .qty-btn-minus {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .qty-btn-plus {
+            background: #cc0000;
+            color: white;
+        }
+        .qty-number {
+            font-weight: 700;
+            font-size: 13px;
+            min-width: 16px;
+            text-align: center;
+        }
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 4px 10px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 10px;
+            margin-top: 2px;
+        }
+        .delivery-login-modal,
+        .admin-login-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+        .delivery-login-modal.show,
+        .admin-login-modal.show {
+            display: flex;
+        }
+        .delivery-login-box,
+        .admin-login-box {
+            background: white;
+            padding: 18px;
+            border-radius: 24px;
+            max-width: 300px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        .delivery-login-box h2,
+        .admin-login-box h2 {
+            color: #cc0000;
+            margin-bottom: 10px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .delivery-login-box input,
+        .admin-login-box input {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid #ffcccc;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            font-size: 12px;
+            outline: none;
+        }
+        .delivery-login-box input:focus,
+        .admin-login-box input:focus {
+            border-color: #cc0000;
+        }
+        .delivery-login-box button,
+        .admin-login-box button {
+            width: 100%;
+            padding: 6px;
+            background: #cc0000;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .delivery-login-box .error,
+        .admin-login-box .error {
+            color: #cc0000;
+            font-size: 10px;
+            text-align: center;
+            margin-top: 4px;
+            display: none;
+        }
+        .delivery-login-box .error.show,
+        .admin-login-box .error.show {
+            display: block;
+        }
+        .close-btn {
+            margin-top: 4px;
+            background: #999;
+            width: 100%;
+            padding: 5px;
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 11px;
+        }
+        .order-card {
+            background: white;
+            border-radius: 10px;
+            padding: 8px;
+            margin-bottom: 6px;
+            border: 1px solid #e9e6ed;
+        }
+        .order-card .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3px;
+        }
+        .order-card .order-id {
+            font-weight: 600;
+            font-size: 10px;
+            color: #1a1a2e;
+        }
+        .order-card .order-time {
+            font-size: 8px;
+            color: #999;
+        }
+        .order-card .customer-info {
+            font-size: 10px;
+            color: #333;
+            margin: 2px 0;
+        }
+        .order-card .customer-info i {
+            color: #cc0000;
+            width: 12px;
+        }
+        .order-card .order-items {
+            font-size: 9px;
+            color: #666;
+            margin: 2px 0;
+            padding: 2px 0;
+            border-top: 1px dashed #f0edf3;
+        }
+        .order-card .order-total {
+            font-weight: 700;
+            color: #cc0000;
+            font-size: 11px;
+        }
+        .order-card .action-btns {
+            display: flex;
+            gap: 4px;
+            margin-top: 4px;
+        }
+        .order-card .action-btns button {
+            flex: 1;
+            padding: 3px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 9px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .order-card .action-btns button:active {
+            transform: scale(0.95);
+        }
+        .btn-accept {
+            background: #4caf50;
+            color: white;
+        }
+        .btn-pickup {
+            background: #ff9800;
+            color: white;
+        }
+        .btn-deliver {
+            background: #2196f3;
+            color: white;
+        }
+        .btn-decline {
+            background: #f44336;
+            color: white;
+        }
+        .order-card .status-badge {
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 7px;
+            font-weight: 600;
+        }
+        .status-badge.pending {
+            background: #ffe0b2;
+            color: #e65100;
+        }
+        .status-badge.payment_pending {
+            background: #fff3e0;
+            color: #e65100;
+        }
+        .status-badge.delivered {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+        .status-badge.assigned {
+            background: #b3e5fc;
+            color: #01579b;
+        }
+        .status-badge.picked_up {
+            background: #fff9c4;
+            color: #f57f17;
+        }
+        .status-badge.completed {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+        .tab-bar {
+            display: flex;
+            gap: 4px;
+            margin: 4px 0;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 3px;
+            border: none;
+            border-radius: 8px;
+            background: #f0f0f0;
+            font-weight: 600;
+            font-size: 9px;
+            cursor: pointer;
+            transition: 0.15s;
+        }
+        .tab-btn.active {
+            background: #cc0000;
+            color: white;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 4px;
+            margin: 4px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #fff5f5, #ffffff);
+            padding: 6px;
+            border-radius: 8px;
+            border: 1px solid #ffe0e0;
+            text-align: center;
+        }
+        .stat-card .number {
+            font-size: 13px;
+            font-weight: 700;
+            color: #cc0000;
+        }
+        .stat-card .label {
+            font-size: 7px;
+            color: #6d6a7a;
+        }
+        .payment-section {
+            background: #f0f8f0;
+            border-radius: 10px;
+            border: 2px solid #4caf50;
+            padding: 10px;
+            margin-top: 6px;
+        }
+        .payment-section h4 {
+            color: #2e7d32;
+            margin-bottom: 6px;
+            font-size: 12px;
+        }
+        .payment-details .phone-numbers {
+            background: #f9f9f9;
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        .payment-details .phone-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            padding: 4px 2px;
+            border-bottom: 1px solid #eee;
+        }
+        .payment-details .phone-row:last-child {
+            border-bottom: none;
+        }
+        .payment-details .phone-row .number {
+            color: #cc0000;
+            font-weight: 700;
+            font-size: 12px;
+        }
+        .payment-details .phone-row .click-btn {
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 3px 10px;
+            font-size: 9px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            transition: 0.2s;
+        }
+        .payment-details .phone-row .click-btn:active {
+            transform: scale(0.95);
+        }
+        .payment-details .phone-row .click-btn i {
+            font-size: 10px;
+        }
+        .payment-details .phone-row .click-btn.mtn {
+            background: #ffcc00;
+            color: #990000;
+        }
+        .payment-details .phone-row .click-btn.airtel {
+            background: #ff0000;
+            color: white;
+        }
+        .payment-details .phone-row .click-btn.zamtel {
+            background: #00a651;
+            color: white;
+        }
+        .payment-details input[type="text"] {
+            width: 100%;
+            padding: 5px 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 11px;
+            margin-top: 3px;
+        }
+        .payment-details .help-text {
+            font-size: 9px;
+            color: #666;
+            margin-top: 3px;
+        }
+        .payment-details .warning {
+            font-size: 9px;
+            color: #e65100;
+            background: #fff3e0;
+            padding: 5px;
+            border-radius: 6px;
+            margin-top: 4px;
+        }
+        .payment-status-badge {
+            display: inline-block;
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 8px;
+            font-weight: 600;
+        }
+        .payment-status-badge.pending {
+            background: #fff3e0;
+            color: #e65100;
+        }
+        .payment-status-badge.confirmed {
+            background: #c8e6c9;
+            color: #2e7d32;
+        }
+        .send-money-hint {
+            font-size: 10px;
+            color: #2e7d32;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .send-money-hint i {
+            font-size: 12px;
+        }
+        .whatsapp-notification {
+            background: #25D366;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-size: 9px;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            margin-top: 3px;
+        }
+        .order-status-wa {
+            background: #e8f5e9;
+            border: 1px solid #a5d6a7;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 10px;
+            color: #2e7d32;
+            margin-top: 3px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
     </style>
 </head>
 <body>
-<div id="root">
-    <div class="app-header">
-        <div class="brand">
-            <img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/logo1.png" alt="Chikorlando Logo" onerror="this.style.display='none';this.parentElement.innerHTML='<i class=\\'fas fa-utensils\\'></i>'"/>
-            <div class="brand-info">
-                <h1>Chikorlando</h1>
-                <span class="subtitle">Restaurant & Food Delivery</span>
-                <div class="contact-info">
-                    <i class="fas fa-phone"></i> 
-                    <span>0777035070</span>
-                    <i class="fas fa-whatsapp" style="margin-left:4px;"></i>
-                    <span>evanchilando0@gmail.com</span>
-                </div>
-            </div>
-        </div>
-        <div class="header-actions">
-            <button class="header-btn" id="deliveryLoginBtn" onclick="openDeliveryLogin()">
-                <i class="fas fa-motorcycle"></i> 
-                <span id="deliveryBtnText">Delivery</span>
-            </button>
-            <button class="header-btn" id="adminLoginBtn" onclick="openAdminLogin()">
-                <i class="fas fa-user-shield"></i>
-            </button>
-            <span class="delivery-name" id="deliveryNameDisplay"></span>
-        </div>
-    </div>
-    <div id="app-container" class="app-body">
-        <!-- Content will be rendered here -->
-    </div>
-    <div class="footnote">
-        <i class="fas fa-shield-alt"></i> Prepayment required · Serving Kasama District, Northern Province, Zambia
-    </div>
-</div>
-
-<!-- Delivery Girl Login Modal -->
-<div class="delivery-login-modal" id="deliveryLoginModal">
-    <div class="delivery-login-box">
-        <h2><i class="fas fa-motorcycle"></i> Delivery Login</h2>
-        <p style="font-size:10px;color:#666;text-align:center;margin-bottom:6px;">Enter your name to start delivering</p>
-        <input type="text" id="deliveryLoginName" placeholder="Enter your name" onkeypress="if(event.key==='Enter') deliveryLogin()" />
-        <button onclick="deliveryLogin()">Login</button>
-        <div class="error" id="deliveryLoginError">❌ Please enter your name</div>
-        <button class="close-btn" onclick="closeDeliveryLogin()">Cancel</button>
-    </div>
-</div>
-
-<!-- Admin Login Modal -->
-<div class="admin-login-modal" id="adminLoginModal">
-    <div class="admin-login-box">
-        <h2><i class="fas fa-user-shield"></i> Admin Login</h2>
-        <input type="password" id="adminPassword" placeholder="Enter admin password" onkeypress="if(event.key==='Enter') adminLogin()" />
-        <button onclick="adminLogin()">Login</button>
-        <div class="error" id="adminLoginError">❌ Incorrect password</div>
-        <div style="margin-top:4px;text-align:center;font-size:9px;color:#999;">
-            <i class="fas fa-info-circle"></i> Default: <strong>admin2426</strong>
-        </div>
-        <button class="close-btn" onclick="closeAdminLogin()">Cancel</button>
-    </div>
-</div>
-
-<script>
-// ============================================
-// SUPABASE CONFIGURATION
-// ============================================
-const SUPABASE_URL = 'https://ndwoqlxtaczwxsescemu.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kd29xbHh0YWN6d3hzZXNjZW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5Mjk2MTQsImV4cCI6MjA5ODUwNTYxNH0.43PgLQSdEESXboLGrdtZCHq-f8TwzItXaGuxmI4NEe8';
-
-// ============================================
-// WHATSAPP CONFIGURATION
-// ============================================
-const WHATSAPP_CONFIG = {
-    adminNumber: '260971157284',
-    restaurantName: 'Chikorlando Restaurant'
-};
-
-// ============================================
-// PAYMENT CONFIGURATION
-// ============================================
-const PAYMENT_CONFIG = {
-    momoNumber: '0971157284',
-    airtelNumber: '0777035070',
-    zamtelNumber: '0971130511'
-};
-
-// ============================================
-// MENU DATA
-// ============================================
-const MENU = [
-    { id: 1, name: 'Nshima with Village Chicken', price: 90.00, emoji: '🍗', imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/vchik.jpg" alt="Nshima & Chicken">', description: 'Traditional Zambian meal with village chicken' },
-    { id: 2, name: 'Nshima with Roasted Chicken', price: 60.00, emoji: '🍗', imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/rostedChi.jpg" alt="Nshima with chicken">', description: 'Traditional Zambian meal with village chicken' },
-    { id: 3, name: 'Nshima with Beef Sausage', price: 50.00, emoji: '🌭', imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/bsausage1.jpg" alt="Beef Sausage">', description: 'Well cooked beef sausages' },
-    { id: 4, name: 'Nshima with Pork', price: 80.00, emoji: '🥩', imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/pork1.jpg" alt="Pork">', description: 'Tender and yummy pork' },
-    { id: 5, name: 'Nshima with Liver', price: 60.00, emoji: '🍗', imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/liver.jpg" alt="Liver">', description: 'Spicy liver with onions' },
-    { id: 6, name: 'Nshima with Boiled Fish', price: 60.00, emoji: '🐟', imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/boiledfish.jpg" alt="Boiled Fish">', description: 'Delicious boiled fish' },
-    { id: 7, name: 'Kapenta', price: 50.00, emoji: '🐟', imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/kap.jpg" alt="Kapenta">', description: 'Dried Kapenta fish' },
-    { id: 8, name: 'Okra Stew', price: 50.00, emoji: '🥬', imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/OKRA.jpg" alt="Okra">', description: 'Fresh okra vegetable stew' },
-    { id: 9, name: 'Nshima with Trotters', price: 60.00, emoji: '🍗', imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/trot.jpg" alt="Trotters">', description: 'Fried chicken trotters' },
-    { id: 10, name: 'Disposable Coke', price: 15.00, emoji: '🥤', imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/coco.jpg" alt="Coca-Cola">', description: 'Ice cold Coca-Cola 500ml' },
-    { id: 11, name: 'Disposable Fanta', price: 15.00, emoji: '🥤', imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fnta.jpg" alt="Fanta">', description: 'Ice cold Fanta 500ml' },
-    { id: 12, name: 'Bottled Fanta Orange', price: 10.00, emoji: '🥤', imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fnt.jpg" alt="Fanta Orange">', description: 'Fanta Orange 300ml' },
-    { id: 13, name: 'Bottled Coke', price: 10.00, emoji: '🥤', imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/small coke.jpg" alt="Bottled Coke">', description: 'Chilled Coke 300ml' },
-    { id: 14, name: 'Cold Water', price: 10.00, emoji: '💧', imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/smallWater.jpg" alt="chilled water">', description: 'Chilled water 500ml' }
-];
-
-const DELIVERY_GIRLS = ['Chaiwa Justine', 'Brenda Mwansa', 'Chola Williams'];
-const ADMIN_PASSWORD = 'admin2426';
-
-// ============================================
-// STATE
-// ============================================
-let cart = [];
-let isAdmin = false;
-let isDeliveryLoggedIn = false;
-let deliveryGirlName = '';
-let customerName = '';
-let customerPhone = '';
-let customerLocation = '';
-let allOrders = [];
-let orderIdCounter = 1;
-let supabaseClient = null;
-let adminTab = 'active';
-
-// ============================================
-// PAYMENT HELPER FUNCTIONS
-// ============================================
-function sendMobileMoney(provider, number, amount) {
-    // Format the number for USSD (remove spaces and leading 0 if present)
-    let cleanNumber = number.replace(/\s/g, '');
-    if (cleanNumber.startsWith('0')) {
-        cleanNumber = cleanNumber.substring(1);
-    }
-    
-    // Create USSD code based on provider
-    let ussdCode = '';
-    let message = '';
-    
-    switch(provider) {
-        case 'mtn':
-            // MTN MoMo USSD: *121# 
-            // For sending money: *121*2*1*recipient#amount#
-            ussdCode = `*121*2*1*${cleanNumber}*${amount}#`;
-            message = `📱 MTN MoMo: Send ZMW ${amount} to ${number}\nDial: ${ussdCode}`;
-            break;
-        case 'airtel':
-            // Airtel Money USSD: *115#
-            ussdCode = `*115*2*1*${cleanNumber}*${amount}#`;
-            message = `📱 Airtel Money: Send ZMW ${amount} to ${number}\nDial: ${ussdCode}`;
-            break;
-        case 'zamtel':
-            // Zamtel Kwacha USSD: *384#
-            ussdCode = `*384*2*1*${cleanNumber}*${amount}#`;
-            message = `📱 Zamtel Kwacha: Send ZMW ${amount} to ${number}\nDial: ${ussdCode}`;
-            break;
-        default:
-            message = `Send ZMW ${amount} to ${number}`;
-    }
-    
-    // Try to open USSD (for mobile browsers)
-    // Note: USSD codes don't work directly from browsers, but we copy to clipboard
-    navigator.clipboard.writeText(ussdCode).then(() => {
-        alert(`📱 ${message}\n\n✅ USSD code copied to clipboard!\nPlease open your dialer and paste the code.`);
-    }).catch(() => {
-        alert(`📱 ${message}\n\nPlease dial this code on your phone:\n${ussdCode}`);
-    });
-    
-    return ussdCode;
-}
-
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        alert('✅ Phone number copied to clipboard!');
-    }).catch(() => {
-        // Fallback
-        const textArea = document.createElement('textarea');
-        textArea.value = text;
-        document.body.appendChild(textArea);
-        textArea.select();
-        document.execCommand('copy');
-        document.body.removeChild(textArea);
-        alert('✅ Phone number copied to clipboard!');
-    });
-}
-
-// ============================================
-// SUPABASE FUNCTIONS
-// ============================================
-async function initSupabase() {
-    try {
-        if (typeof window.supabase === 'undefined') {
-            await new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
-                script.onload = resolve;
-                script.onerror = reject;
-                document.head.appendChild(script);
-            });
-        }
-        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        console.log('✅ Supabase initialized');
-        await loadOrders();
-        return true;
-    } catch (error) {
-        console.error('❌ Supabase initialization failed:', error);
-        return false;
-    }
-}
-
-async function saveOrderToSupabase(orderData) {
-    try {
-        console.log('📤 Saving order to Supabase:', orderData);
-        const { data, error } = await supabaseClient
-            .from('orders')
-            .insert([{
-                customer_name: orderData.customer_name,
-                customer_phone: orderData.customer_phone,
-                customer_location: orderData.customer_location,
-                items: orderData.items,
-                total: orderData.total,
-                status: orderData.status || 'payment_pending',
-                payment_method: orderData.payment_method || 'mobile_money',
-                payment_reference: orderData.payment_reference || '',
-                payment_status: orderData.payment_status || 'pending',
-                district: orderData.district || 'Kasama',
-                province: orderData.province || 'Northern Province'
-            }])
-            .select();
-        if (error) {
-            console.error('❌ Supabase insert error:', error);
-            throw error;
-        }
-        console.log('✅ Order saved to Supabase:', data);
-        return data ? data[0] : null;
-    } catch (error) {
-        console.error('❌ Failed to save order:', error);
-        throw error;
-    }
-}
-
-async function loadOrders() {
-    try {
-        const { data, error } = await supabaseClient
-            .from('orders')
-            .select('*')
-            .order('created_at', { ascending: false });
-        if (error) throw error;
-        allOrders = data || [];
-        console.log(`📦 Orders loaded: ${allOrders.length}`);
-        return allOrders;
-    } catch (error) {
-        console.error('Error loading orders:', error);
-        allOrders = [];
-        return [];
-    }
-}
-
-// ============================================
-// WHATSAPP NOTIFICATION FUNCTION
-// ============================================
-function sendWhatsAppNotification(orderDetails) {
-    const message = `🆕 *NEW ORDER!* 🛵
-
-👤 *Customer:* ${orderDetails.name}
-📱 *Phone:* ${orderDetails.phone}
-📍 *Address:* ${orderDetails.address}
-💰 *Total:* ZMW ${orderDetails.total.toFixed(2)}
-
-🛒 *Items:*
-${orderDetails.items.map(item => `  • ${item.qty}x ${item.name} - ZMW ${(item.price * item.qty).toFixed(2)}`).join('\n')}
-
-💳 *Payment Reference:* ${orderDetails.payment_reference || 'N/A'}
-💵 *Payment Status:* Pending Verification
-
-⏰ *Order Time:* ${new Date().toLocaleString()}
-📍 *Location:* Kasama, Zambia
-
-📋 *Please verify payment before preparing!* 🙏`;
-    const encodedMessage = encodeURIComponent(message);
-    const whatsappUrl = `https://wa.me/${WHATSAPP_CONFIG.adminNumber}?text=${encodedMessage}`;
-    window.open(whatsappUrl, '_blank');
-    return true;
-}
-
-// ============================================
-// DELIVERY LOGIN FUNCTIONS
-// ============================================
-function openDeliveryLogin() {
-    if (isDeliveryLoggedIn) { deliveryLogout(); return; }
-    document.getElementById('deliveryLoginModal').classList.add('show');
-    document.getElementById('deliveryLoginName').value = '';
-    document.getElementById('deliveryLoginError').classList.remove('show');
-    document.getElementById('deliveryLoginName').focus();
-}
-function closeDeliveryLogin() { document.getElementById('deliveryLoginModal').classList.remove('show'); }
-function deliveryLogin() {
-    const name = document.getElementById('deliveryLoginName').value.trim();
-    if (!name) { document.getElementById('deliveryLoginError').textContent = '❌ Please enter your name'; document.getElementById('deliveryLoginError').classList.add('show'); return; }
-    if (!DELIVERY_GIRLS.includes(name)) { document.getElementById('deliveryLoginError').textContent = '❌ Name not found. Contact admin.'; document.getElementById('deliveryLoginError').classList.add('show'); return; }
-    isDeliveryLoggedIn = true; deliveryGirlName = name;
-    document.getElementById('deliveryLoginModal').classList.remove('show');
-    document.getElementById('deliveryNameDisplay').textContent = '👩 ' + name;
-    document.getElementById('deliveryNameDisplay').classList.add('show');
-    document.getElementById('deliveryBtnText').textContent = 'Logout';
-    document.getElementById('deliveryLoginBtn').classList.add('active');
-    alert('✅ Welcome ' + name + '!'); renderApp();
-}
-function deliveryLogout() {
-    isDeliveryLoggedIn = false; deliveryGirlName = '';
-    document.getElementById('deliveryNameDisplay').classList.remove('show');
-    document.getElementById('deliveryBtnText').textContent = 'Delivery';
-    document.getElementById('deliveryLoginBtn').classList.remove('active');
-    alert('👋 Logged out from delivery'); renderApp();
-}
-
-// ============================================
-// ADMIN LOGIN FUNCTIONS
-// ============================================
-function openAdminLogin() {
-    if (isAdmin) { adminLogout(); return; }
-    document.getElementById('adminLoginModal').classList.add('show');
-    document.getElementById('adminPassword').value = '';
-    document.getElementById('adminLoginError').classList.remove('show');
-    document.getElementById('adminPassword').focus();
-}
-function closeAdminLogin() { document.getElementById('adminLoginModal').classList.remove('show'); }
-function adminLogin() {
-    const password = document.getElementById('adminPassword').value;
-    if (password === ADMIN_PASSWORD) {
-        isAdmin = true;
-        document.getElementById('adminLoginModal').classList.remove('show');
-        document.getElementById('adminLoginBtn').classList.add('active');
-        document.getElementById('adminLoginBtn').innerHTML = '<i class="fas fa-sign-out-alt"></i>';
-        alert('✅ Welcome Admin!'); renderApp();
-    } else {
-        document.getElementById('adminLoginError').classList.add('show');
-        document.getElementById('adminPassword').value = '';
-        document.getElementById('adminPassword').focus();
-    }
-}
-function adminLogout() {
-    isAdmin = false;
-    document.getElementById('adminLoginBtn').classList.remove('active');
-    document.getElementById('adminLoginBtn').innerHTML = '<i class="fas fa-user-shield"></i>';
-    alert('👋 Logged out from admin'); renderApp();
-}
-document.getElementById('deliveryLoginModal')?.addEventListener('click', function(e) { if (e.target === this) closeDeliveryLogin(); });
-document.getElementById('adminLoginModal')?.addEventListener('click', function(e) { if (e.target === this) closeAdminLogin(); });
-
-// ============================================
-// RENDER APP
-// ============================================
-function renderApp() {
-    const container = document.getElementById('app-container');
-    const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
-    const cartCount = cart.reduce((acc, i) => acc + i.qty, 0);
-    
-    let cartHTML = cart.length === 0 ? '<div style="color:#7a6e86;padding:4px 0;font-size:12px;"><i class="fas fa-shopping-cart"></i> Cart is empty</div>' :
-        cart.map(item => `<div class="order-row"><span>${item.emoji} ${item.name} × ${item.qty}</span><span>ZMW ${(item.price * item.qty).toFixed(2)}<button onclick="removeFromCart(${item.id})" style="background:none;border:none;color:#cc0000;margin-left:4px;cursor:pointer;font-size:11px;"><i class="fas fa-minus-circle"></i></button></span></div>`).join('');
-    
-    let menuHTML = MENU.map(item => {
-        const qty = cart.find(i => i.id === item.id)?.qty || 0;
-        return `<div class="menu-item-card"><div class="image-container">${item.imgTag}</div><div class="item-info"><div class="item-name">${item.emoji} ${item.name}</div><div class="item-description">${item.description || ''}</div><div class="item-price">ZMW ${item.price.toFixed(2)}</div><div style="margin-top:4px;">${qty === 0 ? `<button class="add-btn-grid" onclick="addToCart(${item.id})"><i class="fas fa-plus"></i> Add</button>` : `<div class="qty-control"><button class="qty-btn-minus" onclick="removeFromCart(${item.id})">−</button><span class="qty-number">${qty}</span><button class="qty-btn-plus" onclick="addToCart(${item.id})">+</button></div>`}</div></div></div>`;
-    }).join('');
-    
-    // Admin Dashboard
-    let adminHTML = '';
-    if (isAdmin) {
-        const activeOrders = allOrders.filter(o => o.status !== 'completed' && o.status !== 'delivered' && o.status !== 'archived');
-        const completedOrders = allOrders.filter(o => o.status === 'completed' || o.status === 'delivered' || o.status === 'archived');
-        const totalOrders = allOrders.length;
-        const pendingOrders = activeOrders.filter(o => o.status === 'payment_pending' || o.status === 'pending').length;
-        const completedCount = completedOrders.length;
-        const totalRevenue = allOrders.reduce((sum, o) => sum + o.total, 0);
-        
-        let ordersListHTML = '';
-        let displayOrders = adminTab === 'active' ? activeOrders : completedOrders;
-        if (displayOrders.length === 0) {
-            ordersListHTML = `<div style="color:#7a6e86;padding:10px;text-align:center;font-size:11px;">${adminTab === 'active' ? 'No active orders' : 'No completed orders'}</div>`;
-        } else {
-            ordersListHTML = displayOrders.map(order => {
-                const statusClass = order.status || 'pending';
-                const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name}`).join(', ') : 'No items';
-                const date = new Date(order.created_at).toLocaleDateString();
-                const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                const paymentStatus = order.payment_status || 'pending';
-                const paymentBadge = `<span class="payment-status-badge ${paymentStatus}">${paymentStatus.toUpperCase()}</span>`;
-                
-                let actionButtons = '';
-                if (adminTab === 'active') {
-                    if (order.status === 'payment_pending' || (order.status === 'pending' && order.payment_status === 'pending')) {
-                        actionButtons = `<div style="margin-top:4px;"><button class="action-btn-small" onclick="confirmPayment(${order.id})" style="background:#4caf50;">✅ Confirm Payment</button></div>`;
-                    }
-                    if (order.status === 'pending' && order.payment_status === 'confirmed') {
-                        actionButtons = `<div style="margin-top:4px;"><button class="action-btn-small" onclick="assignOrder(${order.id}, '${DELIVERY_GIRLS[0]}')" style="background:#2196f3;">Assign</button></div>`;
-                    }
-                    if (order.status === 'assigned') {
-                        actionButtons += `<div style="margin-top:4px;"><button class="action-btn-small" onclick="completeOrder(${order.id})" style="background:#4caf50;">Mark Complete</button></div>`;
-                    }
-                } else {
-                    actionButtons = `<div style="margin-top:4px;"><button class="action-btn-small" onclick="restoreOrder(${order.id})" style="background:#ff9800;">Restore</button><button class="action-btn-small" onclick="deleteOrder(${order.id})" style="background:#f44336;">Delete</button></div>`;
-                }
-                
-                return `<div class="order-card" style="${adminTab === 'completed' ? 'opacity:0.7;background:#f9f9f9;' : ''}">
-                    <div class="header"><span class="order-id">#${order.id} - ${order.customer_name}</span><span class="order-time">${date} ${time}</span></div>
-                    <div class="customer-info"><i class="fas fa-phone"></i> ${order.customer_phone}</div>
-                    <div class="customer-info"><i class="fas fa-map-marker-alt"></i> ${order.customer_location}</div>
-                    <div class="order-items">${itemsText}</div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;flex-wrap:wrap;gap:4px;">
-                        <span class="order-total">ZMW ${order.total.toFixed(2)}</span>
-                        <span class="status-badge ${statusClass}">${statusClass.toUpperCase()}</span>
-                        ${paymentBadge}
+    <div id="root">
+        <div class="app-header">
+            <div class="brand">
+                <i class="fas fa-utensils"></i>
+                <div>
+                    <h1>Chikorlando</h1>
+                    <span class="subtitle">Restaurant & Food Delivery</span>
+                    <div class="contact-info">
+                        <i class="fas fa-phone"></i>
+                        <span>0777035070</span>
+                        <i class="fas fa-whatsapp" style="margin-left:4px;"></i>
+                        <span>evanchilando0@gmail.com</span>
                     </div>
-                    <div style="font-size:9px;color:#666;margin-top:2px;">💳 ${order.payment_method || 'Mobile Money'} | Ref: ${order.payment_reference || 'N/A'}</div>
-                    ${order.delivery_girl ? `<div style="font-size:9px;color:#666;margin-top:2px;"><i class="fas fa-motorcycle"></i> ${order.delivery_girl}</div>` : ''}
-                    ${actionButtons}
-                </div>`;
-            }).join('');
-        }
-        
-        adminHTML = `<div class="admin-panel show">
-            <div class="section-title"><i class="fas fa-chart-line"></i> Admin Dashboard</div>
-            <div class="stats-grid">
-                <div class="stat-card"><div class="number">${totalOrders}</div><div class="label">Total Orders</div></div>
-                <div class="stat-card"><div class="number">${pendingOrders}</div><div class="label">Pending Payment</div></div>
-                <div class="stat-card"><div class="number">${completedCount}</div><div class="label">Completed</div></div>
+                </div>
             </div>
-            <div style="font-size:11px;font-weight:700;color:#cc0000;text-align:center;margin-bottom:4px;">Total Revenue: ZMW ${totalRevenue.toFixed(2)}</div>
-            <div class="tab-bar">
-                <button class="tab-btn ${adminTab === 'active' ? 'active' : ''}" onclick="switchAdminTab('active')"><i class="fas fa-clock"></i> Active (${activeOrders.length})</button>
-                <button class="tab-btn ${adminTab === 'completed' ? 'active' : ''}" onclick="switchAdminTab('completed')"><i class="fas fa-check-circle"></i> Completed (${completedOrders.length})</button>
+            <div class="header-actions">
+                <button class="header-btn" id="deliveryLoginBtn" onclick="openDeliveryLogin()">
+                    <i class="fas fa-motorcycle"></i>
+                    <span id="deliveryBtnText">Delivery</span>
+                </button>
+                <button class="header-btn" id="adminLoginBtn" onclick="openAdminLogin()">
+                    <i class="fas fa-user-shield"></i>
+                </button>
+                <span class="delivery-name" id="deliveryNameDisplay"></span>
             </div>
-            <div class="section-title" style="margin-top:6px;font-size:11px;color:#666;">${adminTab === 'active' ? '📋 Active Orders' : '✅ Completed Orders'}</div>
-            <div style="max-height:300px;overflow-y:auto;">${ordersListHTML}</div>
-            <div class="section-title" style="margin-top:6px;"><i class="fas fa-female"></i> Delivery Girls</div>
-            <div>${DELIVERY_GIRLS.map(g => `<span class="delivery-girl-tag"><i class="fas fa-female"></i> ${g}</span>`).join('')}</div>
-            <div style="margin-top:6px;"><div style="display:flex;gap:4px;"><input id="newGirlInput" placeholder="Add delivery girl" style="flex:1;padding:4px 6px;border:1px solid #ffcccc;border-radius:20px;font-size:10px;outline:none;"><button class="action-btn-small" onclick="addDeliveryGirl()"><i class="fas fa-plus"></i> Add</button></div></div>
-        </div>`;
-    }
-    
-    // Delivery Panel
-    let deliveryHTML = '';
-    if (isDeliveryLoggedIn) {
-        const myOrders = allOrders.filter(o => (o.delivery_girl === deliveryGirlName || o.status === 'pending' || o.status === 'payment_pending') && o.status !== 'completed' && o.status !== 'delivered' && o.status !== 'archived');
-        let ordersListHTML = myOrders.map(order => {
-            const statusClass = order.status || 'pending';
-            const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name}`).join(', ') : 'No items';
-            const date = new Date(order.created_at).toLocaleDateString();
-            const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const isMine = order.delivery_girl === deliveryGirlName;
-            const paymentStatus = order.payment_status || 'pending';
-            const paymentBadge = `<span class="payment-status-badge ${paymentStatus}">${paymentStatus.toUpperCase()}</span>`;
-            
-            let actionsHTML = '';
-            if ((order.status === 'pending' || order.status === 'payment_pending') && !order.delivery_girl) {
-                if (order.payment_status === 'confirmed') {
-                    actionsHTML = `<div class="action-btns"><button class="btn-accept" onclick="acceptOrder(${order.id})"><i class="fas fa-check"></i> Accept</button><button class="btn-decline" onclick="declineOrder(${order.id})"><i class="fas fa-times"></i> Decline</button></div>`;
-                } else {
-                    actionsHTML = `<div style="color:#e65100;font-size:9px;background:#fff3e0;padding:3px 6px;border-radius:4px;text-align:center;">⏳ Awaiting payment confirmation</div>`;
-                }
-            } else if (order.status === 'assigned' && isMine) {
-                actionsHTML = `<div class="action-btns"><button class="btn-pickup" onclick="pickupOrder(${order.id})"><i class="fas fa-box"></i> Picked Up</button></div>`;
-            } else if (order.status === 'picked_up' && isMine) {
-                actionsHTML = `<div class="action-btns"><button class="btn-deliver" onclick="deliverOrder(${order.id})"><i class="fas fa-check-circle"></i> Delivered</button></div>`;
+        </div>
+        <div id="app-container" class="app-body">
+            <!-- Content rendered by JavaScript -->
+        </div>
+        <div class="footnote">
+            <i class="fas fa-shield-alt"></i> Prepayment required · Serving Kasama District, Northern Province, Zambia
+        </div>
+    </div>
+
+    <!-- Delivery Girl Login Modal -->
+    <div class="delivery-login-modal" id="deliveryLoginModal">
+        <div class="delivery-login-box">
+            <h2><i class="fas fa-motorcycle"></i> Delivery Login</h2>
+            <p style="font-size:10px;color:#666;text-align:center;margin-bottom:6px;">Enter your name to start delivering</p>
+            <input type="text" id="deliveryLoginName" placeholder="Enter your name" onkeypress="if(event.key==='Enter') deliveryLogin()" />
+            <button onclick="deliveryLogin()">Login</button>
+            <div class="error" id="deliveryLoginError">❌ Please enter your name</div>
+            <button class="close-btn" onclick="closeDeliveryLogin()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Admin Login Modal -->
+    <div class="admin-login-modal" id="adminLoginModal">
+        <div class="admin-login-box">
+            <h2><i class="fas fa-user-shield"></i> Admin Login</h2>
+            <input type="password" id="adminPassword" placeholder="Enter admin password" onkeypress="if(event.key==='Enter') adminLogin()" />
+            <button onclick="adminLogin()">Login</button>
+            <div class="error" id="adminLoginError">❌ Incorrect password</div>
+            <div style="margin-top:4px;text-align:center;font-size:9px;color:#999;">
+                <i class="fas fa-info-circle"></i> Default: <strong>admin2426</strong>
+            </div>
+            <button class="close-btn" onclick="closeAdminLogin()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // ============================================
+        // SUPABASE CONFIGURATION
+        // ============================================
+        const SUPABASE_URL = 'https://ndwoqlxtaczwxsescemu.supabase.co';
+        const SUPABASE_ANON_KEY =
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kd29xbHh0YWN6d3hzZXNjZW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5Mjk2MTQsImV4cCI6MjA5ODUwNTYxNH0.43PgLQSdEESXboLGrdtZCHq-f8TwzItXaGuxmI4NEe8';
+
+        // ============================================
+        // WHATSAPP CONFIGURATION
+        // ============================================
+        const WHATSAPP_CONFIG = {
+            adminNumber: '260971157284',
+            restaurantName: 'Chikorlando Restaurant'
+        };
+
+        // ============================================
+        // PAYMENT CONFIGURATION
+        // ============================================
+        const PAYMENT_CONFIG = {
+            momoNumber: '0971157284',
+            airtelNumber: '0777035070',
+            zamtelNumber: '0971130511'
+        };
+
+        // ============================================
+        // MENU DATA
+        // ============================================
+        const MENU = [
+            { id: 1, name: 'Nshima with Village Chicken', price: 90.00, emoji: '🍗',
+                imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/vchik.jpg" alt="Nshima & Chicken">',
+                description: 'Traditional Zambian meal with village chicken' },
+            { id: 2, name: 'Nshima with Roasted Chicken', price: 60.00, emoji: '🍗',
+                imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/rostedChi.jpg" alt="Nshima with chicken">',
+                description: 'Traditional Zambian meal with village chicken' },
+            { id: 3, name: 'Nshima with Beef Sausage', price: 50.00, emoji: '🌭',
+                imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/bsausage1.jpg" alt="Beef Sausage">',
+                description: 'Well cooked beef sausages' },
+            { id: 4, name: 'Nshima with Pork', price: 80.00, emoji: '🥩',
+                imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/pork1.jpg" alt="Pork">',
+                description: 'Tender and yummy pork' },
+            { id: 5, name: 'Nshima with Liver', price: 60.00, emoji: '🍗',
+                imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/liver.jpg" alt="Liver">',
+                description: 'Spicy liver with onions' },
+            { id: 6, name: 'Nshima with Boiled Fish', price: 60.00, emoji: '🐟',
+                imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/boiledfish.jpg" alt="Boiled Fish">',
+                description: 'Delicious boiled fish' },
+            { id: 7, name: 'Kapenta', price: 50.00, emoji: '🐟',
+                imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/kap.jpg" alt="Kapenta">',
+                description: 'Dried Kapenta fish' },
+            { id: 8, name: 'Okra Stew', price: 50.00, emoji: '🥬',
+                imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/OKRA.jpg" alt="Okra">',
+                description: 'Fresh okra vegetable stew' },
+            { id: 9, name: 'Nshima with Trotters', price: 60.00, emoji: '🍗',
+                imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/trot.jpg" alt="Trotters">',
+                description: 'Fried chicken trotters' },
+            { id: 10, name: 'Disposable Coke', price: 15.00, emoji: '🥤',
+                imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/coco.jpg" alt="Coca-Cola">',
+                description: 'Ice cold Coca-Cola 500ml' },
+            { id: 11, name: 'Disposable Fanta', price: 15.00, emoji: '🥤',
+                imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fnta.jpg" alt="Fanta">',
+                description: 'Ice cold Fanta 500ml' },
+            { id: 12, name: 'Bottled Fanta Orange', price: 10.00, emoji: '🥤',
+                imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/fnt.jpg" alt="Fanta Orange">',
+                description: 'Fanta Orange 300ml' },
+            { id: 13, name: 'Bottled Coke', price: 10.00, emoji: '🥤',
+                imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/small coke.jpg" alt="Bottled Coke">',
+                description: 'Chilled Coke 300ml' },
+            { id: 14, name: 'Cold Water', price: 10.00, emoji: '💧',
+                imgTag: '<img src="https://raw.githubusercontent.com/1chaiwa/Lg.com/main/images/smallWater.jpg" alt="chilled water">',
+                description: 'Chilled water 500ml' }
+        ];
+
+        const DELIVERY_GIRLS = ['Chaiwa Justine', 'Brenda Mwansa', 'Chola Williams'];
+        const ADMIN_PASSWORD = 'admin2426';
+
+        // ============================================
+        // STATE
+        // ============================================
+        let cart = [];
+        let isAdmin = false;
+        let isDeliveryLoggedIn = false;
+        let deliveryGirlName = '';
+        let customerName = '';
+        let customerPhone = '';
+        let customerLocation = 'Kasama, Northern Province, Zambia';
+        let allOrders = [];
+        let supabaseClient = null;
+        let adminTab = 'active';
+
+        // ============================================
+        // PAYMENT HELPER FUNCTIONS
+        // ============================================
+        function sendMobileMoney(provider, number, amount) {
+            let cleanNumber = number.replace(/\s/g, '');
+            if (cleanNumber.startsWith('0')) {
+                cleanNumber = cleanNumber.substring(1);
             }
-            
-            return `<div class="order-card">
-                <div class="header"><span class="order-id">#${order.id} - ${order.customer_name}</span><span class="order-time">${date} ${time}</span></div>
-                <div class="customer-info"><i class="fas fa-phone"></i> ${order.customer_phone}</div>
-                <div class="customer-info"><i class="fas fa-map-marker-alt"></i> ${order.customer_location}</div>
-                <div class="order-items">${itemsText}</div>
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-top:3px;flex-wrap:wrap;gap:4px;">
-                    <span class="order-total">ZMW ${order.total.toFixed(2)}</span>
-                    <span class="status-badge ${statusClass}">${statusClass.toUpperCase()}</span>
-                    ${paymentBadge}
-                </div>
-                ${actionsHTML}
-            </div>`;
-        }).join('');
-        deliveryHTML = `<div class="delivery-panel show">
-            <div class="section-title"><i class="fas fa-motorcycle"></i> My Deliveries</div>
-            <div style="font-size:10px;color:#666;margin-bottom:4px;">Logged in as: <strong>${deliveryGirlName}</strong></div>
-            ${ordersListHTML || '<div style="color:#7a6e86;padding:10px;text-align:center;font-size:11px;">No active orders available</div>'}
-        </div>`;
-    }
-    
-    // ============================================
-    // PAYMENT SECTION - WITH CLICKABLE NUMBERS
-    // ============================================
-    const totalPriceDisplay = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
-    
-    const paymentHTML = `<div id="paymentSection" class="payment-section">
-        <h4><i class="fas fa-credit-card"></i> Mobile Money Payment</h4>
-        <div class="send-money-hint">
-            <i class="fas fa-hand-pointer"></i> 
-            <span>Tap the button below to send money instantly</span>
-        </div>
-        <div style="margin-bottom:8px;">
-            <p style="font-size:12px;font-weight:600;margin-bottom:6px;">Send payment to:</p>
-            <div class="phone-numbers">
-                <div class="phone-row">
-                    <span><i class="fas fa-network-wired"></i> <strong>MTN MoMo</strong></span>
-                    <span class="number">${PAYMENT_CONFIG.momoNumber}</span>
-                    <button class="click-btn mtn" onclick="sendMobileMoney('mtn', '${PAYMENT_CONFIG.momoNumber}', ${totalPriceDisplay || 10})">
-                        <i class="fas fa-paper-plane"></i> Send
-                    </button>
-                </div>
-                <div class="phone-row">
-                    <span><i class="fas fa-signal"></i> <strong>Airtel Money</strong></span>
-                    <span class="number">${PAYMENT_CONFIG.airtelNumber}</span>
-                    <button class="click-btn airtel" onclick="sendMobileMoney('airtel', '${PAYMENT_CONFIG.airtelNumber}', ${totalPriceDisplay || 10})">
-                        <i class="fas fa-paper-plane"></i> Send
-                    </button>
-                </div>
-                <div class="phone-row">
-                    <span><i class="fas fa-signal"></i> <strong>Zamtel Kwacha</strong></span>
-                    <span class="number">${PAYMENT_CONFIG.zamtelNumber}</span>
-                    <button class="click-btn zamtel" onclick="sendMobileMoney('zamtel', '${PAYMENT_CONFIG.zamtelNumber}', ${totalPriceDisplay || 10})">
-                        <i class="fas fa-paper-plane"></i> Send
-                    </button>
-                </div>
-            </div>
-            <div style="margin-top:6px;font-size:10px;color:#666;text-align:center;">
-                <i class="fas fa-info-circle"></i> Click "Send" to copy the USSD code
-            </div>
-        </div>
-        <div>
-            <label style="font-size:11px;font-weight:600;">Transaction Reference Number *</label>
-            <input type="text" id="transactionRef" placeholder="Enter payment reference (e.g., MOMO123456)">
-            <div class="help-text"><i class="fas fa-info-circle"></i> We'll confirm payment before cooking your food</div>
-        </div>
-        <div class="warning">⚠️ Orders without payment confirmation will be cancelled after 15 minutes</div>
-    </div>`;
-    
-    container.innerHTML = `
-        <div style="background:linear-gradient(135deg,#cc0000,#990000);color:white;padding:5px 10px;border-radius:10px;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
-            <div><i class="fas fa-map-marker-alt"></i> <strong>Kasama District</strong><span style="font-size:8px;opacity:0.8;display:block;">Northern Province, Zambia</span></div>
-            <div class="real-time-indicator" style="color:white;"><span class="dot"></span> Live</div>
-        </div>
-        ${isDeliveryLoggedIn ? `<div style="background:#e8f5e9;padding:3px 8px;border-radius:10px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;font-size:10px;border:1px solid #a5d6a7;"><span><i class="fas fa-motorcycle" style="color:#cc0000;"></i> <strong>${deliveryGirlName}</strong> is online</span><span style="color:#2e7d32;font-size:8px;"><i class="fas fa-circle" style="color:#4caf50;"></i> Available</span></div>` : ''}
-        ${isAdmin ? adminHTML : ''}
-        ${isDeliveryLoggedIn ? deliveryHTML : ''}
-        ${!isAdmin && !isDeliveryLoggedIn ? `
-            <div class="card"><div class="section-title"><i class="fas fa-th-large"></i> Today's Menu <span class="kasama-badge" style="margin-left:auto;">${MENU.length} items</span></div><div class="menu-grid">${menuHTML}</div></div>
-            <div class="order-summary">
-                <div class="section-title"><i class="fas fa-shopping-bag"></i> Your Order ${cartCount > 0 ? `<span class="cart-count">${cartCount}</span>` : ''}</div>
-                ${cartHTML}
-                <div class="order-row order-total"><span>Total</span><span>ZMW ${totalPrice.toFixed(2)}</span></div>
-                <div class="customer-details">
-                    <div style="font-size:10px;font-weight:600;color:#cc0000;margin-bottom:3px;"><i class="fas fa-user"></i> Delivery Details</div>
-                    <div class="form-group"><label>Full Name <span class="required">*</span></label><input type="text" id="customerNameInput" placeholder="Enter your full name" value="${customerName}" /></div>
-                    <div class="form-group"><label>Phone Number <span class="required">*</span></label><input type="tel" id="customerPhoneInput" placeholder="Enter phone number" value="${customerPhone}" /></div>
-                    <div class="form-group"><label>Delivery Address <span class="required">*</span></label><input type="text" id="customerAddressInput" placeholder="Enter your delivery address" value="${customerLocation}" /></div>
-                </div>
-                ${paymentHTML}
-                <button class="action-btn" onclick="placeOrderWithPayment()" ${cart.length === 0 ? 'disabled' : ''}><i class="fas fa-motorcycle"></i> Place Order · Prepay Required</button>
-                <div id="orderStatus"></div>
-            </div>
-            <div class="card">
-                <div class="section-title"><i class="fas fa-map-marked-alt"></i> Location</div>
-                <div class="map-container"><div id="map"></div></div>
-                <div style="font-size:10px;margin-top:2px;"><i class="fas fa-location-dot" style="color:#cc0000;"></i> <strong>Customer:</strong> ${customerLocation || 'Kasama, Northern Province, Zambia'}</div>
-                <button class="whatsapp-btn" onclick="shareLocation()"><i class="fab fa-whatsapp"></i> Share Location</button>
-            </div>
-        ` : ''}
-    `;
-    
-    document.getElementById('customerNameInput')?.addEventListener('input', function() { customerName = this.value; });
-    document.getElementById('customerPhoneInput')?.addEventListener('input', function() { customerPhone = this.value; });
-    document.getElementById('customerAddressInput')?.addEventListener('input', function() { customerLocation = this.value || 'Kasama, Northern Province, Zambia'; initMap(customerLocation); });
-    setTimeout(() => initMap(customerLocation || 'Kasama, Northern Province, Zambia'), 300);
-}
 
-// ============================================
-// ADMIN TAB SWITCHING
-// ============================================
-function switchAdminTab(tab) { adminTab = tab; renderApp(); }
+            let ussdCode = '';
+            let message = '';
 
-// ============================================
-// MAP FUNCTIONS
-// ============================================
-let map = null, mapMarker = null;
-function initMap(location) {
-    try {
-        const mapContainer = document.getElementById('map');
-        if (!mapContainer) return;
-        let lat = -10.2129, lng = 31.1809;
-        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location || 'Kasama')}&limit=1`)
-            .then(r => r.json()).then(data => { if (data && data.length > 0) { lat = parseFloat(data[0].lat); lng = parseFloat(data[0].lon); } createMap(lat, lng, location || 'Kasama, Zambia'); })
-            .catch(() => createMap(lat, lng, location || 'Kasama, Zambia'));
-    } catch (e) { console.error('Map error:', e); }
-}
-function createMap(lat, lng, location) {
-    if (map) map.remove();
-    map = L.map('map').setView([lat, lng], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' }).addTo(map);
-    const markerIcon = L.divIcon({ html: '<i class="fas fa-map-marker-alt" style="color:#cc0000;font-size:24px;"></i>', className: 'custom-marker', iconSize: [24, 24], iconAnchor: [12, 24] });
-    mapMarker = L.marker([lat, lng], { icon: markerIcon }).addTo(map);
-    mapMarker.bindPopup(`<strong>📍 ${location}</strong>`).openPopup();
-}
+            switch (provider) {
+                case 'mtn':
+                    ussdCode = `*121*2*1*${cleanNumber}*${amount}#`;
+                    message = `📱 MTN MoMo: Send ZMW ${amount} to ${number}\nDial: ${ussdCode}`;
+                    break;
+                case 'airtel':
+                    ussdCode = `*115*2*1*${cleanNumber}*${amount}#`;
+                    message = `📱 Airtel Money: Send ZMW ${amount} to ${number}\nDial: ${ussdCode}`;
+                    break;
+                case 'zamtel':
+                    ussdCode = `*384*2*1*${cleanNumber}*${amount}#`;
+                    message = `📱 Zamtel Kwacha: Send ZMW ${amount} to ${number}\nDial: ${ussdCode}`;
+                    break;
+                default:
+                    message = `Send ZMW ${amount} to ${number}`;
+            }
 
-// ============================================
-// CUSTOMER FUNCTIONS
-// ============================================
-function addToCart(id) {
-    const item = MENU.find(i => i.id === id);
-    if (!item) return;
-    const existing = cart.find(i => i.id === id);
-    if (existing) { cart = cart.map(i => i.id === id ? { ...i, qty: i.qty + 1 } : i); } else { cart.push({ ...item, qty: 1 }); }
-    renderApp();
-}
-function removeFromCart(id) {
-    const existing = cart.find(i => i.id === id);
-    if (existing && existing.qty > 1) { cart = cart.map(i => i.id === id ? { ...i, qty: i.qty - 1 } : i); } else { cart = cart.filter(i => i.id !== id); }
-    renderApp();
-}
-
-// ============================================
-// PLACE ORDER WITH PAYMENT
-// ============================================
-async function placeOrderWithPayment() {
-    if (cart.length === 0) { alert('Please add items to your order'); return; }
-    
-    const name = document.getElementById('customerNameInput')?.value.trim() || '';
-    const phone = document.getElementById('customerPhoneInput')?.value.trim() || '';
-    const address = document.getElementById('customerAddressInput')?.value.trim() || 'Kasama, Northern Province, Zambia';
-    
-    if (!name) { alert('⚠️ Please enter your full name'); return; }
-    if (!phone) { alert('⚠️ Please enter your phone number'); return; }
-    if (!address) { alert('⚠️ Please enter your delivery address'); return; }
-    
-    const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
-    const ref = document.getElementById('transactionRef')?.value.trim() || '';
-    if (!ref) { alert('⚠️ Please enter your transaction reference number'); document.getElementById('transactionRef')?.focus(); return; }
-    
-    const orderData = {
-        customer_name: name,
-        customer_phone: phone,
-        customer_location: address,
-        items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
-        total: totalPrice,
-        status: 'payment_pending',
-        payment_method: 'mobile_money',
-        payment_reference: ref,
-        payment_status: 'pending',
-        district: 'Kasama',
-        province: 'Northern Province'
-    };
-    
-    try {
-        const savedOrder = await saveOrderToSupabase(orderData);
-        if (savedOrder) {
-            allOrders.unshift(savedOrder);
-            sendWhatsAppNotification({
-                name, phone, address, total: totalPrice,
-                items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
-                payment_reference: ref
+            navigator.clipboard.writeText(ussdCode).then(() => {
+                alert(`📱 ${message}\n\n✅ USSD code copied to clipboard!\nPlease open your dialer and paste the code.`);
+            }).catch(() => {
+                alert(`📱 ${message}\n\nPlease dial this code on your phone:\n${ussdCode}`);
             });
-            
-            document.getElementById('orderStatus').innerHTML = `
-                <div class="order-placed-banner">
-                    <i class="fas fa-check-circle"></i> ✅ Order placed, ${name}! 
-                    <br>🛵 Payment is being verified.
-                    <br>📱 We'll call you at ${phone}
-                    <br><span class="whatsapp-notification"><i class="fab fa-whatsapp"></i> WhatsApp notification sent to admin!</span>
-                    <div class="order-status-wa"><i class="fab fa-whatsapp" style="color:#25D366;"></i> Order #${savedOrder.id} - Payment Pending Verification</div>
-                    <div style="background:#fff3e0;padding:6px;border-radius:8px;margin-top:4px;font-size:11px;color:#e65100;">💳 Payment Reference: ${ref} - Awaiting confirmation</div>
-                </div>
-            `;
-            cart = [];
-            customerName = name; customerPhone = phone; customerLocation = address;
-            document.getElementById('transactionRef').value = '';
-            setTimeout(() => { document.getElementById('orderStatus').innerHTML = ''; renderApp(); }, 15000);
-            alert(`✅ Order #${savedOrder.id} placed successfully!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}\n💳 Payment Reference: ${ref}\n⏳ We'll confirm payment before cooking.`);
+
+            return ussdCode;
         }
-    } catch (error) {
-        alert('❌ Failed to place order: ' + error.message);
-        console.error('Order error:', error);
-    }
-}
 
-// ============================================
-// ADMIN FUNCTIONS
-// ============================================
-async function confirmPayment(orderId) {
-    if (!confirm('✅ Confirm payment for this order?')) return;
-    const order = allOrders.find(o => o.id === orderId);
-    if (order) {
-        order.status = 'pending';
-        order.payment_status = 'confirmed';
-        try {
-            await supabaseClient.from('orders').update({ status: 'pending', payment_status: 'confirmed' }).eq('id', orderId);
-            console.log('✅ Payment confirmed in Supabase');
-            const confirmMessage = `✅ *PAYMENT CONFIRMED!* 🎉\n\nOrder #${orderId}\nCustomer: ${order.customer_name}\nAmount: ZMW ${order.total.toFixed(2)}\nReference: ${order.payment_reference || 'N/A'}\n\n📋 Ready to prepare and deliver! 🛵`;
-            window.open(`https://wa.me/${WHATSAPP_CONFIG.adminNumber}?text=${encodeURIComponent(confirmMessage)}`, '_blank');
-        } catch (error) { console.error('Error confirming payment:', error); }
-        renderApp();
-        alert('✅ Payment confirmed! Order is now ready for preparation.');
-    }
-}
+        // ============================================
+        // SUPABASE FUNCTIONS
+        // ============================================
+        async function initSupabase() {
+            try {
+                if (typeof window.supabase === 'undefined') {
+                    await new Promise((resolve, reject) => {
+                        const script = document.createElement('script');
+                        script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js';
+                        script.onload = resolve;
+                        script.onerror = reject;
+                        document.head.appendChild(script);
+                    });
+                }
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('✅ Supabase initialized');
+                await loadOrders();
+                return true;
+            } catch (error) {
+                console.error('❌ Supabase initialization failed:', error);
+                return false;
+            }
+        }
 
-async function addDeliveryGirl() {
-    const input = document.getElementById('newGirlInput');
-    const name = input.value.trim();
-    if (!name) { alert('Please enter a name'); return; }
-    DELIVERY_GIRLS.push(name);
-    input.value = '';
-    renderApp();
-    alert('✅ ' + name + ' added as delivery girl!');
-}
+        async function saveOrderToSupabase(orderData) {
+            try {
+                console.log('📤 Saving order to Supabase:', orderData);
+                const { data, error } = await supabaseClient
+                    .from('orders')
+                    .insert([{
+                        customer_name: orderData.customer_name,
+                        customer_phone: orderData.customer_phone,
+                        customer_location: orderData.customer_location,
+                        items: orderData.items,
+                        total: orderData.total,
+                        status: orderData.status || 'payment_pending',
+                        payment_method: orderData.payment_method || 'mobile_money',
+                        payment_reference: orderData.payment_reference || '',
+                        payment_status: orderData.payment_status || 'pending',
+                        district: orderData.district || 'Kasama',
+                        province: orderData.province || 'Northern Province'
+                    }])
+                    .select();
+                if (error) {
+                    console.error('❌ Supabase insert error:', error);
+                    throw error;
+                }
+                console.log('✅ Order saved to Supabase:', data);
+                return data ? data[0] : null;
+            } catch (error) {
+                console.error('❌ Failed to save order:', error);
+                throw error;
+            }
+        }
 
-async function assignOrder(orderId, girlName) {
-    const order = allOrders.find(o => o.id === orderId);
-    if (order && order.payment_status === 'confirmed') {
-        order.status = 'assigned';
-        order.delivery_girl = girlName;
-        try { await supabaseClient.from('orders').update({ status: 'assigned', delivery_girl: girlName }).eq('id', orderId); } catch (error) { console.error('Error updating order:', error); }
-        renderApp();
-        alert('✅ Order #' + orderId + ' assigned to ' + girlName);
-    } else if (order) {
-        alert('⚠️ Payment not confirmed yet. Please confirm payment first.');
-    }
-}
+        async function loadOrders() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('orders')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+                allOrders = data || [];
+                console.log(`📦 Orders loaded: ${allOrders.length}`);
+                return allOrders;
+            } catch (error) {
+                console.error('Error loading orders:', error);
+                allOrders = [];
+                return [];
+            }
+        }
 
-async function completeOrder(orderId) {
-    const order = allOrders.find(o => o.id === orderId);
-    if (order) {
-        order.status = 'completed';
-        try { await supabaseClient.from('orders').update({ status: 'completed' }).eq('id', orderId); } catch (error) { console.error('Error completing order:', error); }
-        renderApp();
-        alert('✅ Order #' + orderId + ' marked as completed!');
-    }
-}
+        // ============================================
+        // WHATSAPP NOTIFICATION FUNCTION
+        // ============================================
+        function sendWhatsAppNotification(orderDetails) {
+            const message = `🆕 *NEW ORDER!* 🛵
 
-async function restoreOrder(orderId) {
-    const order = allOrders.find(o => o.id === orderId);
-    if (order) {
-        order.status = 'pending';
-        order.delivery_girl = '';
-        order.payment_status = 'pending';
-        try { await supabaseClient.from('orders').update({ status: 'pending', delivery_girl: '', payment_status: 'pending' }).eq('id', orderId); } catch (error) { console.error('Error restoring order:', error); }
-        renderApp();
-        alert('✅ Order #' + orderId + ' restored!');
-    }
-}
+        👤 *Customer:* ${orderDetails.name}
+        📱 *Phone:* ${orderDetails.phone}
+        📍 *Address:* ${orderDetails.address}
+        💰 *Total:* ZMW ${orderDetails.total.toFixed(2)}
 
-async function deleteOrder(orderId) {
-    if (!confirm('⚠️ Are you sure you want to permanently delete this order?')) return;
-    try { await supabaseClient.from('orders').delete().eq('id', orderId); allOrders = allOrders.filter(o => o.id !== orderId); renderApp(); alert('✅ Order #' + orderId + ' permanently deleted!'); } catch (error) { console.error('Error deleting order:', error); alert('❌ Failed to delete order'); }
-}
+        🛒 *Items:*
+        ${orderDetails.items.map(item => `  • ${item.qty}x ${item.name} - ZMW ${(item.price * item.qty).toFixed(2)}`).join('\n')}
 
-// ============================================
-// DELIVERY GIRL FUNCTIONS
-// ============================================
-async function acceptOrder(orderId) {
-    const order = allOrders.find(o => o.id === orderId);
-    if (order && order.payment_status === 'confirmed') {
-        order.status = 'assigned';
-        order.delivery_girl = deliveryGirlName;
-        try { await supabaseClient.from('orders').update({ status: 'assigned', delivery_girl: deliveryGirlName }).eq('id', orderId); } catch (error) { console.error('Error accepting order:', error); }
-        renderApp();
-        alert('✅ Order #' + orderId + ' accepted!');
-    } else if (order) {
-        alert('⚠️ Payment not confirmed yet. Please wait for admin to confirm payment.');
-    }
-}
+        💳 *Payment Reference:* ${orderDetails.payment_reference || 'N/A'}
+        💵 *Payment Status:* Pending Verification
 
-async function declineOrder(orderId) {
-    if (!confirm('Are you sure you want to decline this order?')) return;
-    const order = allOrders.find(o => o.id === orderId);
-    if (order) {
-        order.status = 'pending';
-        order.delivery_girl = '';
-        try { await supabaseClient.from('orders').update({ status: 'pending', delivery_girl: '' }).eq('id', orderId); } catch (error) { console.error('Error declining order:', error); }
-        renderApp();
-        alert('❌ Order #' + orderId + ' declined');
-    }
-}
+        ⏰ *Order Time:* ${new Date().toLocaleString()}
+        📍 *Location:* Kasama, Zambia
 
-async function pickupOrder(orderId) {
-    const order = allOrders.find(o => o.id === orderId);
-    if (order) {
-        order.status = 'picked_up';
-        try { await supabaseClient.from('orders').update({ status: 'picked_up' }).eq('id', orderId); } catch (error) { console.error('Error updating order:', error); }
-        renderApp();
-        alert('🛵 Order #' + orderId + ' picked up!');
-    }
-}
+        📋 *Please verify payment before preparing!* 🙏`;
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/${WHATSAPP_CONFIG.adminNumber}?text=${encodedMessage}`;
+            window.open(whatsappUrl, '_blank');
+            return true;
+        }
 
-async function deliverOrder(orderId) {
-    if (!confirm('✅ Confirm delivery of this order?')) return;
-    const order = allOrders.find(o => o.id === orderId);
-    if (order) {
-        order.status = 'delivered';
-        try { await supabaseClient.from('orders').update({ status: 'delivered' }).eq('id', orderId); } catch (error) { console.error('Error delivering order:', error); }
-        renderApp();
-        alert('✅ Order #' + orderId + ' delivered! Thank you!');
-    }
-}
+        // ============================================
+        // DELIVERY LOGIN FUNCTIONS
+        // ============================================
+        function openDeliveryLogin() {
+            if (isDeliveryLoggedIn) { deliveryLogout(); return; }
+            document.getElementById('deliveryLoginModal').classList.add('show');
+            document.getElementById('deliveryLoginName').value = '';
+            document.getElementById('deliveryLoginError').classList.remove('show');
+            document.getElementById('deliveryLoginName').focus();
+        }
 
-function shareLocation() {
-    const message = `📍 I'm ordering from Chikorlando Restaurant in Kasama!\n📍 Location: ${customerLocation || 'Kasama'}\n👤 Name: ${customerName}\n📱 Phone: ${customerPhone}`;
-    window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
-}
+        function closeDeliveryLogin() { document.getElementById('deliveryLoginModal').classList.remove('show'); }
 
-// ============================================
-// START THE APP
-// ============================================
-async function startApp() {
-    await initSupabase();
-    renderApp();
-    console.log('✅ Chikorlando Restaurant App Loaded!');
-    console.log(`📋 ${MENU.length} menu items loaded`);
-    console.log('📍 Serving Kasama District, Zambia');
-    console.log('💳 Clickable Mobile Money payment enabled');
-}
+        function deliveryLogin() {
+            const name = document.getElementById('deliveryLoginName').value.trim();
+            if (!name) { document.getElementById('deliveryLoginError').textContent = '❌ Please enter your name';
+                document.getElementById('deliveryLoginError').classList.add('show'); return; }
+            if (!DELIVERY_GIRLS.includes(name)) { document.getElementById('deliveryLoginError').textContent =
+                    '❌ Name not found. Contact admin.';
+                document.getElementById('deliveryLoginError').classList.add('show'); return; }
+            isDeliveryLoggedIn = true;
+            deliveryGirlName = name;
+            document.getElementById('deliveryLoginModal').classList.remove('show');
+            document.getElementById('deliveryNameDisplay').textContent = '👩 ' + name;
+            document.getElementById('deliveryNameDisplay').classList.add('show');
+            document.getElementById('deliveryBtnText').textContent = 'Logout';
+            document.getElementById('deliveryLoginBtn').classList.add('active');
+            alert('✅ Welcome ' + name + '!');
+            renderApp();
+        }
 
-startApp();
-</script>
+        function deliveryLogout() {
+            isDeliveryLoggedIn = false;
+            deliveryGirlName = '';
+            document.getElementById('deliveryNameDisplay').classList.remove('show');
+            document.getElementById('deliveryBtnText').textContent = 'Delivery';
+            document.getElementById('deliveryLoginBtn').classList.remove('active');
+            alert('👋 Logged out from delivery');
+            renderApp();
+        }
+
+        // ============================================
+        // ADMIN LOGIN FUNCTIONS
+        // ============================================
+        function openAdminLogin() {
+            if (isAdmin) { adminLogout(); return; }
+            document.getElementById('adminLoginModal').classList.add('show');
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('adminLoginError').classList.remove('show');
+            document.getElementById('adminPassword').focus();
+        }
+
+        function closeAdminLogin() { document.getElementById('adminLoginModal').classList.remove('show'); }
+
+        function adminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                isAdmin = true;
+                document.getElementById('adminLoginModal').classList.remove('show');
+                document.getElementById('adminLoginBtn').classList.add('active');
+                document.getElementById('adminLoginBtn').innerHTML = '<i class="fas fa-sign-out-alt"></i>';
+                alert('✅ Welcome Admin!');
+                renderApp();
+            } else {
+                document.getElementById('adminLoginError').classList.add('show');
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminPassword').focus();
+            }
+        }
+
+        function adminLogout() {
+            isAdmin = false;
+            document.getElementById('adminLoginBtn').classList.remove('active');
+            document.getElementById('adminLoginBtn').innerHTML = '<i class="fas fa-user-shield"></i>';
+            alert('👋 Logged out from admin');
+            renderApp();
+        }
+
+        document.getElementById('deliveryLoginModal')?.addEventListener('click', function(e) { if (e.target === this)
+                closeDeliveryLogin(); });
+        document.getElementById('adminLoginModal')?.addEventListener('click', function(e) { if (e.target === this)
+                closeAdminLogin(); });
+
+        // ============================================
+        // RENDER APP
+        // ============================================
+        function renderApp() {
+            const container = document.getElementById('app-container');
+            const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
+            const cartCount = cart.reduce((acc, i) => acc + i.qty, 0);
+
+            let cartHTML = cart.length === 0 ?
+                '<div style="color:#7a6e86;padding:4px 0;font-size:11px;"><i class="fas fa-shopping-cart"></i> Cart is empty</div>' :
+                cart.map(item =>
+                    `<div class="order-row"><span>${item.emoji} ${item.name} × ${item.qty}</span><span>ZMW ${(item.price * item.qty).toFixed(2)}<button onclick="removeFromCart(${item.id})" style="background:none;border:none;color:#cc0000;margin-left:4px;cursor:pointer;font-size:10px;"><i class="fas fa-minus-circle"></i></button></span></div>`
+                    ).join('');
+
+            let menuHTML = MENU.map(item => {
+                const qty = cart.find(i => i.id === item.id)?.qty || 0;
+                return `<div class="menu-item-card"><div class="image-container">${item.imgTag}</div><div class="item-info"><div class="item-name">${item.emoji} ${item.name}</div><div class="item-description">${item.description || ''}</div><div class="item-price">ZMW ${item.price.toFixed(2)}</div><div style="margin-top:3px;">${qty === 0 ? `<button class="add-btn-grid" onclick="addToCart(${item.id})"><i class="fas fa-plus"></i> Add</button>` : `<div class="qty-control"><button class="qty-btn-minus" onclick="removeFromCart(${item.id})">−</button><span class="qty-number">${qty}</span><button class="qty-btn-plus" onclick="addToCart(${item.id})">+</button></div>`}</div></div></div>`;
+            }).join('');
+
+            // Admin Dashboard
+            let adminHTML = '';
+            if (isAdmin) {
+                const activeOrders = allOrders.filter(o => o.status !== 'completed' && o.status !== 'delivered' && o
+                    .status !== 'archived');
+                const completedOrders = allOrders.filter(o => o.status === 'completed' || o.status === 'delivered' || o
+                    .status === 'archived');
+                const totalOrders = allOrders.length;
+                const pendingOrders = activeOrders.filter(o => o.status === 'payment_pending' || o.status === 'pending')
+                    .length;
+                const completedCount = completedOrders.length;
+                const totalRevenue = allOrders.reduce((sum, o) => sum + o.total, 0);
+
+                let ordersListHTML = '';
+                let displayOrders = adminTab === 'active' ? activeOrders : completedOrders;
+                if (displayOrders.length === 0) {
+                    ordersListHTML =
+                        `<div style="color:#7a6e86;padding:8px;text-align:center;font-size:10px;">${adminTab === 'active' ? 'No active orders' : 'No completed orders'}</div>`;
+                } else {
+                    ordersListHTML = displayOrders.map(order => {
+                        const statusClass = order.status || 'pending';
+                        const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name}`).join(', ') :
+                            'No items';
+                        const date = new Date(order.created_at).toLocaleDateString();
+                        const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit',
+                            minute: '2-digit' });
+                        const paymentStatus = order.payment_status || 'pending';
+                        const paymentBadge =
+                            `<span class="payment-status-badge ${paymentStatus}">${paymentStatus.toUpperCase()}</span>`;
+
+                        let actionButtons = '';
+                        if (adminTab === 'active') {
+                            if (order.status === 'payment_pending' || (order.status === 'pending' && order
+                                    .payment_status === 'pending')) {
+                                actionButtons =
+                                    `<div style="margin-top:3px;"><button class="action-btn-small" onclick="confirmPayment(${order.id})" style="background:#4caf50;">✅ Confirm Payment</button></div>`;
+                            }
+                            if (order.status === 'pending' && order.payment_status === 'confirmed') {
+                                actionButtons =
+                                    `<div style="margin-top:3px;"><button class="action-btn-small" onclick="assignOrder(${order.id}, '${DELIVERY_GIRLS[0]}')" style="background:#2196f3;">Assign</button></div>`;
+                            }
+                            if (order.status === 'assigned') {
+                                actionButtons +=
+                                    `<div style="margin-top:3px;"><button class="action-btn-small" onclick="completeOrder(${order.id})" style="background:#4caf50;">Mark Complete</button></div>`;
+                            }
+                        } else {
+                            actionButtons =
+                                `<div style="margin-top:3px;"><button class="action-btn-small" onclick="restoreOrder(${order.id})" style="background:#ff9800;">Restore</button><button class="action-btn-small" onclick="deleteOrder(${order.id})" style="background:#f44336;">Delete</button></div>`;
+                        }
+
+                        return `<div class="order-card" style="${adminTab === 'completed' ? 'opacity:0.7;background:#f9f9f9;' : ''}">
+                            <div class="header"><span class="order-id">#${order.id} - ${order.customer_name}</span><span class="order-time">${date} ${time}</span></div>
+                            <div class="customer-info"><i class="fas fa-phone"></i> ${order.customer_phone}</div>
+                            <div class="customer-info"><i class="fas fa-map-marker-alt"></i> ${order.customer_location}</div>
+                            <div class="order-items">${itemsText}</div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;flex-wrap:wrap;gap:3px;">
+                                <span class="order-total">ZMW ${order.total.toFixed(2)}</span>
+                                <span class="status-badge ${statusClass}">${statusClass.toUpperCase()}</span>
+                                ${paymentBadge}
+                            </div>
+                            <div style="font-size:8px;color:#666;margin-top:2px;">💳 ${order.payment_method || 'Mobile Money'} | Ref: ${order.payment_reference || 'N/A'}</div>
+                            ${order.delivery_girl ? `<div style="font-size:8px;color:#666;margin-top:2px;"><i class="fas fa-motorcycle"></i> ${order.delivery_girl}</div>` : ''}
+                            ${actionButtons}
+                        </div>`;
+                    }).join('');
+                }
+
+                adminHTML = `<div class="admin-panel show">
+                    <div class="section-title"><i class="fas fa-chart-line"></i> Admin Dashboard</div>
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="number">${totalOrders}</div><div class="label">Total Orders</div></div>
+                        <div class="stat-card"><div class="number">${pendingOrders}</div><div class="label">Pending Payment</div></div>
+                        <div class="stat-card"><div class="number">${completedCount}</div><div class="label">Completed</div></div>
+                    </div>
+                    <div style="font-size:10px;font-weight:700;color:#cc0000;text-align:center;margin-bottom:3px;">Total Revenue: ZMW ${totalRevenue.toFixed(2)}</div>
+                    <div class="tab-bar">
+                        <button class="tab-btn ${adminTab === 'active' ? 'active' : ''}" onclick="switchAdminTab('active')"><i class="fas fa-clock"></i> Active (${activeOrders.length})</button>
+                        <button class="tab-btn ${adminTab === 'completed' ? 'active' : ''}" onclick="switchAdminTab('completed')"><i class="fas fa-check-circle"></i> Completed (${completedOrders.length})</button>
+                    </div>
+                    <div class="section-title" style="margin-top:4px;font-size:10px;color:#666;">${adminTab === 'active' ? '📋 Active Orders' : '✅ Completed Orders'}</div>
+                    <div style="max-height:250px;overflow-y:auto;">${ordersListHTML}</div>
+                    <div class="section-title" style="margin-top:4px;"><i class="fas fa-female"></i> Delivery Girls</div>
+                    <div>${DELIVERY_GIRLS.map(g => `<span class="delivery-girl-tag"><i class="fas fa-female"></i> ${g}</span>`).join('')}</div>
+                    <div style="margin-top:4px;"><div style="display:flex;gap:3px;"><input id="newGirlInput" placeholder="Add delivery girl" style="flex:1;padding:3px 6px;border:1px solid #ffcccc;border-radius:20px;font-size:9px;outline:none;"><button class="action-btn-small" onclick="addDeliveryGirl()"><i class="fas fa-plus"></i> Add</button></div></div>
+                </div>`;
+            }
+
+            // Delivery Panel
+            let deliveryHTML = '';
+            if (isDeliveryLoggedIn) {
+                const myOrders = allOrders.filter(o => (o.delivery_girl === deliveryGirlName || o.status === 'pending' || o
+                        .status === 'payment_pending') && o.status !== 'completed' && o.status !== 'delivered' && o
+                        .status !== 'archived');
+                let ordersListHTML = myOrders.map(order => {
+                    const statusClass = order.status || 'pending';
+                    const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name}`).join(', ') :
+                        'No items';
+                    const date = new Date(order.created_at).toLocaleDateString();
+                    const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit',
+                        minute: '2-digit' });
+                    const isMine = order.delivery_girl === deliveryGirlName;
+                    const paymentStatus = order.payment_status || 'pending';
+                    const paymentBadge =
+                        `<span class="payment-status-badge ${paymentStatus}">${paymentStatus.toUpperCase()}</span>`;
+
+                    let actionsHTML = '';
+                    if ((order.status === 'pending' || order.status === 'payment_pending') && !order.delivery_girl) {
+                        if (order.payment_status === 'confirmed') {
+                            actionsHTML =
+                                `<div class="action-btns"><button class="btn-accept" onclick="acceptOrder(${order.id})"><i class="fas fa-check"></i> Accept</button><button class="btn-decline" onclick="declineOrder(${order.id})"><i class="fas fa-times"></i> Decline</button></div>`;
+                        } else {
+                            actionsHTML =
+                                `<div style="color:#e65100;font-size:8px;background:#fff3e0;padding:2px 4px;border-radius:4px;text-align:center;">⏳ Awaiting payment confirmation</div>`;
+                        }
+                    } else if (order.status === 'assigned' && isMine) {
+                        actionsHTML =
+                            `<div class="action-btns"><button class="btn-pickup" onclick="pickupOrder(${order.id})"><i class="fas fa-box"></i> Picked Up</button></div>`;
+                    } else if (order.status === 'picked_up' && isMine) {
+                        actionsHTML =
+                            `<div class="action-btns"><button class="btn-deliver" onclick="deliverOrder(${order.id})"><i class="fas fa-check-circle"></i> Delivered</button></div>`;
+                    }
+
+                    return `<div class="order-card">
+                        <div class="header"><span class="order-id">#${order.id} - ${order.customer_name}</span><span class="order-time">${date} ${time}</span></div>
+                        <div class="customer-info"><i class="fas fa-phone"></i> ${order.customer_phone}</div>
+                        <div class="customer-info"><i class="fas fa-map-marker-alt"></i> ${order.customer_location}</div>
+                        <div class="order-items">${itemsText}</div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;flex-wrap:wrap;gap:3px;">
+                            <span class="order-total">ZMW ${order.total.toFixed(2)}</span>
+                            <span class="status-badge ${statusClass}">${statusClass.toUpperCase()}</span>
+                            ${paymentBadge}
+                        </div>
+                        ${actionsHTML}
+                    </div>`;
+                }).join('');
+                deliveryHTML = `<div class="delivery-panel show">
+                    <div class="section-title"><i class="fas fa-motorcycle"></i> My Deliveries</div>
+                    <div style="font-size:9px;color:#666;margin-bottom:3px;">Logged in as: <strong>${deliveryGirlName}</strong></div>
+                    ${ordersListHTML || '<div style="color:#7a6e86;padding:8px;text-align:center;font-size:10px;">No active orders available</div>'}
+                </div>`;
+            }
+
+            // Payment Section
+            const paymentHTML = `<div id="paymentSection" class="payment-section">
+                <h4><i class="fas fa-credit-card"></i> Mobile Money Payment</h4>
+                <div class="send-money-hint">
+                    <i class="fas fa-hand-pointer"></i> 
+                    <span>Tap the button below to send money instantly</span>
+                </div>
+                <div style="margin-bottom:6px;">
+                    <p style="font-size:11px;font-weight:600;margin-bottom:4px;">Send payment to:</p>
+                    <div class="phone-numbers">
+                        <div class="phone-row">
+                            <span><i class="fas fa-network-wired"></i> <strong>MTN MoMo</strong></span>
+                            <span class="number">${PAYMENT_CONFIG.momoNumber}</span>
+                            <button class="click-btn mtn" onclick="sendMobileMoney('mtn', '${PAYMENT_CONFIG.momoNumber}', ${totalPrice || 10})">
+                                <i class="fas fa-paper-plane"></i> Send
+                            </button>
+                        </div>
+                        <div class="phone-row">
+                            <span><i class="fas fa-signal"></i> <strong>Airtel Money</strong></span>
+                            <span class="number">${PAYMENT_CONFIG.airtelNumber}</span>
+                            <button class="click-btn airtel" onclick="sendMobileMoney('airtel', '${PAYMENT_CONFIG.airtelNumber}', ${totalPrice || 10})">
+                                <i class="fas fa-paper-plane"></i> Send
+                            </button>
+                        </div>
+                        <div class="phone-row">
+                            <span><i class="fas fa-signal"></i> <strong>Zamtel Kwacha</strong></span>
+                            <span class="number">${PAYMENT_CONFIG.zamtelNumber}</span>
+                            <button class="click-btn zamtel" onclick="sendMobileMoney('zamtel', '${PAYMENT_CONFIG.zamtelNumber}', ${totalPrice || 10})">
+                                <i class="fas fa-paper-plane"></i> Send
+                            </button>
+                        </div>
+                    </div>
+                    <div style="margin-top:4px;font-size:9px;color:#666;text-align:center;">
+                        <i class="fas fa-info-circle"></i> Click "Send" to copy the USSD code
+                    </div>
+                </div>
+                <div>
+                    <label style="font-size:10px;font-weight:600;">Transaction Reference Number *</label>
+                    <input type="text" id="transactionRef" placeholder="Enter payment reference (e.g., MOMO123456)">
+                    <div class="help-text"><i class="fas fa-info-circle"></i> We'll confirm payment before cooking your food</div>
+                </div>
+                <div class="warning">⚠️ Orders without payment confirmation will be cancelled after 15 minutes</div>
+            </div>`;
+
+            container.innerHTML = `
+                <div style="background:linear-gradient(135deg,#cc0000,#990000);color:white;padding:4px 8px;border-radius:8px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">
+                    <div><i class="fas fa-map-marker-alt"></i> <strong>Kasama District</strong><span style="font-size:7px;opacity:0.8;display:block;">Northern Province, Zambia</span></div>
+                    <div class="real-time-indicator" style="color:white;"><span class="dot"></span> Live</div>
+                </div>
+                ${isDeliveryLoggedIn ? `<div style="background:#e8f5e9;padding:2px 6px;border-radius:8px;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;font-size:9px;border:1px solid #a5d6a7;"><span><i class="fas fa-motorcycle" style="color:#cc0000;"></i> <strong>${deliveryGirlName}</strong> is online</span><span style="color:#2e7d32;font-size:7px;"><i class="fas fa-circle" style="color:#4caf50;"></i> Available</span></div>` : ''}
+                ${isAdmin ? adminHTML : ''}
+                ${isDeliveryLoggedIn ? deliveryHTML : ''}
+                ${!isAdmin && !isDeliveryLoggedIn ? `
+                    <div class="card"><div class="section-title"><i class="fas fa-th-large"></i> Today's Menu <span class="kasama-badge" style="margin-left:auto;font-size:7px;background:#ffcc00;color:#990000;padding:1px 4px;border-radius:8px;">${MENU.length} items</span></div><div class="menu-grid">${menuHTML}</div></div>
+                    <div class="order-summary">
+                        <div class="section-title"><i class="fas fa-shopping-bag"></i> Your Order ${cartCount > 0 ? `<span class="cart-count">${cartCount}</span>` : ''}</div>
+                        ${cartHTML}
+                        <div class="order-row order-total"><span>Total</span><span>ZMW ${totalPrice.toFixed(2)}</span></div>
+                        <div class="customer-details">
+                            <div style="font-size:9px;font-weight:600;color:#cc0000;margin-bottom:2px;"><i class="fas fa-user"></i> Delivery Details</div>
+                            <div class="form-group"><label>Full Name <span class="required">*</span></label><input type="text" id="customerNameInput" placeholder="Enter your full name" value="${customerName}" /></div>
+                            <div class="form-group"><label>Phone Number <span class="required">*</span></label><input type="tel" id="customerPhoneInput" placeholder="Enter phone number" value="${customerPhone}" /></div>
+                            <div class="form-group"><label>Delivery Address <span class="required">*</span></label><input type="text" id="customerAddressInput" placeholder="Enter your delivery address" value="${customerLocation}" /></div>
+                        </div>
+                        ${paymentHTML}
+                        <button class="action-btn" onclick="placeOrderWithPayment()" ${cart.length === 0 ? 'disabled' : ''}><i class="fas fa-motorcycle"></i> Place Order · Prepay Required</button>
+                        <div id="orderStatus"></div>
+                    </div>
+                    <div class="card">
+                        <div class="section-title"><i class="fas fa-map-marked-alt"></i> Location</div>
+                        <div class="map-container"><div id="map"></div></div>
+                        <div style="font-size:9px;margin-top:2px;"><i class="fas fa-location-dot" style="color:#cc0000;"></i> <strong>Customer:</strong> ${customerLocation || 'Kasama, Northern Province, Zambia'}</div>
+                        <button class="whatsapp-btn" onclick="shareLocation()"><i class="fab fa-whatsapp"></i> Share Location</button>
+                    </div>
+                ` : ''}
+            `;
+
+            document.getElementById('customerNameInput')?.addEventListener('input', function() { customerName = this
+                    .value; });
+            document.getElementById('customerPhoneInput')?.addEventListener('input', function() { customerPhone = this
+                    .value; });
+            document.getElementById('customerAddressInput')?.addEventListener('input', function() {
+                customerLocation = this.value || 'Kasama, Northern Province, Zambia';
+                initMap(customerLocation);
+            });
+            setTimeout(() => initMap(customerLocation || 'Kasama, Northern Province, Zambia'), 300);
+        }
+
+        // ============================================
+        // ADMIN TAB SWITCHING
+        // ============================================
+        function switchAdminTab(tab) { adminTab = tab;
+            renderApp(); }
+
+        // ============================================
+        // MAP FUNCTIONS
+        // ============================================
+        let map = null,
+            mapMarker = null;
+
+        function initMap(location) {
+            try {
+                const mapContainer = document.getElementById('map');
+                if (!mapContainer) return;
+                let lat = -10.2129,
+                    lng = 31.1809;
+                fetch(
+                        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location || 'Kasama')}&limit=1`
+                        )
+                    .then(r => r.json()).then(data => { if (data && data.length > 0) { lat = parseFloat(data[0].lat);
+                            lng = parseFloat(data[0].lon); } createMap(lat, lng, location || 'Kasama, Zambia'); })
+                    .catch(() => createMap(lat, lng, location || 'Kasama, Zambia'));
+            } catch (e) { console.error('Map error:', e); }
+        }
+
+        function createMap(lat, lng, location) {
+            if (map) map.remove();
+            map = L.map('map').setView([lat, lng], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap' })
+                .addTo(map);
+            const markerIcon = L.divIcon({ html: '<i class="fas fa-map-marker-alt" style="color:#cc0000;font-size:24px;"></i>',
+                className: 'custom-marker', iconSize: [24, 24], iconAnchor: [12, 24] });
+            mapMarker = L.marker([lat, lng], { icon: markerIcon }).addTo(map);
+            mapMarker.bindPopup(`<strong>📍 ${location}</strong>`).openPopup();
+        }
+
+        // ============================================
+        // CUSTOMER FUNCTIONS
+        // ============================================
+        function addToCart(id) {
+            const item = MENU.find(i => i.id === id);
+            if (!item) return;
+            const existing = cart.find(i => i.id === id);
+            if (existing) { cart = cart.map(i => i.id === id ? { ...i, qty: i.qty + 1 } : i); } else { cart.push({ ...item,
+                    qty: 1 }); }
+            renderApp();
+        }
+
+        function removeFromCart(id) {
+            const existing = cart.find(i => i.id === id);
+            if (existing && existing.qty > 1) { cart = cart.map(i => i.id === id ? { ...i, qty: i.qty - 1 } : i); } else {
+                cart = cart.filter(i => i.id !== id); }
+            renderApp();
+        }
+
+        // ============================================
+        // PLACE ORDER WITH PAYMENT
+        // ============================================
+        async function placeOrderWithPayment() {
+            if (cart.length === 0) { alert('Please add items to your order'); return; }
+
+            const name = document.getElementById('customerNameInput')?.value.trim() || '';
+            const phone = document.getElementById('customerPhoneInput')?.value.trim() || '';
+            const address = document.getElementById('customerAddressInput')?.value.trim() ||
+            'Kasama, Northern Province, Zambia';
+
+            if (!name) { alert('⚠️ Please enter your full name'); return; }
+            if (!phone) { alert('⚠️ Please enter your phone number'); return; }
+            if (!address) { alert('⚠️ Please enter your delivery address'); return; }
+
+            const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
+            const ref = document.getElementById('transactionRef')?.value.trim() || '';
+            if (!ref) { alert('⚠️ Please enter your transaction reference number');
+                document.getElementById('transactionRef')?.focus(); return; }
+
+            const orderData = {
+                customer_name: name,
+                customer_phone: phone,
+                customer_location: address,
+                items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
+                total: totalPrice,
+                status: 'payment_pending',
+                payment_method: 'mobile_money',
+                payment_reference: ref,
+                payment_status: 'pending',
+                district: 'Kasama',
+                province: 'Northern Province'
+            };
+
+            try {
+                const savedOrder = await saveOrderToSupabase(orderData);
+                if (savedOrder) {
+                    allOrders.unshift(savedOrder);
+                    sendWhatsAppNotification({
+                        name,
+                        phone,
+                        address,
+                        total: totalPrice,
+                        items: cart.map(i => ({ name: i.name, qty: i.qty, price: i.price })),
+                        payment_reference: ref
+                    });
+
+                    document.getElementById('orderStatus').innerHTML = `
+                        <div class="order-placed-banner">
+                            <i class="fas fa-check-circle"></i> ✅ Order placed, ${name}! 
+                            <br>🛵 Payment is being verified.
+                            <br>📱 We'll call you at ${phone}
+                            <br><span class="whatsapp-notification"><i class="fab fa-whatsapp"></i> WhatsApp notification sent to admin!</span>
+                            <div class="order-status-wa"><i class="fab fa-whatsapp" style="color:#25D366;"></i> Order #${savedOrder.id} - Payment Pending Verification</div>
+                            <div style="background:#fff3e0;padding:4px;border-radius:6px;margin-top:3px;font-size:10px;color:#e65100;">💳 Payment Reference: ${ref} - Awaiting confirmation</div>
+                        </div>
+                    `;
+                    cart = [];
+                    customerName = name;
+                    customerPhone = phone;
+                    customerLocation = address;
+                    document.getElementById('transactionRef').value = '';
+                    setTimeout(() => { document.getElementById('orderStatus').innerHTML = '';
+                        renderApp(); }, 15000);
+                    alert(
+                        `✅ Order #${savedOrder.id} placed successfully!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}\n💳 Payment Reference: ${ref}\n⏳ We'll confirm payment before cooking.`
+                        );
+                }
+            } catch (error) {
+                alert('❌ Failed to place order: ' + error.message);
+                console.error('Order error:', error);
+            }
+        }
+
+        // ============================================
+        // ADMIN FUNCTIONS
+        // ============================================
+        async function confirmPayment(orderId) {
+            if (!confirm('✅ Confirm payment for this order?')) return;
+            const order = allOrders.find(o => o.id === orderId);
+            if (order) {
+                order.status = 'pending';
+                order.payment_status = 'confirmed';
+                try {
+                    await supabaseClient.from('orders').update({ status: 'pending', payment_status: 'confirmed' }).eq(
+                        'id', orderId);
+                    console.log('✅ Payment confirmed in Supabase');
+                    const confirmMessage =
+                        `✅ *PAYMENT CONFIRMED!* 🎉\n\nOrder #${orderId}\nCustomer: ${order.customer_name}\nAmount: ZMW ${order.total.toFixed(2)}\nReference: ${order.payment_reference || 'N/A'}\n\n📋 Ready to prepare and deliver! 🛵`;
+                    window.open(
+                        `https://wa.me/${WHATSAPP_CONFIG.adminNumber}?text=${encodeURIComponent(confirmMessage)}`,
+                    '_blank');
+                } catch (error) { console.error('Error confirming payment:', error); }
+                renderApp();
+                alert('✅ Payment confirmed! Order is now ready for preparation.');
+            }
+        }
+
+        async function addDeliveryGirl() {
+            const input = document.getElementById('newGirlInput');
+            const name = input.value.trim();
+            if (!name) { alert('Please enter a name'); return; }
+            DELIVERY_GIRLS.push(name);
+            input.value = '';
+            renderApp();
+            alert('✅ ' + name + ' added as delivery girl!');
+        }
+
+        async function assignOrder(orderId, girlName) {
+            const order = allOrders.find(o => o.id === orderId);
+            if (order && order.payment_status === 'confirmed') {
+                order.status = 'assigned';
+                order.delivery_girl = girlName;
+                try { await supabaseClient.from('orders').update({ status: 'assigned', delivery_girl: girlName }).eq(
+                        'id', orderId); } catch (error) { console.error('Error updating order:', error); }
+                renderApp();
+                alert('✅ Order #' + orderId + ' assigned to ' + girlName);
+            } else if (order) {
+                alert('⚠️ Payment not confirmed yet. Please confirm payment first.');
+            }
+        }
+
+        async function completeOrder(orderId) {
+            const order = allOrders.find(o => o.id === orderId);
+            if (order) {
+                order.status = 'completed';
+                try { await supabaseClient.from('orders').update({ status: 'completed' }).eq('id', orderId); } catch (
+                    error) { console.error('Error completing order:', error); }
+                renderApp();
+                alert('✅ Order #' + orderId + ' marked as completed!');
+            }
+        }
+
+        async function restoreOrder(orderId) {
+            const order = allOrders.find(o => o.id === orderId);
+            if (order) {
+                order.status = 'pending';
+                order.delivery_girl = '';
+                order.payment_status = 'pending';
+                try { await supabaseClient.from('orders').update({ status: 'pending', delivery_girl: '',
+                        payment_status: 'pending' }).eq('id', orderId); } catch (error) { console.error(
+                        'Error restoring order:', error); }
+                renderApp();
+                alert('✅ Order #' + orderId + ' restored!');
+            }
+        }
+
+        async function deleteOrder(orderId) {
+            if (!confirm('⚠️ Are you sure you want to permanently delete this order?')) return;
+            try { await supabaseClient.from('orders').delete().eq('id', orderId);
+                allOrders = allOrders.filter(o => o.id !== orderId);
+                renderApp();
+                alert('✅ Order #' + orderId + ' permanently deleted!'); } catch (error) { console.error(
+                    'Error deleting order:', error);
+                alert('❌ Failed to delete order'); }
+        }
+
+        // ============================================
+        // DELIVERY GIRL FUNCTIONS
+        // ============================================
+        async function acceptOrder(orderId) {
+            const order = allOrders.find(o => o.id === orderId);
+            if (order && order.payment_status === 'confirmed') {
+                order.status = 'assigned';
+                order.delivery_girl = deliveryGirlName;
+                try { await supabaseClient.from('orders').update({ status: 'assigned', delivery_girl: deliveryGirlName })
+                        .eq('id', orderId); } catch (error) { console.error('Error accepting order:', error); }
+                renderApp();
+                alert('✅ Order #' + orderId + ' accepted!');
+            } else if (order) {
+                alert('⚠️ Payment not confirmed yet. Please wait for admin to confirm payment.');
+            }
+        }
+
+        async function declineOrder(orderId) {
+            if (!confirm('Are you sure you want to decline this order?')) return;
+            const order = allOrders.find(o => o.id === orderId);
+            if (order) {
+                order.status = 'pending';
+                order.delivery_girl = '';
+                try { await supabaseClient.from('orders').update({ status: 'pending', delivery_girl: '' }).eq('id',
+                        orderId); } catch (error) { console.error('Error declining order:', error); }
+                renderApp();
+                alert('❌ Order #' + orderId + ' declined');
+            }
+        }
+
+        async function pickupOrder(orderId) {
+            const order = allOrders.find(o => o.id === orderId);
+            if (order) {
+                order.status = 'picked_up';
+                try { await supabaseClient.from('orders').update({ status: 'picked_up' }).eq('id', orderId); } catch (
+                    error) { console.error('Error updating order:', error); }
+                renderApp();
+                alert('🛵 Order #' + orderId + ' picked up!');
+            }
+        }
+
+        async function deliverOrder(orderId) {
+            if (!confirm('✅ Confirm delivery of this order?')) return;
+            const order = allOrders.find(o => o.id === orderId);
+            if (order) {
+                order.status = 'delivered';
+                try { await supabaseClient.from('orders').update({ status: 'delivered' }).eq('id', orderId); } catch (
+                    error) { console.error('Error delivering order:', error); }
+                renderApp();
+                alert('✅ Order #' + orderId + ' delivered! Thank you!');
+            }
+        }
+
+        function shareLocation() {
+            const message =
+                `📍 I'm ordering from Chikorlando Restaurant in Kasama!\n📍 Location: ${customerLocation || 'Kasama'}\n👤 Name: ${customerName}\n📱 Phone: ${customerPhone}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(message)}`, '_blank');
+        }
+
+        // ============================================
+        // START THE APP
+        // ============================================
+        async function startApp() {
+            await initSupabase();
+            renderApp();
+            console.log('✅ Chikorlando Restaurant App Loaded!');
+            console.log(`📋 ${MENU.length} menu items loaded`);
+            console.log('📍 Serving Kasama District, Zambia');
+            console.log('💳 Clickable Mobile Money payment enabled');
+        }
+
+        startApp();
+    </script>
 </body>
 </html>
