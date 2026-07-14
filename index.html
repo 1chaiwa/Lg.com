@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Chikorlando Restaurant & Food Delivery</title>
+    <title>Chikorlando Restaurant - Food Delivery Kasama</title>
+    <meta name="description" content="Order delicious Zambian food for delivery in Kasama, Northern Province. Prepayment via mobile money required." />
+    <meta name="theme-color" content="#cc0000" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍽️</text></svg>" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -27,11 +30,12 @@
             max-width: 430px;
             background: white;
             border-radius: 32px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
             overflow: hidden;
             min-height: 780px;
             display: flex;
             flex-direction: column;
+            position: relative;
         }
         .app-header {
             background: linear-gradient(135deg, #cc0000, #990000);
@@ -42,6 +46,8 @@
             justify-content: space-between;
             gap: 6px;
             min-height: 50px;
+            position: relative;
+            z-index: 10;
         }
         .app-header .brand {
             display: flex;
@@ -154,6 +160,10 @@
             border: 1px solid #f0eff2;
             overflow: hidden;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            transition: transform 0.15s;
+        }
+        .menu-item-card:active {
+            transform: scale(0.97);
         }
         .menu-item-card .image-container {
             width: 100%;
@@ -233,7 +243,7 @@
             color: white;
             border: none;
             border-radius: 40px;
-            padding: 7px;
+            padding: 8px;
             font-weight: 700;
             font-size: 12px;
             width: 100%;
@@ -315,6 +325,10 @@
             border-radius: 6px;
             font-size: 11px;
             outline: none;
+            transition: border-color 0.2s;
+        }
+        .customer-details input:focus {
+            border-color: #cc0000;
         }
         .customer-details .required {
             color: #cc0000;
@@ -669,8 +683,6 @@
             font-size: 7px;
             color: #6d6a7a;
         }
-
-        /* Simplified Payment Section - Just Numbers */
         .payment-section {
             background: #f0f8f0;
             border-radius: 10px;
@@ -757,6 +769,18 @@
             margin-top: 4px;
             text-align: center;
         }
+        .payment-instruction {
+            background: #fff8e1;
+            border-left: 3px solid #ff9800;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            color: #666;
+            margin-top: 4px;
+        }
+        .payment-instruction strong {
+            color: #cc0000;
+        }
         .payment-status-badge {
             display: inline-block;
             padding: 1px 6px;
@@ -795,17 +819,33 @@
             align-items: center;
             gap: 4px;
         }
-        .payment-instruction {
-            background: #fff8e1;
-            border-left: 3px solid #ff9800;
-            padding: 6px 8px;
-            border-radius: 4px;
-            font-size: 9px;
-            color: #666;
-            margin-top: 4px;
-        }
-        .payment-instruction strong {
+        .loading-spinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
             color: #cc0000;
+        }
+        .loading-spinner i {
+            font-size: 30px;
+            margin-bottom: 10px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        .version-info {
+            font-size: 7px;
+            color: #ccc;
+            text-align: center;
+            padding: 4px;
+            background: #f9f9f9;
         }
     </style>
 </head>
@@ -837,11 +877,15 @@
             </div>
         </div>
         <div id="app-container" class="app-body">
-            <!-- Content rendered by JavaScript -->
+            <div class="loading-spinner" id="loadingSpinner">
+                <i class="fas fa-spinner"></i>
+                <p style="font-size:12px;color:#666;">Loading delicious food...</p>
+            </div>
         </div>
         <div class="footnote">
             <i class="fas fa-shield-alt"></i> Prepayment required · Serving Kasama District, Northern Province, Zambia
         </div>
+        <div class="version-info">v2.0 · Powered by Chikorlando</div>
     </div>
 
     <!-- Delivery Girl Login Modal -->
@@ -872,27 +916,20 @@
 
     <script>
         // ============================================
-        // SUPABASE CONFIGURATION
+        // CONFIGURATION - EDIT THESE VALUES
         // ============================================
-        const SUPABASE_URL = 'https://ndwoqlxtaczwxsescemu.supabase.co';
-        const SUPABASE_ANON_KEY =
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kd29xbHh0YWN6d3hzZXNjZW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5Mjk2MTQsImV4cCI6MjA5ODUwNTYxNH0.43PgLQSdEESXboLGrdtZCHq-f8TwzItXaGuxmI4NEe8';
-
-        // ============================================
-        // WHATSAPP CONFIGURATION
-        // ============================================
-        const WHATSAPP_CONFIG = {
+        const CONFIG = {
+            supabaseUrl: 'https://ndwoqlxtaczwxsescemu.supabase.co',
+            supabaseKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kd29xbHh0YWN6d3hzZXNjZW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI5Mjk2MTQsImV4cCI6MjA5ODUwNTYxNH0.43PgLQSdEESXboLGrdtZCHq-f8TwzItXaGuxmI4NEe8',
             adminNumber: '260971157284',
-            restaurantName: 'Chikorlando Restaurant'
-        };
-
-        // ============================================
-        // PAYMENT CONFIGURATION - JUST NUMBERS
-        // ============================================
-        const PAYMENT_CONFIG = {
-            momoNumber: '0971157284',
-            airtelNumber: '0777035070',
-            zamtelNumber: '0971130511'
+            restaurantName: 'Chikorlando Restaurant',
+            adminPassword: 'admin2426',
+            paymentNumbers: {
+                momo: '0971157284',
+                airtel: '0777035070',
+                zamtel: '0971130511'
+            },
+            deliveryGirls: ['Chaiwa Justine', 'Brenda Mwansa', 'Chola Williams']
         };
 
         // ============================================
@@ -943,9 +980,6 @@
                 description: 'Chilled water 500ml' }
         ];
 
-        const DELIVERY_GIRLS = ['Chaiwa Justine', 'Brenda Mwansa', 'Chola Williams'];
-        const ADMIN_PASSWORD = 'admin2426';
-
         // ============================================
         // STATE
         // ============================================
@@ -961,13 +995,12 @@
         let adminTab = 'active';
 
         // ============================================
-        // COPY TO CLIPBOARD FUNCTION
+        // UTILITY FUNCTIONS
         // ============================================
         function copyNumber(number) {
             navigator.clipboard.writeText(number).then(() => {
                 alert('✅ Phone number copied to clipboard!');
             }).catch(() => {
-                // Fallback
                 const textArea = document.createElement('textarea');
                 textArea.value = number;
                 document.body.appendChild(textArea);
@@ -976,6 +1009,10 @@
                 document.body.removeChild(textArea);
                 alert('✅ Phone number copied to clipboard!');
             });
+        }
+
+        function generateReference() {
+            return 'CHIK' + Date.now().toString().slice(-6) + Math.random().toString(36).slice(-3).toUpperCase();
         }
 
         // ============================================
@@ -992,7 +1029,7 @@
                         document.head.appendChild(script);
                     });
                 }
-                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                supabaseClient = window.supabase.createClient(CONFIG.supabaseUrl, CONFIG.supabaseKey);
                 console.log('✅ Supabase initialized');
                 await loadOrders();
                 return true;
@@ -1004,7 +1041,6 @@
 
         async function saveOrderToSupabase(orderData) {
             try {
-                console.log('📤 Saving order to Supabase:', orderData);
                 const { data, error } = await supabaseClient
                     .from('orders')
                     .insert([{
@@ -1021,11 +1057,7 @@
                         province: orderData.province || 'Northern Province'
                     }])
                     .select();
-                if (error) {
-                    console.error('❌ Supabase insert error:', error);
-                    throw error;
-                }
-                console.log('✅ Order saved to Supabase:', data);
+                if (error) throw error;
                 return data ? data[0] : null;
             } catch (error) {
                 console.error('❌ Failed to save order:', error);
@@ -1041,7 +1073,6 @@
                     .order('created_at', { ascending: false });
                 if (error) throw error;
                 allOrders = data || [];
-                console.log(`📦 Orders loaded: ${allOrders.length}`);
                 return allOrders;
             } catch (error) {
                 console.error('Error loading orders:', error);
@@ -1051,34 +1082,16 @@
         }
 
         // ============================================
-        // WHATSAPP NOTIFICATION FUNCTION
+        // WHATSAPP NOTIFICATION
         // ============================================
         function sendWhatsAppNotification(orderDetails) {
-            const message = `🆕 *NEW ORDER!* 🛵
-
-        👤 *Customer:* ${orderDetails.name}
-        📱 *Phone:* ${orderDetails.phone}
-        📍 *Address:* ${orderDetails.address}
-        💰 *Total:* ZMW ${orderDetails.total.toFixed(2)}
-
-        🛒 *Items:*
-        ${orderDetails.items.map(item => `  • ${item.qty}x ${item.name} - ZMW ${(item.price * item.qty).toFixed(2)}`).join('\n')}
-
-        💳 *Payment Reference:* ${orderDetails.payment_reference || 'N/A'}
-        💵 *Payment Status:* Pending Verification
-
-        ⏰ *Order Time:* ${new Date().toLocaleString()}
-        📍 *Location:* Kasama, Zambia
-
-        📋 *Please verify payment before preparing!* 🙏`;
-            const encodedMessage = encodeURIComponent(message);
-            const whatsappUrl = `https://wa.me/${WHATSAPP_CONFIG.adminNumber}?text=${encodedMessage}`;
-            window.open(whatsappUrl, '_blank');
-            return true;
+            const message =
+                `🆕 *NEW ORDER!* 🛵\n\n👤 *Customer:* ${orderDetails.name}\n📱 *Phone:* ${orderDetails.phone}\n📍 *Address:* ${orderDetails.address}\n💰 *Total:* ZMW ${orderDetails.total.toFixed(2)}\n\n🛒 *Items:*\n${orderDetails.items.map(item => `  • ${item.qty}x ${item.name} - ZMW ${(item.price * item.qty).toFixed(2)}`).join('\n')}\n\n💳 *Reference:* ${orderDetails.payment_reference}\n💵 *Payment Status:* Pending Verification\n\n📋 *Please verify payment before preparing!* 🙏`;
+            window.open(`https://wa.me/${CONFIG.adminNumber}?text=${encodeURIComponent(message)}`, '_blank');
         }
 
         // ============================================
-        // DELIVERY LOGIN FUNCTIONS
+        // DELIVERY LOGIN
         // ============================================
         function openDeliveryLogin() {
             if (isDeliveryLoggedIn) { deliveryLogout(); return; }
@@ -1094,7 +1107,7 @@
             const name = document.getElementById('deliveryLoginName').value.trim();
             if (!name) { document.getElementById('deliveryLoginError').textContent = '❌ Please enter your name';
                 document.getElementById('deliveryLoginError').classList.add('show'); return; }
-            if (!DELIVERY_GIRLS.includes(name)) { document.getElementById('deliveryLoginError').textContent =
+            if (!CONFIG.deliveryGirls.includes(name)) { document.getElementById('deliveryLoginError').textContent =
                     '❌ Name not found. Contact admin.';
                 document.getElementById('deliveryLoginError').classList.add('show'); return; }
             isDeliveryLoggedIn = true;
@@ -1104,7 +1117,6 @@
             document.getElementById('deliveryNameDisplay').classList.add('show');
             document.getElementById('deliveryBtnText').textContent = 'Logout';
             document.getElementById('deliveryLoginBtn').classList.add('active');
-            alert('✅ Welcome ' + name + '!');
             renderApp();
         }
 
@@ -1114,12 +1126,11 @@
             document.getElementById('deliveryNameDisplay').classList.remove('show');
             document.getElementById('deliveryBtnText').textContent = 'Delivery';
             document.getElementById('deliveryLoginBtn').classList.remove('active');
-            alert('👋 Logged out from delivery');
             renderApp();
         }
 
         // ============================================
-        // ADMIN LOGIN FUNCTIONS
+        // ADMIN LOGIN
         // ============================================
         function openAdminLogin() {
             if (isAdmin) { adminLogout(); return; }
@@ -1133,12 +1144,11 @@
 
         function adminLogin() {
             const password = document.getElementById('adminPassword').value;
-            if (password === ADMIN_PASSWORD) {
+            if (password === CONFIG.adminPassword) {
                 isAdmin = true;
                 document.getElementById('adminLoginModal').classList.remove('show');
                 document.getElementById('adminLoginBtn').classList.add('active');
                 document.getElementById('adminLoginBtn').innerHTML = '<i class="fas fa-sign-out-alt"></i>';
-                alert('✅ Welcome Admin!');
                 renderApp();
             } else {
                 document.getElementById('adminLoginError').classList.add('show');
@@ -1151,7 +1161,6 @@
             isAdmin = false;
             document.getElementById('adminLoginBtn').classList.remove('active');
             document.getElementById('adminLoginBtn').innerHTML = '<i class="fas fa-user-shield"></i>';
-            alert('👋 Logged out from admin');
             renderApp();
         }
 
@@ -1159,256 +1168,6 @@
                 closeDeliveryLogin(); });
         document.getElementById('adminLoginModal')?.addEventListener('click', function(e) { if (e.target === this)
                 closeAdminLogin(); });
-
-        // ============================================
-        // RENDER APP
-        // ============================================
-        function renderApp() {
-            const container = document.getElementById('app-container');
-            const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
-            const cartCount = cart.reduce((acc, i) => acc + i.qty, 0);
-
-            let cartHTML = cart.length === 0 ?
-                '<div style="color:#7a6e86;padding:4px 0;font-size:11px;"><i class="fas fa-shopping-cart"></i> Cart is empty</div>' :
-                cart.map(item =>
-                    `<div class="order-row"><span>${item.emoji} ${item.name} × ${item.qty}</span><span>ZMW ${(item.price * item.qty).toFixed(2)}<button onclick="removeFromCart(${item.id})" style="background:none;border:none;color:#cc0000;margin-left:4px;cursor:pointer;font-size:10px;"><i class="fas fa-minus-circle"></i></button></span></div>`
-                    ).join('');
-
-            let menuHTML = MENU.map(item => {
-                const qty = cart.find(i => i.id === item.id)?.qty || 0;
-                return `<div class="menu-item-card"><div class="image-container">${item.imgTag}</div><div class="item-info"><div class="item-name">${item.emoji} ${item.name}</div><div class="item-description">${item.description || ''}</div><div class="item-price">ZMW ${item.price.toFixed(2)}</div><div style="margin-top:3px;">${qty === 0 ? `<button class="add-btn-grid" onclick="addToCart(${item.id})"><i class="fas fa-plus"></i> Add</button>` : `<div class="qty-control"><button class="qty-btn-minus" onclick="removeFromCart(${item.id})">−</button><span class="qty-number">${qty}</span><button class="qty-btn-plus" onclick="addToCart(${item.id})">+</button></div>`}</div></div></div>`;
-            }).join('');
-
-            // Admin Dashboard
-            let adminHTML = '';
-            if (isAdmin) {
-                const activeOrders = allOrders.filter(o => o.status !== 'completed' && o.status !== 'delivered' && o
-                    .status !== 'archived');
-                const completedOrders = allOrders.filter(o => o.status === 'completed' || o.status === 'delivered' || o
-                    .status === 'archived');
-                const totalOrders = allOrders.length;
-                const pendingOrders = activeOrders.filter(o => o.status === 'payment_pending' || o.status === 'pending')
-                    .length;
-                const completedCount = completedOrders.length;
-                const totalRevenue = allOrders.reduce((sum, o) => sum + o.total, 0);
-
-                let ordersListHTML = '';
-                let displayOrders = adminTab === 'active' ? activeOrders : completedOrders;
-                if (displayOrders.length === 0) {
-                    ordersListHTML =
-                        `<div style="color:#7a6e86;padding:8px;text-align:center;font-size:10px;">${adminTab === 'active' ? 'No active orders' : 'No completed orders'}</div>`;
-                } else {
-                    ordersListHTML = displayOrders.map(order => {
-                        const statusClass = order.status || 'pending';
-                        const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name}`).join(', ') :
-                            'No items';
-                        const date = new Date(order.created_at).toLocaleDateString();
-                        const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit',
-                            minute: '2-digit' });
-                        const paymentStatus = order.payment_status || 'pending';
-                        const paymentBadge =
-                            `<span class="payment-status-badge ${paymentStatus}">${paymentStatus.toUpperCase()}</span>`;
-
-                        let actionButtons = '';
-                        if (adminTab === 'active') {
-                            if (order.status === 'payment_pending' || (order.status === 'pending' && order
-                                    .payment_status === 'pending')) {
-                                actionButtons =
-                                    `<div style="margin-top:3px;"><button class="action-btn-small" onclick="confirmPayment(${order.id})" style="background:#4caf50;">✅ Confirm Payment</button></div>`;
-                            }
-                            if (order.status === 'pending' && order.payment_status === 'confirmed') {
-                                actionButtons =
-                                    `<div style="margin-top:3px;"><button class="action-btn-small" onclick="assignOrder(${order.id}, '${DELIVERY_GIRLS[0]}')" style="background:#2196f3;">Assign</button></div>`;
-                            }
-                            if (order.status === 'assigned') {
-                                actionButtons +=
-                                    `<div style="margin-top:3px;"><button class="action-btn-small" onclick="completeOrder(${order.id})" style="background:#4caf50;">Mark Complete</button></div>`;
-                            }
-                        } else {
-                            actionButtons =
-                                `<div style="margin-top:3px;"><button class="action-btn-small" onclick="restoreOrder(${order.id})" style="background:#ff9800;">Restore</button><button class="action-btn-small" onclick="deleteOrder(${order.id})" style="background:#f44336;">Delete</button></div>`;
-                        }
-
-                        return `<div class="order-card" style="${adminTab === 'completed' ? 'opacity:0.7;background:#f9f9f9;' : ''}">
-                            <div class="header"><span class="order-id">#${order.id} - ${order.customer_name}</span><span class="order-time">${date} ${time}</span></div>
-                            <div class="customer-info"><i class="fas fa-phone"></i> ${order.customer_phone}</div>
-                            <div class="customer-info"><i class="fas fa-map-marker-alt"></i> ${order.customer_location}</div>
-                            <div class="order-items">${itemsText}</div>
-                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;flex-wrap:wrap;gap:3px;">
-                                <span class="order-total">ZMW ${order.total.toFixed(2)}</span>
-                                <span class="status-badge ${statusClass}">${statusClass.toUpperCase()}</span>
-                                ${paymentBadge}
-                            </div>
-                            <div style="font-size:8px;color:#666;margin-top:2px;">💳 ${order.payment_method || 'Mobile Money'} | Ref: ${order.payment_reference || 'N/A'}</div>
-                            ${order.delivery_girl ? `<div style="font-size:8px;color:#666;margin-top:2px;"><i class="fas fa-motorcycle"></i> ${order.delivery_girl}</div>` : ''}
-                            ${actionButtons}
-                        </div>`;
-                    }).join('');
-                }
-
-                adminHTML = `<div class="admin-panel show">
-                    <div class="section-title"><i class="fas fa-chart-line"></i> Admin Dashboard</div>
-                    <div class="stats-grid">
-                        <div class="stat-card"><div class="number">${totalOrders}</div><div class="label">Total Orders</div></div>
-                        <div class="stat-card"><div class="number">${pendingOrders}</div><div class="label">Pending Payment</div></div>
-                        <div class="stat-card"><div class="number">${completedCount}</div><div class="label">Completed</div></div>
-                    </div>
-                    <div style="font-size:10px;font-weight:700;color:#cc0000;text-align:center;margin-bottom:3px;">Total Revenue: ZMW ${totalRevenue.toFixed(2)}</div>
-                    <div class="tab-bar">
-                        <button class="tab-btn ${adminTab === 'active' ? 'active' : ''}" onclick="switchAdminTab('active')"><i class="fas fa-clock"></i> Active (${activeOrders.length})</button>
-                        <button class="tab-btn ${adminTab === 'completed' ? 'active' : ''}" onclick="switchAdminTab('completed')"><i class="fas fa-check-circle"></i> Completed (${completedOrders.length})</button>
-                    </div>
-                    <div class="section-title" style="margin-top:4px;font-size:10px;color:#666;">${adminTab === 'active' ? '📋 Active Orders' : '✅ Completed Orders'}</div>
-                    <div style="max-height:250px;overflow-y:auto;">${ordersListHTML}</div>
-                    <div class="section-title" style="margin-top:4px;"><i class="fas fa-female"></i> Delivery Girls</div>
-                    <div>${DELIVERY_GIRLS.map(g => `<span class="delivery-girl-tag"><i class="fas fa-female"></i> ${g}</span>`).join('')}</div>
-                    <div style="margin-top:4px;"><div style="display:flex;gap:3px;"><input id="newGirlInput" placeholder="Add delivery girl" style="flex:1;padding:3px 6px;border:1px solid #ffcccc;border-radius:20px;font-size:9px;outline:none;"><button class="action-btn-small" onclick="addDeliveryGirl()"><i class="fas fa-plus"></i> Add</button></div></div>
-                </div>`;
-            }
-
-            // Delivery Panel
-            let deliveryHTML = '';
-            if (isDeliveryLoggedIn) {
-                const myOrders = allOrders.filter(o => (o.delivery_girl === deliveryGirlName || o.status === 'pending' || o
-                        .status === 'payment_pending') && o.status !== 'completed' && o.status !== 'delivered' && o
-                        .status !== 'archived');
-                let ordersListHTML = myOrders.map(order => {
-                    const statusClass = order.status || 'pending';
-                    const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name}`).join(', ') :
-                        'No items';
-                    const date = new Date(order.created_at).toLocaleDateString();
-                    const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit',
-                        minute: '2-digit' });
-                    const isMine = order.delivery_girl === deliveryGirlName;
-                    const paymentStatus = order.payment_status || 'pending';
-                    const paymentBadge =
-                        `<span class="payment-status-badge ${paymentStatus}">${paymentStatus.toUpperCase()}</span>`;
-
-                    let actionsHTML = '';
-                    if ((order.status === 'pending' || order.status === 'payment_pending') && !order.delivery_girl) {
-                        if (order.payment_status === 'confirmed') {
-                            actionsHTML =
-                                `<div class="action-btns"><button class="btn-accept" onclick="acceptOrder(${order.id})"><i class="fas fa-check"></i> Accept</button><button class="btn-decline" onclick="declineOrder(${order.id})"><i class="fas fa-times"></i> Decline</button></div>`;
-                        } else {
-                            actionsHTML =
-                                `<div style="color:#e65100;font-size:8px;background:#fff3e0;padding:2px 4px;border-radius:4px;text-align:center;">⏳ Awaiting payment confirmation</div>`;
-                        }
-                    } else if (order.status === 'assigned' && isMine) {
-                        actionsHTML =
-                            `<div class="action-btns"><button class="btn-pickup" onclick="pickupOrder(${order.id})"><i class="fas fa-box"></i> Picked Up</button></div>`;
-                    } else if (order.status === 'picked_up' && isMine) {
-                        actionsHTML =
-                            `<div class="action-btns"><button class="btn-deliver" onclick="deliverOrder(${order.id})"><i class="fas fa-check-circle"></i> Delivered</button></div>`;
-                    }
-
-                    return `<div class="order-card">
-                        <div class="header"><span class="order-id">#${order.id} - ${order.customer_name}</span><span class="order-time">${date} ${time}</span></div>
-                        <div class="customer-info"><i class="fas fa-phone"></i> ${order.customer_phone}</div>
-                        <div class="customer-info"><i class="fas fa-map-marker-alt"></i> ${order.customer_location}</div>
-                        <div class="order-items">${itemsText}</div>
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;flex-wrap:wrap;gap:3px;">
-                            <span class="order-total">ZMW ${order.total.toFixed(2)}</span>
-                            <span class="status-badge ${statusClass}">${statusClass.toUpperCase()}</span>
-                            ${paymentBadge}
-                        </div>
-                        ${actionsHTML}
-                    </div>`;
-                }).join('');
-                deliveryHTML = `<div class="delivery-panel show">
-                    <div class="section-title"><i class="fas fa-motorcycle"></i> My Deliveries</div>
-                    <div style="font-size:9px;color:#666;margin-bottom:3px;">Logged in as: <strong>${deliveryGirlName}</strong></div>
-                    ${ordersListHTML || '<div style="color:#7a6e86;padding:8px;text-align:center;font-size:10px;">No active orders available</div>'}
-                </div>`;
-            }
-
-            // ============================================
-            // SIMPLIFIED PAYMENT SECTION - JUST NUMBERS
-            // ============================================
-            const paymentHTML = `<div id="paymentSection" class="payment-section">
-                <h4><i class="fas fa-credit-card"></i> Mobile Money Payment</h4>
-                <div class="payment-numbers">
-                    <div class="payment-row">
-                        <span><i class="fas fa-network-wired"></i> <strong>MTN MoMo</strong></span>
-                        <span class="number">${PAYMENT_CONFIG.momoNumber}</span>
-                        <button class="copy-btn mtn" onclick="copyNumber('${PAYMENT_CONFIG.momoNumber}')">
-                            <i class="fas fa-copy"></i> Copy
-                        </button>
-                    </div>
-                    <div class="payment-row">
-                        <span><i class="fas fa-signal"></i> <strong>Airtel Money</strong></span>
-                        <span class="number">${PAYMENT_CONFIG.airtelNumber}</span>
-                        <button class="copy-btn airtel" onclick="copyNumber('${PAYMENT_CONFIG.airtelNumber}')">
-                            <i class="fas fa-copy"></i> Copy
-                        </button>
-                    </div>
-                    <div class="payment-row">
-                        <span><i class="fas fa-signal"></i> <strong>Zamtel Kwacha</strong></span>
-                        <span class="number">${PAYMENT_CONFIG.zamtelNumber}</span>
-                        <button class="copy-btn zamtel" onclick="copyNumber('${PAYMENT_CONFIG.zamtelNumber}')">
-                            <i class="fas fa-copy"></i> Copy
-                        </button>
-                    </div>
-                </div>
-                <div class="payment-hint">
-                    <i class="fas fa-info-circle"></i> Copy the number and send payment via your mobile money app
-                </div>
-                <div class="payment-instruction">
-                    <strong>📝 After sending money:</strong> Tell us the reference number via WhatsApp or call <strong>0777035070</strong>
-                </div>
-                <div class="payment-warning">
-                    ⚠️ Orders without payment confirmation will be cancelled after 15 minutes
-                </div>
-            </div>`;
-
-            container.innerHTML = `
-                <div style="background:linear-gradient(135deg,#cc0000,#990000);color:white;padding:4px 8px;border-radius:8px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">
-                    <div><i class="fas fa-map-marker-alt"></i> <strong>Kasama District</strong><span style="font-size:7px;opacity:0.8;display:block;">Northern Province, Zambia</span></div>
-                    <div class="real-time-indicator" style="color:white;"><span class="dot"></span> Live</div>
-                </div>
-                ${isDeliveryLoggedIn ? `<div style="background:#e8f5e9;padding:2px 6px;border-radius:8px;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;font-size:9px;border:1px solid #a5d6a7;"><span><i class="fas fa-motorcycle" style="color:#cc0000;"></i> <strong>${deliveryGirlName}</strong> is online</span><span style="color:#2e7d32;font-size:7px;"><i class="fas fa-circle" style="color:#4caf50;"></i> Available</span></div>` : ''}
-                ${isAdmin ? adminHTML : ''}
-                ${isDeliveryLoggedIn ? deliveryHTML : ''}
-                ${!isAdmin && !isDeliveryLoggedIn ? `
-                    <div class="card"><div class="section-title"><i class="fas fa-th-large"></i> Today's Menu <span class="kasama-badge" style="margin-left:auto;font-size:7px;background:#ffcc00;color:#990000;padding:1px 4px;border-radius:8px;">${MENU.length} items</span></div><div class="menu-grid">${menuHTML}</div></div>
-                    <div class="order-summary">
-                        <div class="section-title"><i class="fas fa-shopping-bag"></i> Your Order ${cartCount > 0 ? `<span class="cart-count">${cartCount}</span>` : ''}</div>
-                        ${cartHTML}
-                        <div class="order-row order-total"><span>Total</span><span>ZMW ${totalPrice.toFixed(2)}</span></div>
-                        <div class="customer-details">
-                            <div style="font-size:9px;font-weight:600;color:#cc0000;margin-bottom:2px;"><i class="fas fa-user"></i> Delivery Details</div>
-                            <div class="form-group"><label>Full Name <span class="required">*</span></label><input type="text" id="customerNameInput" placeholder="Enter your full name" value="${customerName}" /></div>
-                            <div class="form-group"><label>Phone Number <span class="required">*</span></label><input type="tel" id="customerPhoneInput" placeholder="Enter phone number" value="${customerPhone}" /></div>
-                            <div class="form-group"><label>Delivery Address <span class="required">*</span></label><input type="text" id="customerAddressInput" placeholder="Enter your delivery address" value="${customerLocation}" /></div>
-                        </div>
-                        ${paymentHTML}
-                        <button class="action-btn" onclick="placeOrderWithPayment()" ${cart.length === 0 ? 'disabled' : ''}><i class="fas fa-motorcycle"></i> Place Order · Prepay Required</button>
-                        <div id="orderStatus"></div>
-                    </div>
-                    <div class="card">
-                        <div class="section-title"><i class="fas fa-map-marked-alt"></i> Location</div>
-                        <div class="map-container"><div id="map"></div></div>
-                        <div style="font-size:9px;margin-top:2px;"><i class="fas fa-location-dot" style="color:#cc0000;"></i> <strong>Customer:</strong> ${customerLocation || 'Kasama, Northern Province, Zambia'}</div>
-                        <button class="whatsapp-btn" onclick="shareLocation()"><i class="fab fa-whatsapp"></i> Share Location</button>
-                    </div>
-                ` : ''}
-            `;
-
-            document.getElementById('customerNameInput')?.addEventListener('input', function() { customerName = this
-                    .value; });
-            document.getElementById('customerPhoneInput')?.addEventListener('input', function() { customerPhone = this
-                    .value; });
-            document.getElementById('customerAddressInput')?.addEventListener('input', function() {
-                customerLocation = this.value || 'Kasama, Northern Province, Zambia';
-                initMap(customerLocation);
-            });
-            setTimeout(() => initMap(customerLocation || 'Kasama, Northern Province, Zambia'), 300);
-        }
-
-        // ============================================
-        // ADMIN TAB SWITCHING
-        // ============================================
-        function switchAdminTab(tab) { adminTab = tab;
-            renderApp(); }
 
         // ============================================
         // MAP FUNCTIONS
@@ -1462,7 +1221,7 @@
         }
 
         // ============================================
-        // PLACE ORDER WITH PAYMENT
+        // PLACE ORDER
         // ============================================
         async function placeOrderWithPayment() {
             if (cart.length === 0) { alert('Please add items to your order'); return; }
@@ -1477,9 +1236,7 @@
             if (!address) { alert('⚠️ Please enter your delivery address'); return; }
 
             const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
-
-            // Generate a simple reference number
-            const ref = 'CHIK' + Date.now().toString().slice(-6);
+            const ref = generateReference();
 
             const orderData = {
                 customer_name: name,
@@ -1513,11 +1270,11 @@
                             <i class="fas fa-check-circle"></i> ✅ Order placed, ${name}! 
                             <br>🛵 Payment is being verified.
                             <br>📱 We'll call you at ${phone}
-                            <br><span class="whatsapp-notification"><i class="fab fa-whatsapp"></i> WhatsApp notification sent to admin!</span>
-                            <div class="order-status-wa"><i class="fab fa-whatsapp" style="color:#25D366;"></i> Order #${savedOrder.id} - Payment Pending Verification</div>
-                            <div style="background:#fff3e0;padding:4px;border-radius:6px;margin-top:3px;font-size:10px;color:#e65100;">💳 Payment Reference: ${ref} - Awaiting confirmation</div>
+                            <br><span class="whatsapp-notification"><i class="fab fa-whatsapp"></i> WhatsApp notification sent!</span>
+                            <div class="order-status-wa"><i class="fab fa-whatsapp" style="color:#25D366;"></i> Order #${savedOrder.id} - Payment Pending</div>
+                            <div style="background:#fff3e0;padding:4px;border-radius:6px;margin-top:3px;font-size:10px;color:#e65100;">💳 Reference: ${ref}</div>
                             <div style="background:#e8f5e9;padding:4px;border-radius:6px;margin-top:3px;font-size:9px;color:#2e7d32;">
-                                📝 Send money to: <strong>${PAYMENT_CONFIG.momoNumber}</strong> (MTN) or <strong>${PAYMENT_CONFIG.airtelNumber}</strong> (Airtel)
+                                📝 Send to: <strong>${CONFIG.paymentNumbers.momo}</strong> (MTN) or <strong>${CONFIG.paymentNumbers.airtel}</strong> (Airtel)
                             </div>
                         </div>
                     `;
@@ -1528,12 +1285,11 @@
                     setTimeout(() => { document.getElementById('orderStatus').innerHTML = '';
                         renderApp(); }, 20000);
                     alert(
-                        `✅ Order #${savedOrder.id} placed successfully!\n\n📱 We'll call you at ${phone}\n📍 Delivering to: ${address}\n💳 Payment Reference: ${ref}\n📝 Send payment to: ${PAYMENT_CONFIG.momoNumber} (MTN) or ${PAYMENT_CONFIG.airtelNumber} (Airtel)\n⏳ We'll confirm payment before cooking.`
+                        `✅ Order #${savedOrder.id} placed!\n\n📱 We'll call you at ${phone}\n📍 ${address}\n💳 Reference: ${ref}\n📝 Send to: ${CONFIG.paymentNumbers.momo} (MTN) or ${CONFIG.paymentNumbers.airtel} (Airtel)`
                         );
                 }
             } catch (error) {
                 alert('❌ Failed to place order: ' + error.message);
-                console.error('Order error:', error);
             }
         }
 
@@ -1549,15 +1305,13 @@
                 try {
                     await supabaseClient.from('orders').update({ status: 'pending', payment_status: 'confirmed' }).eq(
                         'id', orderId);
-                    console.log('✅ Payment confirmed in Supabase');
                     const confirmMessage =
-                        `✅ *PAYMENT CONFIRMED!* 🎉\n\nOrder #${orderId}\nCustomer: ${order.customer_name}\nAmount: ZMW ${order.total.toFixed(2)}\nReference: ${order.payment_reference || 'N/A'}\n\n📋 Ready to prepare and deliver! 🛵`;
-                    window.open(
-                        `https://wa.me/${WHATSAPP_CONFIG.adminNumber}?text=${encodeURIComponent(confirmMessage)}`,
+                        `✅ *PAYMENT CONFIRMED!* 🎉\n\nOrder #${orderId}\nCustomer: ${order.customer_name}\nAmount: ZMW ${order.total.toFixed(2)}\nReference: ${order.payment_reference || 'N/A'}\n\n📋 Ready to prepare! 🛵`;
+                    window.open(`https://wa.me/${CONFIG.adminNumber}?text=${encodeURIComponent(confirmMessage)}`,
                     '_blank');
-                } catch (error) { console.error('Error confirming payment:', error); }
+                } catch (error) { console.error('Error:', error); }
                 renderApp();
-                alert('✅ Payment confirmed! Order is now ready for preparation.');
+                alert('✅ Payment confirmed!');
             }
         }
 
@@ -1565,10 +1319,10 @@
             const input = document.getElementById('newGirlInput');
             const name = input.value.trim();
             if (!name) { alert('Please enter a name'); return; }
-            DELIVERY_GIRLS.push(name);
+            CONFIG.deliveryGirls.push(name);
             input.value = '';
             renderApp();
-            alert('✅ ' + name + ' added as delivery girl!');
+            alert('✅ ' + name + ' added!');
         }
 
         async function assignOrder(orderId, girlName) {
@@ -1577,11 +1331,11 @@
                 order.status = 'assigned';
                 order.delivery_girl = girlName;
                 try { await supabaseClient.from('orders').update({ status: 'assigned', delivery_girl: girlName }).eq(
-                        'id', orderId); } catch (error) { console.error('Error updating order:', error); }
+                        'id', orderId); } catch (error) { console.error('Error:', error); }
                 renderApp();
                 alert('✅ Order #' + orderId + ' assigned to ' + girlName);
             } else if (order) {
-                alert('⚠️ Payment not confirmed yet. Please confirm payment first.');
+                alert('⚠️ Payment not confirmed yet.');
             }
         }
 
@@ -1590,9 +1344,9 @@
             if (order) {
                 order.status = 'completed';
                 try { await supabaseClient.from('orders').update({ status: 'completed' }).eq('id', orderId); } catch (
-                    error) { console.error('Error completing order:', error); }
+                    error) { console.error('Error:', error); }
                 renderApp();
-                alert('✅ Order #' + orderId + ' marked as completed!');
+                alert('✅ Order #' + orderId + ' completed!');
             }
         }
 
@@ -1603,22 +1357,24 @@
                 order.delivery_girl = '';
                 order.payment_status = 'pending';
                 try { await supabaseClient.from('orders').update({ status: 'pending', delivery_girl: '',
-                        payment_status: 'pending' }).eq('id', orderId); } catch (error) { console.error(
-                        'Error restoring order:', error); }
+                        payment_status: 'pending' }).eq('id', orderId); } catch (error) { console.error('Error:',
+                        error); }
                 renderApp();
                 alert('✅ Order #' + orderId + ' restored!');
             }
         }
 
         async function deleteOrder(orderId) {
-            if (!confirm('⚠️ Are you sure you want to permanently delete this order?')) return;
+            if (!confirm('⚠️ Permanently delete this order?')) return;
             try { await supabaseClient.from('orders').delete().eq('id', orderId);
                 allOrders = allOrders.filter(o => o.id !== orderId);
                 renderApp();
-                alert('✅ Order #' + orderId + ' permanently deleted!'); } catch (error) { console.error(
-                    'Error deleting order:', error);
-                alert('❌ Failed to delete order'); }
+                alert('✅ Order #' + orderId + ' deleted!'); } catch (error) { console.error('Error:', error);
+                alert('❌ Failed to delete'); }
         }
+
+        function switchAdminTab(tab) { adminTab = tab;
+            renderApp(); }
 
         // ============================================
         // DELIVERY GIRL FUNCTIONS
@@ -1629,22 +1385,22 @@
                 order.status = 'assigned';
                 order.delivery_girl = deliveryGirlName;
                 try { await supabaseClient.from('orders').update({ status: 'assigned', delivery_girl: deliveryGirlName })
-                        .eq('id', orderId); } catch (error) { console.error('Error accepting order:', error); }
+                        .eq('id', orderId); } catch (error) { console.error('Error:', error); }
                 renderApp();
                 alert('✅ Order #' + orderId + ' accepted!');
             } else if (order) {
-                alert('⚠️ Payment not confirmed yet. Please wait for admin to confirm payment.');
+                alert('⚠️ Payment not confirmed yet.');
             }
         }
 
         async function declineOrder(orderId) {
-            if (!confirm('Are you sure you want to decline this order?')) return;
+            if (!confirm('Decline this order?')) return;
             const order = allOrders.find(o => o.id === orderId);
             if (order) {
                 order.status = 'pending';
                 order.delivery_girl = '';
                 try { await supabaseClient.from('orders').update({ status: 'pending', delivery_girl: '' }).eq('id',
-                        orderId); } catch (error) { console.error('Error declining order:', error); }
+                        orderId); } catch (error) { console.error('Error:', error); }
                 renderApp();
                 alert('❌ Order #' + orderId + ' declined');
             }
@@ -1655,19 +1411,19 @@
             if (order) {
                 order.status = 'picked_up';
                 try { await supabaseClient.from('orders').update({ status: 'picked_up' }).eq('id', orderId); } catch (
-                    error) { console.error('Error updating order:', error); }
+                    error) { console.error('Error:', error); }
                 renderApp();
                 alert('🛵 Order #' + orderId + ' picked up!');
             }
         }
 
         async function deliverOrder(orderId) {
-            if (!confirm('✅ Confirm delivery of this order?')) return;
+            if (!confirm('✅ Confirm delivery?')) return;
             const order = allOrders.find(o => o.id === orderId);
             if (order) {
                 order.status = 'delivered';
                 try { await supabaseClient.from('orders').update({ status: 'delivered' }).eq('id', orderId); } catch (
-                    error) { console.error('Error delivering order:', error); }
+                    error) { console.error('Error:', error); }
                 renderApp();
                 alert('✅ Order #' + orderId + ' delivered! Thank you!');
             }
@@ -1680,17 +1436,276 @@
         }
 
         // ============================================
+        // RENDER APP
+        // ============================================
+        function renderApp() {
+            const container = document.getElementById('app-container');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            if (loadingSpinner) loadingSpinner.style.display = 'none';
+
+            const totalPrice = cart.reduce((acc, i) => acc + i.price * i.qty, 0);
+            const cartCount = cart.reduce((acc, i) => acc + i.qty, 0);
+
+            let cartHTML = cart.length === 0 ?
+                '<div style="color:#7a6e86;padding:4px 0;font-size:11px;"><i class="fas fa-shopping-cart"></i> Cart is empty</div>' :
+                cart.map(item =>
+                    `<div class="order-row"><span>${item.emoji} ${item.name} × ${item.qty}</span><span>ZMW ${(item.price * item.qty).toFixed(2)}<button onclick="removeFromCart(${item.id})" style="background:none;border:none;color:#cc0000;margin-left:4px;cursor:pointer;font-size:10px;"><i class="fas fa-minus-circle"></i></button></span></div>`
+                    ).join('');
+
+            let menuHTML = MENU.map(item => {
+                const qty = cart.find(i => i.id === item.id)?.qty || 0;
+                return `<div class="menu-item-card"><div class="image-container">${item.imgTag}</div><div class="item-info"><div class="item-name">${item.emoji} ${item.name}</div><div class="item-description">${item.description || ''}</div><div class="item-price">ZMW ${item.price.toFixed(2)}</div><div style="margin-top:3px;">${qty === 0 ? `<button class="add-btn-grid" onclick="addToCart(${item.id})"><i class="fas fa-plus"></i> Add</button>` : `<div class="qty-control"><button class="qty-btn-minus" onclick="removeFromCart(${item.id})">−</button><span class="qty-number">${qty}</span><button class="qty-btn-plus" onclick="addToCart(${item.id})">+</button></div>`}</div></div></div>`;
+            }).join('');
+
+            // Admin Dashboard
+            let adminHTML = '';
+            if (isAdmin) {
+                const activeOrders = allOrders.filter(o => o.status !== 'completed' && o.status !== 'delivered' && o
+                    .status !== 'archived');
+                const completedOrders = allOrders.filter(o => o.status === 'completed' || o.status === 'delivered' || o
+                    .status === 'archived');
+                const totalOrders = allOrders.length;
+                const pendingOrders = activeOrders.filter(o => o.status === 'payment_pending' || o.status === 'pending')
+                    .length;
+                const completedCount = completedOrders.length;
+                const totalRevenue = allOrders.reduce((sum, o) => sum + o.total, 0);
+
+                let ordersListHTML = '';
+                let displayOrders = adminTab === 'active' ? activeOrders : completedOrders;
+                if (displayOrders.length === 0) {
+                    ordersListHTML =
+                        `<div style="color:#7a6e86;padding:8px;text-align:center;font-size:10px;">${adminTab === 'active' ? 'No active orders' : 'No completed orders'}</div>`;
+                } else {
+                    ordersListHTML = displayOrders.map(order => {
+                        const statusClass = order.status || 'pending';
+                        const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name}`).join(', ') :
+                            'No items';
+                        const date = new Date(order.created_at).toLocaleDateString();
+                        const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit',
+                            minute: '2-digit' });
+                        const paymentStatus = order.payment_status || 'pending';
+                        const paymentBadge =
+                            `<span class="payment-status-badge ${paymentStatus}">${paymentStatus.toUpperCase()}</span>`;
+
+                        let actionButtons = '';
+                        if (adminTab === 'active') {
+                            if (order.status === 'payment_pending' || (order.status === 'pending' && order
+                                    .payment_status === 'pending')) {
+                                actionButtons =
+                                    `<div style="margin-top:3px;"><button class="action-btn-small" onclick="confirmPayment(${order.id})" style="background:#4caf50;">✅ Confirm Payment</button></div>`;
+                            }
+                            if (order.status === 'pending' && order.payment_status === 'confirmed') {
+                                actionButtons =
+                                    `<div style="margin-top:3px;"><button class="action-btn-small" onclick="assignOrder(${order.id}, '${CONFIG.deliveryGirls[0]}')" style="background:#2196f3;">Assign</button></div>`;
+                            }
+                            if (order.status === 'assigned') {
+                                actionButtons +=
+                                    `<div style="margin-top:3px;"><button class="action-btn-small" onclick="completeOrder(${order.id})" style="background:#4caf50;">Complete</button></div>`;
+                            }
+                        } else {
+                            actionButtons =
+                                `<div style="margin-top:3px;"><button class="action-btn-small" onclick="restoreOrder(${order.id})" style="background:#ff9800;">Restore</button><button class="action-btn-small" onclick="deleteOrder(${order.id})" style="background:#f44336;">Delete</button></div>`;
+                        }
+
+                        return `<div class="order-card" style="${adminTab === 'completed' ? 'opacity:0.7;background:#f9f9f9;' : ''}">
+                            <div class="header"><span class="order-id">#${order.id} - ${order.customer_name}</span><span class="order-time">${date} ${time}</span></div>
+                            <div class="customer-info"><i class="fas fa-phone"></i> ${order.customer_phone}</div>
+                            <div class="customer-info"><i class="fas fa-map-marker-alt"></i> ${order.customer_location}</div>
+                            <div class="order-items">${itemsText}</div>
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;flex-wrap:wrap;gap:3px;">
+                                <span class="order-total">ZMW ${order.total.toFixed(2)}</span>
+                                <span class="status-badge ${statusClass}">${statusClass.toUpperCase()}</span>
+                                ${paymentBadge}
+                            </div>
+                            <div style="font-size:8px;color:#666;margin-top:2px;">💳 ${order.payment_method || 'Mobile Money'} | Ref: ${order.payment_reference || 'N/A'}</div>
+                            ${order.delivery_girl ? `<div style="font-size:8px;color:#666;margin-top:2px;"><i class="fas fa-motorcycle"></i> ${order.delivery_girl}</div>` : ''}
+                            ${actionButtons}
+                        </div>`;
+                    }).join('');
+                }
+
+                adminHTML = `<div class="admin-panel show">
+                    <div class="section-title"><i class="fas fa-chart-line"></i> Admin Dashboard</div>
+                    <div class="stats-grid">
+                        <div class="stat-card"><div class="number">${totalOrders}</div><div class="label">Total</div></div>
+                        <div class="stat-card"><div class="number">${pendingOrders}</div><div class="label">Pending Payment</div></div>
+                        <div class="stat-card"><div class="number">${completedCount}</div><div class="label">Completed</div></div>
+                    </div>
+                    <div style="font-size:10px;font-weight:700;color:#cc0000;text-align:center;margin-bottom:3px;">Revenue: ZMW ${totalRevenue.toFixed(2)}</div>
+                    <div class="tab-bar">
+                        <button class="tab-btn ${adminTab === 'active' ? 'active' : ''}" onclick="switchAdminTab('active')"><i class="fas fa-clock"></i> Active (${activeOrders.length})</button>
+                        <button class="tab-btn ${adminTab === 'completed' ? 'active' : ''}" onclick="switchAdminTab('completed')"><i class="fas fa-check-circle"></i> Completed (${completedOrders.length})</button>
+                    </div>
+                    <div style="max-height:250px;overflow-y:auto;">${ordersListHTML}</div>
+                    <div class="section-title" style="margin-top:4px;"><i class="fas fa-female"></i> Delivery Girls</div>
+                    <div>${CONFIG.deliveryGirls.map(g => `<span class="delivery-girl-tag"><i class="fas fa-female"></i> ${g}</span>`).join('')}</div>
+                    <div style="margin-top:4px;"><div style="display:flex;gap:3px;"><input id="newGirlInput" placeholder="Add delivery girl" style="flex:1;padding:3px 6px;border:1px solid #ffcccc;border-radius:20px;font-size:9px;outline:none;"><button class="action-btn-small" onclick="addDeliveryGirl()"><i class="fas fa-plus"></i> Add</button></div></div>
+                </div>`;
+            }
+
+            // Delivery Panel
+            let deliveryHTML = '';
+            if (isDeliveryLoggedIn) {
+                const myOrders = allOrders.filter(o => (o.delivery_girl === deliveryGirlName || o.status === 'pending' || o
+                        .status === 'payment_pending') && o.status !== 'completed' && o.status !== 'delivered' && o
+                        .status !== 'archived');
+                let ordersListHTML = myOrders.map(order => {
+                    const statusClass = order.status || 'pending';
+                    const itemsText = order.items ? order.items.map(i => `${i.qty}x ${i.name}`).join(', ') :
+                        'No items';
+                    const date = new Date(order.created_at).toLocaleDateString();
+                    const time = new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit',
+                        minute: '2-digit' });
+                    const isMine = order.delivery_girl === deliveryGirlName;
+                    const paymentStatus = order.payment_status || 'pending';
+                    const paymentBadge =
+                        `<span class="payment-status-badge ${paymentStatus}">${paymentStatus.toUpperCase()}</span>`;
+
+                    let actionsHTML = '';
+                    if ((order.status === 'pending' || order.status === 'payment_pending') && !order.delivery_girl) {
+                        if (order.payment_status === 'confirmed') {
+                            actionsHTML =
+                                `<div class="action-btns"><button class="btn-accept" onclick="acceptOrder(${order.id})"><i class="fas fa-check"></i> Accept</button><button class="btn-decline" onclick="declineOrder(${order.id})"><i class="fas fa-times"></i> Decline</button></div>`;
+                        } else {
+                            actionsHTML =
+                                `<div style="color:#e65100;font-size:8px;background:#fff3e0;padding:2px 4px;border-radius:4px;text-align:center;">⏳ Awaiting payment</div>`;
+                        }
+                    } else if (order.status === 'assigned' && isMine) {
+                        actionsHTML =
+                            `<div class="action-btns"><button class="btn-pickup" onclick="pickupOrder(${order.id})"><i class="fas fa-box"></i> Picked Up</button></div>`;
+                    } else if (order.status === 'picked_up' && isMine) {
+                        actionsHTML =
+                            `<div class="action-btns"><button class="btn-deliver" onclick="deliverOrder(${order.id})"><i class="fas fa-check-circle"></i> Delivered</button></div>`;
+                    }
+
+                    return `<div class="order-card">
+                        <div class="header"><span class="order-id">#${order.id} - ${order.customer_name}</span><span class="order-time">${date} ${time}</span></div>
+                        <div class="customer-info"><i class="fas fa-phone"></i> ${order.customer_phone}</div>
+                        <div class="customer-info"><i class="fas fa-map-marker-alt"></i> ${order.customer_location}</div>
+                        <div class="order-items">${itemsText}</div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:2px;flex-wrap:wrap;gap:3px;">
+                            <span class="order-total">ZMW ${order.total.toFixed(2)}</span>
+                            <span class="status-badge ${statusClass}">${statusClass.toUpperCase()}</span>
+                            ${paymentBadge}
+                        </div>
+                        ${actionsHTML}
+                    </div>`;
+                }).join('');
+                deliveryHTML = `<div class="delivery-panel show">
+                    <div class="section-title"><i class="fas fa-motorcycle"></i> My Deliveries</div>
+                    <div style="font-size:9px;color:#666;margin-bottom:3px;">Logged in: <strong>${deliveryGirlName}</strong></div>
+                    ${ordersListHTML || '<div style="color:#7a6e86;padding:8px;text-align:center;font-size:10px;">No active orders</div>'}
+                </div>`;
+            }
+
+            // Payment Section
+            const paymentHTML = `<div id="paymentSection" class="payment-section">
+                <h4><i class="fas fa-credit-card"></i> Mobile Money Payment</h4>
+                <div class="payment-numbers">
+                    <div class="payment-row">
+                        <span><i class="fas fa-network-wired"></i> <strong>MTN MoMo</strong></span>
+                        <span class="number">${CONFIG.paymentNumbers.momo}</span>
+                        <button class="copy-btn mtn" onclick="copyNumber('${CONFIG.paymentNumbers.momo}')">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <div class="payment-row">
+                        <span><i class="fas fa-signal"></i> <strong>Airtel Money</strong></span>
+                        <span class="number">${CONFIG.paymentNumbers.airtel}</span>
+                        <button class="copy-btn airtel" onclick="copyNumber('${CONFIG.paymentNumbers.airtel}')">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <div class="payment-row">
+                        <span><i class="fas fa-signal"></i> <strong>Zamtel Kwacha</strong></span>
+                        <span class="number">${CONFIG.paymentNumbers.zamtel}</span>
+                        <button class="copy-btn zamtel" onclick="copyNumber('${CONFIG.paymentNumbers.zamtel}')">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                </div>
+                <div class="payment-hint">
+                    <i class="fas fa-info-circle"></i> Copy number and send via mobile money app
+                </div>
+                <div class="payment-instruction">
+                    <strong>📝 After sending:</strong> Tell us the reference via WhatsApp or call <strong>0777035070</strong>
+                </div>
+                <div class="payment-warning">
+                    ⚠️ Orders without payment confirmation are cancelled after 15 minutes
+                </div>
+            </div>`;
+
+            container.innerHTML = `
+                <div style="background:linear-gradient(135deg,#cc0000,#990000);color:white;padding:4px 8px;border-radius:8px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">
+                    <div><i class="fas fa-map-marker-alt"></i> <strong>Kasama District</strong><span style="font-size:7px;opacity:0.8;display:block;">Northern Province, Zambia</span></div>
+                    <div class="real-time-indicator" style="color:white;"><span class="dot"></span> Live</div>
+                </div>
+                ${isDeliveryLoggedIn ? `<div style="background:#e8f5e9;padding:2px 6px;border-radius:8px;margin-bottom:4px;display:flex;align-items:center;justify-content:space-between;font-size:9px;border:1px solid #a5d6a7;"><span><i class="fas fa-motorcycle" style="color:#cc0000;"></i> <strong>${deliveryGirlName}</strong> is online</span><span style="color:#2e7d32;font-size:7px;"><i class="fas fa-circle" style="color:#4caf50;"></i> Available</span></div>` : ''}
+                ${isAdmin ? adminHTML : ''}
+                ${isDeliveryLoggedIn ? deliveryHTML : ''}
+                ${!isAdmin && !isDeliveryLoggedIn ? `
+                    <div class="card"><div class="section-title"><i class="fas fa-th-large"></i> Today's Menu <span class="kasama-badge" style="margin-left:auto;font-size:7px;background:#ffcc00;color:#990000;padding:1px 4px;border-radius:8px;">${MENU.length} items</span></div><div class="menu-grid">${menuHTML}</div></div>
+                    <div class="order-summary">
+                        <div class="section-title"><i class="fas fa-shopping-bag"></i> Your Order ${cartCount > 0 ? `<span class="cart-count">${cartCount}</span>` : ''}</div>
+                        ${cartHTML}
+                        <div class="order-row order-total"><span>Total</span><span>ZMW ${totalPrice.toFixed(2)}</span></div>
+                        <div class="customer-details">
+                            <div style="font-size:9px;font-weight:600;color:#cc0000;margin-bottom:2px;"><i class="fas fa-user"></i> Delivery Details</div>
+                            <div class="form-group"><label>Full Name <span class="required">*</span></label><input type="text" id="customerNameInput" placeholder="Enter your full name" value="${customerName}" /></div>
+                            <div class="form-group"><label>Phone Number <span class="required">*</span></label><input type="tel" id="customerPhoneInput" placeholder="Enter phone number" value="${customerPhone}" /></div>
+                            <div class="form-group"><label>Delivery Address <span class="required">*</span></label><input type="text" id="customerAddressInput" placeholder="Enter your delivery address" value="${customerLocation}" /></div>
+                        </div>
+                        ${paymentHTML}
+                        <button class="action-btn" onclick="placeOrderWithPayment()" ${cart.length === 0 ? 'disabled' : ''}><i class="fas fa-motorcycle"></i> Place Order · Prepay Required</button>
+                        <div id="orderStatus"></div>
+                    </div>
+                    <div class="card">
+                        <div class="section-title"><i class="fas fa-map-marked-alt"></i> Location</div>
+                        <div class="map-container"><div id="map"></div></div>
+                        <div style="font-size:9px;margin-top:2px;"><i class="fas fa-location-dot" style="color:#cc0000;"></i> <strong>Customer:</strong> ${customerLocation || 'Kasama, Northern Province, Zambia'}</div>
+                        <button class="whatsapp-btn" onclick="shareLocation()"><i class="fab fa-whatsapp"></i> Share Location</button>
+                    </div>
+                ` : ''}
+            `;
+
+            document.getElementById('customerNameInput')?.addEventListener('input', function() { customerName = this
+                    .value; });
+            document.getElementById('customerPhoneInput')?.addEventListener('input', function() { customerPhone = this
+                    .value; });
+            document.getElementById('customerAddressInput')?.addEventListener('input', function() {
+                customerLocation = this.value || 'Kasama, Northern Province, Zambia';
+                initMap(customerLocation);
+            });
+            setTimeout(() => initMap(customerLocation || 'Kasama, Northern Province, Zambia'), 300);
+        }
+
+        // ============================================
         // START THE APP
         // ============================================
         async function startApp() {
-            await initSupabase();
-            renderApp();
-            console.log('✅ Chikorlando Restaurant App Loaded!');
-            console.log(`📋 ${MENU.length} menu items loaded`);
+            console.log('🍽️ Chikorlando Restaurant App');
             console.log('📍 Serving Kasama District, Zambia');
-            console.log('💳 Payment numbers displayed - copy and send');
+            console.log('📱 v2.0 - Professional Edition');
+            
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            if (loadingSpinner) {
+                loadingSpinner.innerHTML = `
+                    <i class="fas fa-spinner"></i>
+                    <p style="font-size:12px;color:#666;">Connecting to server...</p>
+                `;
+            }
+            
+            await initSupabase();
+            
+            if (loadingSpinner) {
+                loadingSpinner.style.display = 'none';
+            }
+            
+            renderApp();
+            console.log('✅ App ready!');
         }
 
+        // Start the app
         startApp();
     </script>
 </body>
